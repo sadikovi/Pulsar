@@ -1,0 +1,66 @@
+.pl-background {
+    background: #252525;
+}
+
+.pl-navbar {
+    padding: 15px 0;
+    background: #000;
+    text-shadow: none;
+}
+
+.pl-navbar-nav>li>a {
+    color: #666;
+    text-shadow: none;
+    background: none;
+}
+
+.pl-navbar-nav>li>a:hover, .pl-navbar-nav>li>a:active, .pl-navbar-nav>li>a:focus {
+    color: #fff;
+    text-shadow: none;
+    background: none;
+}
+
+.pl-footer {
+    padding: 90px 0;
+}
+
+.pl-section {
+    padding: 120px 0;
+}
+
+.pl-section-colored-1 {
+    background: #3e3e5e;
+}
+
+.pl-section-colored-2 {
+    background: #4d5271;
+}
+
+.pl-section-colored-3 {
+    background: #4d5b71;
+}
+
+.pl-font-white {
+    color: #f9f9f9!important;
+}
+
+.pl-image-feature {
+    width: 200px;
+    height: 140px;
+    margin: 10px 0;
+}
+
+.pl-navbar-brand {
+}
+
+.pl-link,
+.pl-subnav>li>a {
+    color: #f9f9f9;
+    text-decoration: none;
+}
+
+.pl-link:hover, .pl-link:active, .pl-link:focus,
+.pl-subnav>li>a:hover, .pl-subnav>li>a:active, .pl-subnav>li>a:focus {
+    color: #f9f9f9;
+    text-decoration: none;
+}
