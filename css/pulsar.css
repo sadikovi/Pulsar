@@ -36,7 +36,7 @@
 }
 
 .pl-section-colored-3 {
-    background: #4d5b71;
+    background: #576780;
 }
 
 .pl-font-white {
@@ -73,14 +73,12 @@
     background: none;
 }
 
-.pl-link,
-.pl-subnav>li>a {
+a.pl-link {
     color: #8ccde8;
     text-decoration: none;
 }
 
-.pl-link:hover, .pl-link:active, .pl-link:focus,
-.pl-subnav>li>a:hover, .pl-subnav>li>a:active, .pl-subnav>li>a:focus {
+a.pl-link:hover, .pl-link:active, .pl-link:focus {
     color: #8ccde8;
     text-decoration: underline;
 }
