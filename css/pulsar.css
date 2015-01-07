@@ -3,7 +3,6 @@
 }
 
 .pl-navbar {
-    padding: 15px 0;
     background: #000;
     text-shadow: none;
 }
@@ -29,7 +28,7 @@
 }
 
 .pl-section-colored-1 {
-    background: #3e3e5e;
+    background: #3e3e5e url("../images/bgnd-stars.jpg") 50% 70% no-repeat;
 }
 
 .pl-section-colored-2 {
@@ -44,23 +43,44 @@
     color: #f9f9f9!important;
 }
 
+.pl-font-light {
+    font-weight: 100;
+    letter-spacing: 1px;
+}
+
+.pl-font-thin {
+    font-weight: 200;
+    letter-spacing: 1px;
+}
+
 .pl-image-feature {
-    width: 200px;
-    height: 140px;
-    margin: 10px 0;
+    width: 100px;
+    height: 100px;
+    margin: 50px 0;
 }
 
 .pl-navbar-brand {
+    text-shadow: none;
+    text-decoration: none;
+    color: #4d7198;
+    background:none;
+}
+
+.pl-navbar-brand:hover, .pl-navbar-brand:active, .pl-navbar-brand:focus {
+    color: #3b83c0;
+    text-shadow: none;
+    text-decoration: none;
+    background: none;
 }
 
 .pl-link,
 .pl-subnav>li>a {
-    color: #f9f9f9;
+    color: #8ccde8;
     text-decoration: none;
 }
 
 .pl-link:hover, .pl-link:active, .pl-link:focus,
 .pl-subnav>li>a:hover, .pl-subnav>li>a:active, .pl-subnav>li>a:focus {
-    color: #f9f9f9;
-    text-decoration: none;
+    color: #8ccde8;
+    text-decoration: underline;
 }
