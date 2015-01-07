@@ -28,7 +28,7 @@
 }
 
 .pl-section-colored-1 {
-    background: #2a2a3f url("../images/bgnd-stars.jpg") 50% 70% no-repeat;
+    background: #2a2a3f url("../images/bgnd-stars.jpg") 50% 70% repeat-x;
 }
 
 .pl-section-colored-2 {
