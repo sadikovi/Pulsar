@@ -325,26 +325,35 @@ function buildGraph(graph_target, graph_sources, price) {
         }
         parentStat.appendChild(Statistics.htmlCore());
         var ht = document.getElementById("ga-toggle-statistics-element");
-        toggleStats = function(ht, toggle) {
-            ht.innerHTML = "";
-            var on = toggle && (!Util.hasClass(parentStat, "hidden") || Util.hasClass(parentStat, "show"));
-            var a = null;
-            if (on) {
-                Util.addClass(parentStat, "hidden");
-                Util.removeClass(parentStat, "show");
-                a = Util.createElement("span", null, "", "Show statistics", ht);
-            } else {
-                Util.addClass(parentStat, "show");
-                Util.removeClass(parentStat, "hidden");
-                a = Util.createElement("span", null, "", "Hide statistics", ht);
 
+        var togglePanel = function(target, toggler, text, init) {
+            toggler.isPanelOn = (init!==null)?!init:toggler.isPanelOn;
+
+            if (!toggler.hasAction) {
+                Util.addEventListener(toggler, "click", function(e) {
+                    togglePanel.call(this, target, toggler, text, null);
+                });
+                toggler.hasAction = true;
             }
-            Util.addEventListener(a, "click", function(e) {
-                toggleStats.call(this, ht, true);
-            });
+            if (toggler.isPanelOn) {
+                Util.addClass(target, "hidden"); Util.removeClass(target, "show");
+                toggler.isPanelOn = false; toggler.innerHTML = "Show "+text;
+            } else {
+                Util.addClass(target, "show"); Util.removeClass(target, "hidden");
+                toggler.isPanelOn = true; toggler.innerHTML = "Hide "+text;
+            }
         }
-        toggleStats(ht, false);
+        
+
+        togglePanel(parentStat, ht, "statistics", true);
         /**************************/
+
+        /****** toggle legend ******/
+        var legend = document.getElementById("ga-legend-element");
+        var legendToggle = document.getElementById("ga-toggle-legend-element");
+        togglePanel(legend, legendToggle, "legend", false);
+        /****** toggle legend ******/
+
 
         // prepare dimensions
         var width = 1100, height = 450;

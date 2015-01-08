@@ -43,7 +43,7 @@ button {
 }
 
 .ga-statistics-controls {
-    font-size:80%;
+    font-size:11px;
     text-align: right;
     padding: 0 3px;
 }
@@ -109,4 +109,41 @@ button {
     margin-right: 5px;
     vertical-align: bottom;
     cursor: pointer;
+}
+
+.legend {
+    color: #777;
+}
+
+.legend .caption {
+    padding: 5px;
+}
+
+.legend .heading {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 2px;
+    margin: 5px 0;
+}
+
+.legend .block {
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    vertical-align: top;
+}
+
+.legend .item {
+
+}
+
+.legend .meaning {
+    max-width: 150px;
+}
+
+.legend .legend-controls {
+    font-size:11px;
+    text-align: right;
+    padding: 0 3px;
 }
