@@ -1,3 +1,7 @@
+body {
+    font-family: "Roboto Neue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .pl-background {
     background: #252525;
 }
@@ -45,12 +49,14 @@
 
 .pl-font-light {
     font-weight: 100;
-    letter-spacing: 1px;
+    /*letter-spacing: 1px;*/
+    font-family: "Roboto Neue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .pl-font-thin {
     font-weight: 200;
-    letter-spacing: 1px;
+    /*letter-spacing: 1px;*/
+    font-family: "Roboto Neue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .pl-image-feature {
