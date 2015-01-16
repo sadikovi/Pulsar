@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pulsar Framework Tests</title>
+
+    <link href="demo/css/external/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .top-large {
+            margin-top: 15px!important;
+        }
+
+        .top-small {
+            margin-top: 5px!important;
+        }
+
+        .test-font {
+            font-size: 12px;
+        }
+        .test-table {
+            width: 100%;
+        }
+        .test-item {
+            padding: 2px 0;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container top-large">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Tests</h3>
+            </div>
+            <div class="panel-body">
+                <table class="test-table test-font" id="pulsar-tests"></table>
+            </div>
+            <div class="panel-footer">
+                <button class="btn btn-success" id="pulsar-tests-run">Run</button>
+            </div>
+    </div>
+    <script src="demo/js/groups.js"></script>
+    <script src="tests/js/tests.js"></script>
+    <script src="tests/js/tests-engine.js"></script>
+</body>
+</html>
