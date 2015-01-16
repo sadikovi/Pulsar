@@ -2,7 +2,8 @@
 var data = {
     sources: [
         {
-            id: 1001, name: "Avondale, 3 bedrooms",
+            id: 1001,
+            name: "Avondale, 3 bedrooms",
             desc: "Sunny recently painted 3 bedroom bungalow with large deck and great views.",
             type: "source",
             value: 530,
@@ -787,7 +788,7 @@ var data = {
                     ]
                 },
                 {id: 2, name: "Canterbury", desc: "...", parent: 0, level: 1, leaf: false, isUni: true, isCollapsed: true, children: [
-                        {id: 21, name: "Chrishchurch City", desc: "...", parent: 2, level: 2, leaf: false, isUni: true, isCollapsed: true, children: [
+                        {id: 21, name: "Christchurch City", desc: "...", parent: 2, level: 2, leaf: false, isUni: true, isCollapsed: true, children: [
                                 {id: 211, name: "Addington", desc: "...", parent: 21, level: 3, leaf: true, isUni: true, isCollapsed: true, children: []},
                                 {id: 212, name: "City Centre", desc: "...", parent: 21, level: 3, leaf: true, isUni: true, isCollapsed: true, children: []},
                                 {id: 213, name: "Ilam", desc: "...", parent: 21, level: 3, leaf: true, isUni: true, isCollapsed: true, children: []}
