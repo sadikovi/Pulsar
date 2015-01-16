@@ -1,9 +1,36 @@
 function buildGraph(graph_target, graph_sources, price) {
+    var P_GREEN = "alert-green", P_YELLOW = "alert-yellow", P_RED = "alert-red";
+
+    // style for group and subgroup
+    getGroupStyle = function(group) {
+        if (Groups.getMainGroup(group) == "A") {
+            return P_GREEN;
+        } else if (Groups.getMainGroup(group) == "B") {
+            return P_YELLOW;
+        } else if (Groups.getMainGroup(group) == "C") {
+            return P_RED;
+        } else {
+            return false;
+        }
+    }
+
+    getSubgroupThreshold = function(subgroup) {
+        if (Groups.getSubgroupIndex(subgroup) == "1") {
+            return (Groups.getMainGroup(subgroup) == "C")?1:5;
+        } else if (Groups.getSubgroupIndex(subgroup) == "2") {
+            return 3;
+        } else if (Groups.getSubgroupIndex(subgroup) == "3") {
+            return (Groups.getMainGroup(subgroup) == "C")?5:1;
+        } else {
+            return 1;
+        }
+    }
+
     messageForTargetNode = function(d) {
         var msg = "<strong>"+d.name+"</strong>";
-        msg += "<div><span><div class=\"tag alert-green\"></div> "+d.priorityGroups.green
-        +"</span>&nbsp;&nbsp;<span><div class=\"tag alert-yellow\"></div> "+d.priorityGroups.yellow
-        +"</span>&nbsp;&nbsp;<span><div class=\"tag alert-red\"></div> "+d.priorityGroups.red+"</span></div>";
+        msg += "<div><span><div class=\"tag alert-green\"></div> "+d.priorityGroups.A
+        +"</span>&nbsp;&nbsp;<span><div class=\"tag alert-yellow\"></div> "+d.priorityGroups.B
+        +"</span>&nbsp;&nbsp;<span><div class=\"tag alert-red\"></div> "+d.priorityGroups.C+"</span></div>";
         return msg;
     }
 
@@ -85,7 +112,7 @@ function buildGraph(graph_target, graph_sources, price) {
             });
         }
 
-        var ta = b("alert-green", l), tb = b("alert-yellow", l), tc = b("alert-red", l);
+        var ta = b(P_GREEN, l), tb = b(P_YELLOW, l), tc = b(P_RED, l);
         console.log("Update will take effect with next search");
     }
 
@@ -93,9 +120,9 @@ function buildGraph(graph_target, graph_sources, price) {
     addLinkAttributes = function(link) {
         link
         .attr("class", function(d) {
-            return "link " + d.edge_group;
+            return "link " + getGroupStyle(d.group);
         }).style("stroke-width", function(d) {
-            return (d.edge_threshold)?d.edge_threshold:1;
+            return getSubgroupThreshold(d.group);
         }).style("stroke-dasharray", function(d) {
             if (d.source.type == "source" || d.target.type == "") {
                 return "none";
@@ -176,7 +203,7 @@ function buildGraph(graph_target, graph_sources, price) {
             }
             return d.node_radius;
         }).attr("class", function(d) {
-            return (d.type=="source")?d.priority:"target";
+            return (d.type=="source")?getGroupStyle(d.priority):"target";
         });
 
         // append bigger circle to hover the source
@@ -187,18 +214,36 @@ function buildGraph(graph_target, graph_sources, price) {
             }
             return (d.node_radius)?d.node_radius*3:0;
         }).attr("class", function(d) {
-            var className = (d.type=="source")?d.priority:"target";
+            var className = (d.type=="source")?getGroupStyle(d.priority):"target";
             return ((d.type=="source")?"source-callout": "target-callout")+" "+className;
         });
         // add priority paths for node
         addPriorityPaths(node);
     }
 
+    // build priority bars using x, y and radius of the parent circle
+    getPriorityPath = function(x, y, r, value, sum, index) {
+        var angle=value*1.0/sum, strokeWidth=4, delta=5, rad=r+index*delta;
+        // build path applying angle of 360 degrees
+        var path = GraphBuilder.constructPath(x, y, rad, angle*Math.PI*2);
+        path.strokeWidth = strokeWidth;
+        if (index <= 1) {
+            path.class = P_GREEN;
+        } else if (index == 2) {
+            path.class = P_YELLOW;
+        } else if (index == 3) {
+            path.class = P_RED;
+        } else {
+            path.stroke = "transparent";
+        }
+        return path;
+    }
+
     // get path for index priority and node
     getPathForIndexPriority = function(i, d) {
-        var priority = (i==1)?d.priorityGroups.green:((i==2)?d.priorityGroups.yellow:d.priorityGroups.red);
-        var sum = (d.priorityGroups.green + d.priorityGroups.yellow + d.priorityGroups.red);
-        return GraphBuilder.getPriorityPath(0, 0, d.node_radius, priority, sum, i);
+        var priority = (i==1)?d.priorityGroups.A:((i==2)?d.priorityGroups.B:d.priorityGroups.C);
+        var sum = (d.priorityGroups.A + d.priorityGroups.B + d.priorityGroups.C);
+        return getPriorityPath(0, 0, d.node_radius, priority, sum, i);
     }
 
     // adds priority paths to the target nodes
@@ -313,9 +358,9 @@ function buildGraph(graph_target, graph_sources, price) {
                     cnt++;
                     t_avg_sum += result.nodes[i].properties.price;
                 } else {
-                    Statistics.addStatistics("group3", "Acceptable", result.nodes[i].priorityGroups.green);
-                    Statistics.addStatistics("group3", "Considerable", result.nodes[i].priorityGroups.yellow);
-                    Statistics.addStatistics("group3", "Expensive", result.nodes[i].priorityGroups.red);
+                    Statistics.addStatistics("group3", "Acceptable", result.nodes[i].priorityGroups.A);
+                    Statistics.addStatistics("group3", "Considerable", result.nodes[i].priorityGroups.B);
+                    Statistics.addStatistics("group3", "Expensive", result.nodes[i].priorityGroups.C);
                 }
             }
             Statistics.addStatistics("group1", "Offers overall", cnt);
@@ -343,7 +388,7 @@ function buildGraph(graph_target, graph_sources, price) {
                 toggler.isPanelOn = true; toggler.innerHTML = "Hide "+text;
             }
         }
-        
+
 
         togglePanel(parentStat, ht, "statistics", true);
         /**************************/

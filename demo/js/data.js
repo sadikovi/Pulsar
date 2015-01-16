@@ -190,7 +190,7 @@ var data = {
                 bedrooms: 2,
                 bathrooms: 1,
                 link: "http://www.trademe.co.nz/property/residential-property-to-rent/auction-817832355.htm",
-                thumbnail: "http://trademe.tmcdn.co.nz/photoserver/tq/349741422.jpg"
+                thumbnail: "http://trademe.tmcdn.co.nz/photoserver/med/357950025.jpg"
             }
         },
         {

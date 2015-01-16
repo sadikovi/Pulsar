@@ -1,7 +1,6 @@
 var GraphBuilder = GraphBuilder || (function() {
     var prefix = "GraphBuilder: ", rValue = 0, selected = null;
     var stack = [];  // stack of the graph targets
-    var P_GREEN = "alert-green", P_YELLOW = "alert-yellow", P_RED = "alert-red", P_UNDEFINED = "alert-undefined";
 
     return {
         // set rValue
@@ -44,9 +43,7 @@ var GraphBuilder = GraphBuilder || (function() {
 
                     /***************************/
                     /* test: add edge threshold and priority */
-                    var edge_data = GraphBuilder.calculateNodePriority(sources[i].value, rValue);
-                    edge.edge_threshold = edge_data.threshold;
-                    edge.edge_group = edge_data.priority;
+                    edge.group = Groups.groupPriority(sources[i].value, rValue);
                     /***************************/
 
                     edges.push(edge);
@@ -105,9 +102,7 @@ var GraphBuilder = GraphBuilder || (function() {
 
                             /***************************/
                             /* test: add edge threshold and priority */
-                            var edge_data = GraphBuilder.calculateNodePriority(node.value, rValue);
-                            edge.edge_threshold = edge_data.threshold;
-                            edge.edge_group = edge_data.priority;
+                            edge.group = Groups.groupPriority(node.value, rValue);
                             /***************************/
 
                             edges.push(edge);
@@ -171,9 +166,7 @@ var GraphBuilder = GraphBuilder || (function() {
 
                     /***************************/
                     /* test: add edge threshold and priority */
-                    var edge_data = GraphBuilder.calculateNodePriority(connectedBefore[k].value, rValue);
-                    edge.edge_threshold = edge_data.threshold;
-                    edge.edge_group = edge_data.priority;
+                    edge.group = Groups.groupPriority(connectedBefore[k].value, rValue);
                     /***************************/
 
                     edges.push(edge);
@@ -235,73 +228,35 @@ var GraphBuilder = GraphBuilder || (function() {
             }
         },
 
-        // function to calculate edge threshold and group
-        calculateNodePriority: function(value, rValue) {
-            var a = (rValue - value);
-            var ACC_RATE = 0.25; // acceptance percentage
-
-            var groupPriority = function(value, rValue) {
-                var max = Math.max(value, rValue);
-                var diff = Math.abs(value - rValue)*1.0/max;
-
-                var MIN_RATE = 0.2;
-                var MAX_RATE = 0.5;
-
-                if (diff <= MIN_RATE) {
-                    return 1;
-                } else if (diff < MAX_RATE) {
-                    return 3;
-                } else {
-                    return 5;
-                }
-            };
-
-            var res = {};
-            if (a >= 0) {
-                res.priority = P_GREEN;
-            } else if (a < 0 && rValue*(1+ACC_RATE) >= value) {
-                res.priority = P_YELLOW;
-            } else if (a < 0) {
-                res.priority = P_RED;
-            } else {
-                res.priority = P_UNDEFINED;
-            }
-            // assign group priority
-            res.threshold = groupPriority(value, rValue);
-
-            return res;
-        },
-
         // global precalculation of priorities
         precalculatePriorities: function(sources, target) {
             if (!sources || !target || rValue === null) {
                 throw (prefix + "precalculateMaxValue - parameters are undefined");
             }
 
-            var pp = {"green": 0, "yellow": 0, "red": 0, "undefined": 0};
+            var pp = {"A": 0, "B": 0, "C": 0, "undefined": 0};
+            var incrementPriorityCount = function(obj, priority) {
+                if (Groups.getMainGroup(priority) == "A") {
+                    obj.A++;
+                } else if (Groups.getMainGroup(priority) == "B") {
+                    obj.B++;
+                } else if (Groups.getMainGroup(priority) == "C") {
+                    obj.C++;
+                } else {
+                    obj.undefined++;
+                }
+            }
             if (target.leaf || target.children.length == 0) {
                 for (var j=0; j<sources.length; j++) {
                     if (sources[j].target == target.id) {
-                        var res = GraphBuilder.calculateNodePriority(sources[j].value, rValue);
-                        sources[j].priority = res.priority;
-                        if (res.priority == P_GREEN) {
-                            pp.green++;
-                        } else if (res.priority == P_YELLOW) {
-                            pp.yellow++;
-                        } else if (res.priority == P_RED) {
-                            pp.red++;
-                        } else {
-                            pp.undefined++;
-                        }
+                        sources[j].priority = Groups.groupPriority(sources[j].value, rValue);;
+                        incrementPriorityCount(pp, sources[j].priority);
                     }
                 }
             } else if (!target.leaf && target.children) {
                 for (var i=0; i<target.children.length; i++) {
                     var p = GraphBuilder.precalculatePriorities(sources, target.children[i], rValue);
-                    pp.green += p.green;
-                    pp.yellow += p.yellow;
-                    pp.red += p.red;
-                    pp.undefined += p.undefined;
+                    pp.A += p.A; pp.B += p.B; pp.C += p.C; pp.undefined += p.undefined;
                 }
             }
 
@@ -332,30 +287,6 @@ var GraphBuilder = GraphBuilder || (function() {
             // end point of the arc
             path.x = path.ax + r*(1 - Math.cos(angle));
             path.y = path.ay - r*Math.sin(angle);
-
-            return path;
-        },
-
-        // build priority bars using x, y and radius of the parent circle
-        getPriorityPath: function(x, y, r, value, sum, index) {
-            var angle = value*1.0 / sum;
-            var strokeWidth = 4;
-            var delta = 5;
-            var rad = r + index*delta;
-            // build path applying angle of 360 degrees
-            var path = GraphBuilder.constructPath(x, y, rad, angle*Math.PI*2);
-
-            if (index <= 1) {
-                path.class = P_GREEN;
-            } else if (index == 2) {
-                path.class = P_YELLOW;
-            } else if (index == 3) {
-                path.class = P_RED;
-            } else {
-                path.stroke = "transparent";
-            }
-
-            path.strokeWidth = strokeWidth;
 
             return path;
         },

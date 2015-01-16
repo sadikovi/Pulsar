@@ -1,4 +1,5 @@
 var Actions = (function() {
+    // example of "actions" object
     var actions = [
         {
             "id":"drilldown",
