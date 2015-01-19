@@ -129,6 +129,9 @@ var TestEngine = (function() {
 })();
 
 
+// build tests
+var results = TestEngine.buildTests();
+TestEngine.fillTable(results);
 
 // add action to the button
 TestEngine.addAction(function(e) {

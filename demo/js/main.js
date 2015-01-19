@@ -120,9 +120,9 @@ function buildGraph(graph_target, graph_sources, price) {
     addLinkAttributes = function(link) {
         link
         .attr("class", function(d) {
-            return "link " + getGroupStyle(d.group);
+            return "link " + getGroupStyle(d.priority);
         }).style("stroke-width", function(d) {
-            return getSubgroupThreshold(d.group);
+            return getSubgroupThreshold(d.priority);
         }).style("stroke-dasharray", function(d) {
             if (d.source.type == "source" || d.target.type == "") {
                 return "none";

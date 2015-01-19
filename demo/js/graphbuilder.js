@@ -43,7 +43,7 @@ var GraphBuilder = GraphBuilder || (function() {
 
                     /***************************/
                     /* test: add edge threshold and priority */
-                    edge.group = Groups.groupPriority(sources[i].value, rValue);
+                    edge.priority = Groups.groupPriority(sources[i].value, rValue);
                     /***************************/
 
                     edges.push(edge);
@@ -102,7 +102,7 @@ var GraphBuilder = GraphBuilder || (function() {
 
                             /***************************/
                             /* test: add edge threshold and priority */
-                            edge.group = Groups.groupPriority(node.value, rValue);
+                            edge.priority = Groups.groupPriority(node.value, rValue);
                             /***************************/
 
                             edges.push(edge);
@@ -166,7 +166,7 @@ var GraphBuilder = GraphBuilder || (function() {
 
                     /***************************/
                     /* test: add edge threshold and priority */
-                    edge.group = Groups.groupPriority(connectedBefore[k].value, rValue);
+                    edge.priority = Groups.groupPriority(connectedBefore[k].value, rValue);
                     /***************************/
 
                     edges.push(edge);
