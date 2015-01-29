@@ -4,22 +4,20 @@ body {
 
 .pl-background {
     /*background: #252525;*/
-    background: #000;
+    background: #020106;
 }
 
 .pl-page {
-    max-width: 1100px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
 .pl-footer {
     padding: 90px 0;
-    background: #020106;
 }
 
 .pl-section-separator {
     height: 5px;
-    background: #020106;
 }
 
 .pl-section {
@@ -28,11 +26,11 @@ body {
 }
 
 .pl-section-large {
-    padding: 200px 0;
+    padding: 180px 0;
 }
 
 .pl-section-colored-1 {
-    background: #2a2a3f url("../images/bgnd-stars-alt.jpg") 50% 100%;
+    background: #2a2a3f url("../images/pl-section-1.jpg") 50% 100%;
 }
 
 .pl-section-colored-2 {
@@ -48,11 +46,11 @@ body {
 }
 
 .pl-section-colored-5  {
-    background: #403838;
+    background: #503d44;
 }
 
 .pl-section-colored-6 {
-    background: #020106 url("../images/bgnd-stars-alt2.jpg") 50% 100%;
+    background: #020106 url("../images/pl-section-6.jpg") 50% 100%;
 }
 
 .pl-panel {
@@ -84,6 +82,11 @@ body {
     border-radius: 20px;
     padding: 20px;
     background: rgba(255, 255, 255, .2);
+}
+
+.pl-image-screen {
+    width: 700px;
+    padding: 20px;
 }
 
 a.pl-link {
