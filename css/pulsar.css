@@ -3,44 +3,60 @@ body {
 }
 
 .pl-background {
-    background: #252525;
-}
-
-.pl-navbar {
+    /*background: #252525;*/
     background: #000;
-    text-shadow: none;
 }
 
-.pl-navbar-nav>li>a {
-    color: #666;
-    text-shadow: none;
-    background: none;
-}
-
-.pl-navbar-nav>li>a:hover, .pl-navbar-nav>li>a:active, .pl-navbar-nav>li>a:focus {
-    color: #fff;
-    text-shadow: none;
-    background: none;
+.pl-page {
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .pl-footer {
     padding: 90px 0;
+    background: #020106;
+}
+
+.pl-section-separator {
+    height: 5px;
+    background: #020106;
 }
 
 .pl-section {
+    min-height: 120px;
     padding: 120px 0;
 }
 
+.pl-section-large {
+    padding: 200px 0;
+}
+
 .pl-section-colored-1 {
-    background: #2a2a3f url("../images/bgnd-stars-alt1.jpg") 50% 80% repeat-x;
+    background: #2a2a3f url("../images/bgnd-stars-alt.jpg") 50% 100%;
 }
 
 .pl-section-colored-2 {
-    background: #4d5271;
+    background: #3d4450;
 }
 
 .pl-section-colored-3 {
     background: #576780;
+}
+
+.pl-section-colored-4  {
+    background: #252525;
+}
+
+.pl-section-colored-5  {
+    background: #403838;
+}
+
+.pl-section-colored-6 {
+    background: #020106 url("../images/bgnd-stars-alt2.jpg") 50% 100%;
+}
+
+.pl-panel {
+    padding: 0 40px;
 }
 
 .pl-font-white {
@@ -60,23 +76,14 @@ body {
 }
 
 .pl-image-feature {
-    width: 90px;
-    height: 90px;
+    width: 120px;
+    height: 120px;
     margin: 50px 0;
-}
-
-.pl-navbar-brand {
-    text-shadow: none;
-    text-decoration: none;
-    color: #4d7198;
-    background:none;
-}
-
-.pl-navbar-brand:hover, .pl-navbar-brand:active, .pl-navbar-brand:focus {
-    color: #3b83c0;
-    text-shadow: none;
-    text-decoration: none;
-    background: none;
+    opacity: .6;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, .2);
 }
 
 a.pl-link {
@@ -87,4 +94,12 @@ a.pl-link {
 a.pl-link:hover, .pl-link:active, .pl-link:focus {
     color: #8ccde8;
     text-decoration: underline;
+}
+
+h1.pl-emphasize, h2.pl-emphasize {
+    color: #8ccde8!important;
+}
+
+.pl-conseal {
+    opacity: .7!important;
 }
