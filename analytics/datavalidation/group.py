@@ -48,4 +48,4 @@ class Group(object):
 
     '#Public - Returns json representation of the instance'
     def getJSON(self):
-        return "{ \"id\": \"%s\", \"externalId\": \"%s\", \"name\": \"%s\", \"desc\": \"%s\", \"parent\": \"%s\", \"children\": [%s] }" % (self._id, self._externalId, self._name, self._desc, self._parent, ','.join([child.getJSON() for child in self._children]))
+        return """{ "id": "%s", "externalId": "%s", "name": "%s", "desc": "%s", "parent": "%s", "children": [%s] }""" % (self._id, self._externalId, self._name, self._desc, self._parent, ','.join([child.getJSON() for child in self._children]))

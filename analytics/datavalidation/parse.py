@@ -41,28 +41,24 @@ class Parse(object):
 
     '#Public - Returns external id if found, otherwise empty string'
     def getExternalId(self):
-        id = self._getValueForKeyArray(Parse.KEY_ID)
-        return id if id is not None else ""
+        return self._getValueForKeyArray(Parse.KEY_ID)
 
     '#Public - Returns id based on external id given'
     def guidBasedId(self, id=''):
-        id = id if type(id) == StringType and len(id) > 0 else uuid.uuid4().hex
-        return str(uuid.uuid4()) + '-' + uuid.uuid3(uuid.NAMESPACE_DNS, id).hex
+        id = uuid.uuid3(uuid.NAMESPACE_DNS, id).hex if type(id) == StringType and len(id) > 0 else uuid.uuid4().hex
+        return str(uuid.uuid4()) + '-' + id
 
     '#Public - Returns name from the object'
     def getName(self):
-        name = self._getValueForKeyArray(Parse.KEY_NAME)
-        return name if name is not None else ""
+        return self._getValueForKeyArray(Parse.KEY_NAME)
 
     '#Public - Returns description from the object'
     def getDesc(self):
-        desc = self._getValueForKeyArray(Parse.KEY_DESC)
-        return desc if desc is not None else ""
+        return self._getValueForKeyArray(Parse.KEY_DESC)
 
     '#Public - Returns group from the object'
     def getGroup(self):
-        group = self._getValueForKeyArray(Parse.KEY_GROUP)
-        return group if group is not None else ""
+        return self._getValueForKeyArray(Parse.KEY_GROUP)
 
     '#Public - Returns parent from the object'
     def getParent(self):
@@ -75,10 +71,10 @@ class Parse(object):
     '#Public - Returns dict with secondary properties, '
     'excluding id, name, desc, group and other primary attributes'
     def getSecondaryProperties(self):
-        if len(self._primaryKeys) > 0:
-            secondaryKeys = list(set(self._object.keys()) - set(self._primaryKeys))
-            a = {}
-            for key in secondaryKeys: a[key] = self._object[key]
-            return a
-        else:
+        if len(self._primaryKeys) == 0:
             return self._object
+        secondaryKeys = list(set(self._object.keys()) - set(self._primaryKeys))
+        a = {}
+        for key in secondaryKeys:
+            a[key] = self._object[key]
+        return a

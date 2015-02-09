@@ -1,9 +1,10 @@
 from types import DictType, ListType
-import property as pr
-import group as g
-import groupsmap as gm
 import result as r
-
+import group as g
+import property as p
+import resultsmap as rm
+import groupsmap as gm
+import propertiesmap as pm
 
 class Validator(object):
     'Data validation and conversion of raw data into particular format for Analytics'
@@ -11,72 +12,63 @@ class Validator(object):
     'Create instance of validator with results, groups and properties arrays'
     '   to convert them later into json for comparison algorithms'
     def __init__(self):
-        self._results = []
-        self._groups = []
-        self._properties = []
-        self._isPropertiesSearch = True
-        self._groupsmap = gm.GroupsMap()
+        self._results = rm.ResultsMap()
+        self._groups = gm.GroupsMap()
+        self._properties = pm.PropertiesMap()
 
+    '#Private - Loads groups from an array'
     def _loadGroups(self, groups):
         if type(groups) is not ListType:
             raise TypeError("Expected <type 'list'>, received " + str(type(groups)))
-
         for obj in groups:
             group = g.Group(obj)
-            self._groupsmap.assign(group.getExternalId(), group.getId())
-            self._groups.append(group)
+            self._groups.assign(group)
         #TODO: create hierarchy and check for cycles in data
 
-    def _loadResults(self, results, properties, isPropertiesSearch):
+    '#Private - Loads results by providing raw data array'
+    def _loadResults(self, results):
         if type(results) is not ListType:
             raise TypeError("Expected <type 'list'>, received " + str(type(results)))
-        if isPropertiesSearch is False and type(properties) is not ListType:
-            raise TypeError("Expected <type 'list'>, received " + str(type(properties)))
-        elif isPropertiesSearch is True:
-            properties = {}
-
         for obj in results:
-            result = r.Result(obj, "", [])
-            result.updateGroup(self._groupsmap.getGuid(result.getGroup()))
-            self._results.append(result)
-            if isPropertiesSearch is False:
-                result.updateProperties(properties)
-            else:
-                props = result.getProperties()
-                for key in props:
-                    if key not in properties: properties[key] = props[key]
+            result = r.Result(obj)
+            result.updateGroup(self._groups.guid(result.getGroup()))
+            self._results.assign(result)
 
-        if isPropertiesSearch is True:
-            self._loadProperties(properties)
-            for result in self._results:
-                # update properties for each result
-                result.updateProperties(properties)
-
+    '#Private - Loads properties from properties dict'
     def _loadProperties(self, properties):
         if type(properties) is not DictType:
             raise TypeError("Expected <type 'dict'>, received " + str(type(properties)))
-
         for key in properties:
             try:
-                self._properties.append(pr.Property(key, properties[key]))
+                self._properties.assign(p.Property(key, properties[key]))
             except KeyError:
                 continue
 
-    def loadData(self, groups, results, properties):
-        self._isPropertiesSearch = True if properties is None else False
+    '#Public - Loads and validates groups, results, and properties'
+    def loadData(self, groups, results, properties={}):
+        #load groups, results, and properties
         self._loadGroups(groups)
-        if self._isPropertiesSearch is False:
-            self._loadProperties(properties)
-        self._loadResults(results, self._properties, self._isPropertiesSearch)
+        self._loadResults(results)
+        self._loadProperties(properties)
+        #check if we need to discover properties
+        if self._properties.isEmpty() is True:
+            #TODO: review this!
+            for id in self._results.keys():
+                sp = self._results.get(id).getProperties()
+                for key in sp:
+                    pr = p.Property(key, sp[key]);
+                    self._properties.assign(pr)
+        for id in self._results.keys():
+            self._results.get(id).updateProperties(self._properties)
 
-    '#Public - Returns results array'
+    '#Public - Returns results map'
     def getResults(self):
         return self._results
 
-    '#Public - Returns groups for results'
+    '#Public - Returns groups map'
     def getGroups(self):
         return self._groups
 
-    '#Public - Returns properties for results'
+    '#Public - Returns properties map'
     def getProperties(self):
         return self._properties

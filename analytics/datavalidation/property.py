@@ -16,6 +16,7 @@ class Property(object):
         self._id = str(uuid.uuid4())
         self._name = name
 
+        # check type of the sample to identify whether sample is a number or string
         if type(sample) is IntType or type(sample) is FloatType:
             self._type = Property.PROPERTY_NUMBER
         elif type(sample) is StringType:
