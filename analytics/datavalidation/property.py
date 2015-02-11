@@ -1,5 +1,6 @@
-import uuid
+import parse as p
 from types import StringType, IntType, FloatType
+import checkerror as c
 
 class Property(object):
     'Property class to hold name of the property and its type'
@@ -9,14 +10,14 @@ class Property(object):
 
     def __init__(self, name, sample):
         if name is None or sample is None:
-            raise ValueError("Expected a value, received None")
+            raise c.CheckError("value", "None")
         if type(name) is not StringType:
-            raise TypeError("Expected <type 'str'>, received " + str(type(name)))
+            raise c.CheckError("<type 'str'>", str(type(name)))
 
-        self._id = str(uuid.uuid4())
+        self._id = p.Parse.guidBasedId()
         self._name = name
 
-        # check type of the sample to identify whether sample is a number or string
+        # check type to identify whether sample is a number or string
         if type(sample) is IntType or type(sample) is FloatType:
             self._type = Property.PROPERTY_NUMBER
         elif type(sample) is StringType:

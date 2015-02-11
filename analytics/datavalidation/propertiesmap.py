@@ -1,4 +1,5 @@
 import property as p
+import checkerror as c
 
 class PropertiesMap(object):
     'Class to store properties'
@@ -18,7 +19,7 @@ class PropertiesMap(object):
     '#Public - Adds property to the map'
     def assign(self, property):
         if type(property) is not p.Property:
-            raise TypeError("Expected <type 'Property'>, received " + str(type(property)))
+            raise c.CheckError("<type 'Property'>", str(type(property)))
         if self.has(property.getName()) is False:
             self._map[property.getName()] = property
 

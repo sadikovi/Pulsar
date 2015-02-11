@@ -1,4 +1,5 @@
 import result as r
+import checkerror as c
 
 class ResultsMap(object):
     'Class to store results'
@@ -18,7 +19,7 @@ class ResultsMap(object):
     '#Public - Adds result to the map'
     def assign(self, result):
         if type(result) is not r.Result:
-            raise TypeError("Expected <type 'Result'>, received " + str(type(result)))
+            raise c.CheckError("<type 'Result'>", str(type(result)))
 
         if self.has(result.getId()) is False:
             self._map[result.getId()] = result

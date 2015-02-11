@@ -5,6 +5,7 @@ import property as p
 import resultsmap as rm
 import groupsmap as gm
 import propertiesmap as pm
+import checkerror as c
 
 class Validator(object):
     'Data validation and conversion of raw data into particular format for Analytics'
@@ -19,16 +20,16 @@ class Validator(object):
     '#Private - Loads groups from an array'
     def _loadGroups(self, groups):
         if type(groups) is not ListType:
-            raise TypeError("Expected <type 'list'>, received " + str(type(groups)))
+            raise c.CheckError("<type 'list'>", str(type(groups)))
         for obj in groups:
-            group = g.Group(obj)
+            group = g.Group.createFromObject(obj)
             self._groups.assign(group)
-        #TODO: create hierarchy and check for cycles in data
+        self._groups.updateParentIdsToGuids()
 
     '#Private - Loads results by providing raw data array'
     def _loadResults(self, results):
         if type(results) is not ListType:
-            raise TypeError("Expected <type 'list'>, received " + str(type(results)))
+            raise c.CheckError("<type 'list'>", str(type(results)))
         for obj in results:
             result = r.Result(obj)
             result.updateGroup(self._groups.guid(result.getGroup()))
@@ -37,7 +38,7 @@ class Validator(object):
     '#Private - Loads properties from properties dict'
     def _loadProperties(self, properties):
         if type(properties) is not DictType:
-            raise TypeError("Expected <type 'dict'>, received " + str(type(properties)))
+            raise c.CheckError("<type 'dict'>", str(type(properties)))
         for key in properties:
             try:
                 self._properties.assign(p.Property(key, properties[key]))
@@ -45,7 +46,7 @@ class Validator(object):
                 continue
 
     '#Public - Loads and validates groups, results, and properties'
-    def loadData(self, groups, results, properties={}):
+    def prepareData(self, groups, results, properties={}):
         #load groups, results, and properties
         self._loadGroups(groups)
         self._loadResults(results)
@@ -56,10 +57,17 @@ class Validator(object):
             for id in self._results.keys():
                 sp = self._results.get(id).getProperties()
                 for key in sp:
-                    pr = p.Property(key, sp[key]);
-                    self._properties.assign(pr)
+                    self._properties.assign(p.Property(key, sp[key]))
+        #update results with all group changes and new properies
         for id in self._results.keys():
-            self._results.get(id).updateProperties(self._properties)
+            temp = self._results.get(id)
+            #update properties
+            temp.updateProperties(self._properties)
+            #update unknown group in case group is None
+            if temp.getGroup() is None:
+                temp.updateGroup(self._groups.unknownGroup().getId())
+        #build hierarchy
+        self._groups.buildHierarchy()
 
     '#Public - Returns results map'
     def getResults(self):

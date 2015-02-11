@@ -7,6 +7,8 @@ import groupsmap as gm
 import resultsmap as rm
 import propertiesmap as pm
 import property as pr
+import hqueue as hq
+import checkerror as c
 #add libraries
 import unittest
 import json
@@ -25,7 +27,7 @@ class Parse_TestsSequence(DataValidation_TestsSequence):
         self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
 
     def test_parse_init(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             parse = p.Parse("str")
             parse.updateInstance(123)
 
@@ -43,9 +45,9 @@ class Parse_TestsSequence(DataValidation_TestsSequence):
 
     def test_parse_guidBasedId(self):
         parse = p.Parse(self._testResult)
-        uid = parse.guidBasedId()
+        uid = p.Parse.guidBasedId()
         self.assertTrue(len(uid) > 10)
-        uid1 = parse.guidBasedId('testid')
+        uid1 = p.Parse.guidBasedId('testid')
         self.assertTrue(len(uid1) > 10)
         self.assertTrue(uid != uid1)
 
@@ -101,40 +103,51 @@ class Group_TestsSequence(DataValidation_TestsSequence):
     def setUp(self):
         self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
 
+    def test_group_createFromObject(self):
+        with self.assertRaises(c.CheckError):
+            group = g.Group.createFromObject([])
+        with self.assertRaises(c.CheckError):
+            group = g.Group.createFromObject("123")
+        group = g.Group.createFromObject(self._testGroup)
+
     def test_group_init(self):
-        with self.assertRaises(TypeError):
-            group = g.Group([])
-        with self.assertRaises(TypeError):
-            group = g.Group("123")
-        group = g.Group(self._testGroup)
+        group1 = g.Group(p.Parse.guidBasedId(), self._testGroup['id'], self._testGroup['name'], self._testGroup['desc'], self._testGroup['parent'])
+        group2 = g.Group.createFromObject(self._testGroup)
+        self.assertEqual(group1.getId() != group2.getId(), True)
+        self.assertEqual(group1.getExternalId(), group2.getExternalId())
+        self.assertEqual(group1.getName(), group2.getName())
+        self.assertEqual(group1.getDesc(), group2.getDesc())
+        self.assertEqual(group1.getParent(), group2.getParent())
 
     def test_group_checkAttributes(self):
-        group = g.Group(self._testGroup)
+        group = g.Group.createFromObject(self._testGroup)
         self.assertEqual(group.getExternalId(), self._testGroup['id'])
         self.assertEqual(group.getName(), self._testGroup['name'])
         self.assertEqual(group.getDesc(), self._testGroup['desc'])
         self.assertEqual(group.getParent(), self._testGroup['parent'])
         self.assertTrue(len(group.getId()) > 10)
-        group = g.Group({})
+        group = g.Group.createFromObject({})
         self.assertTrue(len(group.getId()) > 10)
         self.assertEqual(group.getParent(), None)
 
     def test_group_children(self):
-        group = g.Group(self._testGroup)
+        group = g.Group.createFromObject(self._testGroup)
         self.assertEqual(group.getChildren(), [])
 
     def test_group_addChild(self):
-        group = g.Group(self._testGroup)
-        subgroup = g.Group(self._testGroup)
+        group = g.Group.createFromObject(self._testGroup)
+        subgroup = g.Group.createFromObject(self._testGroup)
         # raise an exception
-        self.assertRaises(ValueError, group.addChild, "123")
+        self.assertRaises(c.CheckError, group.addChild, "123")
         # should not raise any exception
+        group.addChild(None)
+        self.assertEqual(len(group.getChildren()), 0)
         group.addChild(subgroup)
         self.assertEqual(len(group.getChildren()), 1)
 
     def test_group_json(self):
-        group = g.Group(self._testGroup)
-        group.addChild(g.Group(self._testGroup))
+        group = g.Group.createFromObject(self._testGroup)
+        group.addChild(g.Group.createFromObject(self._testGroup))
         obj = json.loads(group.getJSON())
         self.assertEqual(obj['id'], group.getId())
         self.assertEqual(obj['externalId'], group.getExternalId())
@@ -142,6 +155,32 @@ class Group_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(obj['desc'], group.getDesc())
         self.assertEqual(obj['parent'], group.getParent())
         self.assertEqual(len(obj['children']), 1)
+
+    def test_group_updateParent(self):
+        group = g.Group.createFromObject(self._testGroup)
+        group.updateParent("123")
+        self.assertEqual(group.getParent(), "123")
+
+    def test_group_hasChild(self):
+        group = g.Group.createFromObject(self._testGroup)
+        child = g.Group.createFromObject(self._testGroup)
+        self.assertEqual(group.hasChild(None), False)
+        self.assertEqual(group.hasChild(child), False)
+        group.addChild(child)
+        self.assertEqual(group.hasChild(child), True)
+
+    def test_group_addChildren(self):
+        group = g.Group.createFromObject(self._testGroup)
+        children = {}
+        with self.assertRaises(c.CheckError):
+            group.addChildren(children)
+        children = [g.Group.createFromObject(self._testGroup), g.Group.createFromObject(self._testGroup)]
+        group.addChildren(children)
+        self.assertEqual(len(group.getChildren()), 2)
+        child = g.Group.createFromObject(self._testGroup)
+        children = [child, child]
+        group.addChildren(children)
+        self.assertEqual(len(group.getChildren()), 3)
 
 # Result tests
 class Result_TestsSequence(DataValidation_TestsSequence):
@@ -151,11 +190,11 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self._testGroup =  {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
 
     def test_result_init(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             result = r.Result("str")
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             result = r.Result(1)
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             result = r.Result(self._testResult, None)
 
     def test_result_isInitialised(self):
@@ -163,7 +202,7 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getName(), self._testResult['name'])
 
     def test_result_checkAttributes(self):
-        group = g.Group(self._testGroup)
+        group = g.Group.createFromObject(self._testGroup)
         result = r.Result(self._testResult, group.getId())
         self.assertTrue(len(result.getId()) > 10)
         self.assertEqual(result.getExternalId(), self._testResult['id'])
@@ -193,10 +232,11 @@ class Result_TestsSequence(DataValidation_TestsSequence):
 
 #Property tests
 class Property_TestsSequence(DataValidation_TestsSequence):
+
     def test_property_init(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             property = pr.Property({}, [])
-        with self.assertRaises(ValueError):
+        with self.assertRaises(c.CheckError):
             property = pr.Property(None, None)
 
         property = pr.Property('value', 123)
@@ -204,12 +244,60 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEquals(property.getName(), 'value')
         self.assertEquals(property.getType(), pr.Property.PROPERTY_NUMBER)
 
+#hQueue tests
+class hQueue_TestsSequence(DataValidation_TestsSequence):
+
+    def setUp(self):
+        self._array = [1, 2, 3, 4, 5]
+
+    def test_hqueue_init(self):
+        with self.assertRaises(c.CheckError):
+            queue = hq.hQueue({})
+        queue = hq.hQueue(self._array)
+        self.assertEqual(queue._queue, self._array)
+
+    def test_hqueue_randomize(self):
+        queue = hq.hQueue(self._array)
+        queue.randomize()
+        queue._queue.sort()
+        self.assertEqual(queue._queue, self._array)
+
+    def test_hqueue_isEmpty(self):
+        queue = hq.hQueue([])
+        self.assertEqual(queue.isEmpty(), True)
+        queue.enqueue(1)
+        self.assertEqual(queue.isEmpty(), False)
+        queue.dequeue()
+        self.assertEqual(queue.isEmpty(), True)
+
+    def test_hqueue_enqueue(self):
+        queue = hq.hQueue([])
+        queue.enqueue(1)
+        self.assertEqual(queue._queue, [1])
+
+    def test_hqueue_dequeue(self):
+        queue = hq.hQueue([])
+        queue.enqueue(1)
+        queue.enqueue(2)
+        queue.dequeue()
+        self.assertEqual(queue._queue, [2])
+
+    def test_hqueue_peek(self):
+        queue = hq.hQueue(self._array)
+        obj = queue.peek()
+        self.assertEqual(obj, queue._queue[0])
+        self.assertEqual(len(queue._queue), len(self._array))
+
+    def test_hqueue_getList(self):
+        queue = hq.hQueue(self._array)
+        self.assertEqual(queue.getList(), self._array)
+
 #GroupsMap tests
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
         self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
-        self._group = g.Group(self._testGroup)
+        self._group = g.Group.createFromObject(self._testGroup)
 
     def test_groupsmap_init(self):
         map = gm.GroupsMap()
@@ -249,6 +337,33 @@ class GroupsMap_TestsSequence(DataValidation_TestsSequence):
         map.assign(self._group)
         self.assertEqual(map.isEmpty(), False)
 
+    def test_groupsmap_unknownGroup(self):
+        map = gm.GroupsMap()
+        group = map.unknownGroup()
+        self.assertEqual(group.getId(), map.keys()[0])
+
+    def test_groupsmap_buildHierarchy(self):
+        self._testGroups = [
+            {'id': '1', 'name': '1', 'desc': '1', 'parent': None},
+            {'id': '2', 'name': '2', 'desc': '2', 'parent': '1'},
+            {'id': '3', 'name': '3', 'desc': '3', 'parent': '1'},
+            {'id': '4', 'name': '4', 'desc': '4', 'parent': '2'},
+            {'id': '5', 'name': '5', 'desc': '5', 'parent': '2'},
+            {'id': '6', 'name': '6', 'desc': '6', 'parent': '3'},
+            {'id': '7', 'name': '7', 'desc': '7', 'parent': '8'},
+            {'id': '8', 'name': '8', 'desc': '8', 'parent': '10'},
+            {'id': '9', 'name': '9', 'desc': '9', 'parent': '10'},
+            {'id': '10', 'name': '10', 'desc': '10', 'parent': '7'},
+            {'id': '11', 'name': '11', 'desc': '11', 'parent': '12'}
+        ]
+        map = gm.GroupsMap()
+        for gr in self._testGroups:
+            map.assign(g.Group.createFromObject(gr))
+        map.updateParentIdsToGuids()
+        map.buildHierarchy()
+        self.assertEqual(len(map.keys()), 4)
+        #self.assertEqual(len(map.get(map.keys()[0]).getChildren()), 2)
+
 #ResultsMap tests
 class ResultsMap_TestsSequence(DataValidation_TestsSequence):
 
@@ -262,7 +377,7 @@ class ResultsMap_TestsSequence(DataValidation_TestsSequence):
 
     def test_resultmap_assign(self):
         map = rm.ResultsMap()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             map.assign("123")
         map.assign(self._result)
         self.assertEqual(map._map[self._result.getId()], self._result)
@@ -304,7 +419,7 @@ class PropertiesMap_TestsSequence(DataValidation_TestsSequence):
 
     def test_propertiesmap_assign(self):
         map = pm.PropertiesMap()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             map.assign(123)
         map.assign(self._property)
         self.assertEqual(len(map.keys()), 1)
@@ -343,8 +458,14 @@ class PropertiesMap_TestsSequence(DataValidation_TestsSequence):
 class Validator_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
-        self._testGroups = [{"id": "super", "name": "supername", "parent": "null"}, {"id": "a", "name": "aname", "parent": "super"}]
-        self._testResults = [{"id": "A", "name": "Aname", "desc": "A", "group": "a", "value": 123, "price": 320}, {"id": "B", "name": "Bname", "desc": "B", "group": "b", "value": 123, "price": 320}]
+        self._testGroups = [
+            {"id": "super", "name": "supername", "parent": "null"},
+            {"id": "a", "name": "aname", "parent": "super"}
+        ]
+        self._testResults = [
+            {"id": "A", "name": "Aname", "desc": "A", "group": "a", "value": 123, "price": 320},
+            {"id": "B", "name": "Bname", "desc": "B", "group": "b", "value": 123, "price": 320}
+        ]
         self._testProperties = {'delight': 123, 'wombat': 'wer'}
 
     def test_validator_init(self):
@@ -355,29 +476,29 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
 
     def test_validator_loadGroups(self):
         dv = v.Validator()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             dv._loadGroups("test")
         dv._loadGroups(self._testGroups)
         self.assertEquals(len(dv.getGroups().keys()), 2)
 
     def test_validator_loadResults(self):
         dv = v.Validator()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.CheckError):
             dv._loadResults("test")
         dv._loadResults(self._testResults)
         self.assertEquals(len(dv.getResults().keys()), 2)
 
     def test_validator_loadProperties(self):
         dv = v.Validator()
-        with  self.assertRaises(TypeError):
+        with  self.assertRaises(c.CheckError):
             dv._loadProperties([])
         dv._loadProperties(self._testProperties)
         self.assertEquals(len(dv.getProperties().keys()), 2)
 
     def test_validator_loadDataWithoutDiscover(self):
         dv = v.Validator()
-        dv.loadData(self._testGroups, self._testResults, self._testProperties)
-        self.assertEquals(len(dv.getGroups().keys()), 2)
+        dv.prepareData(self._testGroups, self._testResults, self._testProperties)
+        self.assertEquals(len(dv.getGroups().keys()), 2) #including unknown group
         self.assertEquals(len(dv.getResults().keys()), 2)
         self.assertEquals(len(dv.getProperties().keys()), 2)
         self.assertEquals(dv.getProperties().has('delight'), True)
@@ -390,8 +511,8 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
 
     def test_validator_loadDataWithDiscover(self):
         dv = v.Validator()
-        dv.loadData(self._testGroups, self._testResults)
-        self.assertEquals(len(dv.getGroups().keys()), 2)
+        dv.prepareData(self._testGroups, self._testResults)
+        self.assertEquals(len(dv.getGroups().keys()), 2) #including unknown group
         self.assertEquals(len(dv.getResults().keys()), 2)
         self.assertEquals(len(dv.getProperties().keys()), 2)
         id = dv.getResults().keys()[0]
@@ -409,6 +530,7 @@ def loadSuites():
         unittest.TestLoader().loadTestsFromTestCase(Group_TestsSequence),
         unittest.TestLoader().loadTestsFromTestCase(Result_TestsSequence),
         unittest.TestLoader().loadTestsFromTestCase(Property_TestsSequence),
+        unittest.TestLoader().loadTestsFromTestCase(hQueue_TestsSequence),
         unittest.TestLoader().loadTestsFromTestCase(GroupsMap_TestsSequence),
         unittest.TestLoader().loadTestsFromTestCase(ResultsMap_TestsSequence),
         unittest.TestLoader().loadTestsFromTestCase(PropertiesMap_TestsSequence),

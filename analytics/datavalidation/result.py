@@ -1,5 +1,6 @@
 from types import DictType, StringType, ListType
 import parse as p
+import checkerror as c
 import property as pr
 import propertiesmap as pm
 import json
@@ -11,13 +12,13 @@ class Result(object):
     # group is a group id that result relates to
     def __init__(self, obj, group="", properties=pm.PropertiesMap()):
         if type(obj) is not DictType:
-            raise TypeError ("Expected <type 'dict'>, received " + str(type(obj)))
+            raise c.CheckError("<type 'dict'>", str(type(obj)))
         if type(group) is not StringType:
-            raise TypeError("Expected <type 'str'>, received " + str(type(group)))
+            raise c.CheckError("<type 'str'>", str(type(group)))
         if type(properties) is not pm.PropertiesMap:
-            raise TypeError("Expected <type 'PropertiesMap'>, received " + str(type(properties)))
+            raise c.CheckError("<type 'PropertiesMap'>", str(type(properties)))
         parse = p.Parse(obj)
-        self._id = parse.guidBasedId()
+        self._id = p.Parse.guidBasedId()
         self._externalId = parse.getExternalId()
         self._name = parse.getName()
         self._desc = parse.getDesc()

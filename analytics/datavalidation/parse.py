@@ -1,4 +1,5 @@
 import uuid
+import checkerror as c
 from types import DictType, StringType
 
 class Parse(object):
@@ -23,9 +24,7 @@ class Parse(object):
 
     '#Private - Method for returning a value for a certain set of keys in array given'
     def _getValueForKeyArray(self, array):
-        if (self._object is None):
-            raise ValueError("Expected object, received None")
-
+        if (self._object is None): raise c.CheckError("object", "None")
         for key in array:
             if key in self._object:
                 self._primaryKeys.append(key)
@@ -34,8 +33,7 @@ class Parse(object):
 
     '#Public - Updates instance with new object and resets all the attributes'
     def updateInstance(self, object):
-        if type(object) is not DictType:
-            raise TypeError("Expected <type 'dict'>, received " + str(type(object)))
+        if type(object) is not DictType: raise c.CheckError("<type 'dict'>", str(type(object)))
         self._resetParse()
         self._object = object
 
@@ -43,7 +41,8 @@ class Parse(object):
     def getExternalId(self):
         return self._getValueForKeyArray(Parse.KEY_ID)
 
-    '#Public - Returns id based on external id given'
+    '#[Static] Public - Returns id based on external id given'
+    @classmethod
     def guidBasedId(self, id=''):
         id = uuid.uuid3(uuid.NAMESPACE_DNS, id).hex if type(id) == StringType and len(id) > 0 else uuid.uuid4().hex
         return str(uuid.uuid4()) + '-' + id
