@@ -1,14 +1,14 @@
-#add local classes
-import checkerror as c
-#add libraries
+# import libs
 import unittest
+# import classes
+import analytics.datavalidation.exceptions.checkerror as c
 
 # Superclass for this tests sequence
 class Exceptions_TestsSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
 
-#VValueError tests
+# VValueError tests
 class CheckError_TestsSequence(Exceptions_TestsSequence):
 
     def test_checkerror_raise(self):
@@ -24,16 +24,18 @@ class CheckError_TestsSequence(Exceptions_TestsSequence):
         self.assertEqual(msg, "[!] Expected 1, received 2")
 
 
-#Load tests
-def loadSuites():
-    suites = [
-        unittest.TestLoader().loadTestsFromTestCase(CheckError_TestsSequence),
+# Load test suites
+def _suites():
+    return [
+        CheckError_TestsSequence
     ]
 
-    #global test suite for this module
+# Load tests
+def loadSuites():
+    # global test suite for this module
     gsuite = unittest.TestSuite()
-    for suite in suites: gsuite.addTest(suite)
-
+    for suite in _suites():
+        gsuite.addTest(unittest.TestLoader().loadTestsFromTestCase(suite))
     return gsuite
 
 if __name__ == '__main__':

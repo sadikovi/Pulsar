@@ -1,6 +1,6 @@
-import parse as p
+import analytics.datavalidation.parse as p
 from types import StringType, IntType, FloatType
-import checkerror as c
+import analytics.datavalidation.exceptions.checkerror as c
 
 class Property(object):
     'Property class to hold name of the property and its type'

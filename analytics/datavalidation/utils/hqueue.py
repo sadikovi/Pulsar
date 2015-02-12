@@ -1,5 +1,5 @@
 from types import ListType
-import checkerror as c
+import analytics.datavalidation.exceptions.checkerror as c
 import random
 
 class hQueue(object):

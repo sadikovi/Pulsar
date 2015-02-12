@@ -1,24 +1,24 @@
-#add local classes
-import validator as v
-import result as r
-import parse as p
-import group as g
-import groupsmap as gm
-import resultsmap as rm
-import propertiesmap as pm
-import property as pr
-import hqueue as hq
-import checkerror as c
-#add libraries
+# import libs
 import unittest
 import json
+# import classes
+import analytics.datavalidation.validator as v
+import analytics.datavalidation.result as r
+import analytics.datavalidation.parse as p
+import analytics.datavalidation.group as g
+import analytics.datavalidation.groupsmap as gm
+import analytics.datavalidation.resultsmap as rm
+import analytics.datavalidation.propertiesmap as pm
+import analytics.datavalidation.property as pr
+import analytics.datavalidation.exceptions.checkerror as c
+import analytics.datavalidation.utils.hqueue as hq
 
 # Superclass for this tests sequence
 class DataValidation_TestsSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
 
-#Parse tests
+# Parse tests
 class Parse_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
@@ -98,7 +98,7 @@ class Parse_TestsSequence(DataValidation_TestsSequence):
         parse.updateInstance(self._testGroup)
         self.assertEqual(parse.getParent(), self._testGroup['parent'])
 
-#Group tests
+# Group tests
 class Group_TestsSequence(DataValidation_TestsSequence):
     def setUp(self):
         self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
@@ -230,7 +230,7 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getProperties()['price'], self._testResult['price'])
         self.assertEqual(result.getProperties()['delight'], None)
 
-#Property tests
+# Property tests
 class Property_TestsSequence(DataValidation_TestsSequence):
 
     def test_property_init(self):
@@ -244,7 +244,7 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEquals(property.getName(), 'value')
         self.assertEquals(property.getType(), pr.Property.PROPERTY_NUMBER)
 
-#hQueue tests
+# hQueue tests
 class hQueue_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
@@ -292,7 +292,7 @@ class hQueue_TestsSequence(DataValidation_TestsSequence):
         queue = hq.hQueue(self._array)
         self.assertEqual(queue.getList(), self._array)
 
-#GroupsMap tests
+# GroupsMap tests
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
@@ -364,7 +364,7 @@ class GroupsMap_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(len(map.keys()), 4)
         #self.assertEqual(len(map.get(map.keys()[0]).getChildren()), 2)
 
-#ResultsMap tests
+# ResultsMap tests
 class ResultsMap_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
@@ -407,7 +407,7 @@ class ResultsMap_TestsSequence(DataValidation_TestsSequence):
         map.remove(self._result.getId())
         self.assertEqual(map.isEmpty(), True)
 
-#PropertiesMap tests
+# PropertiesMap tests
 class PropertiesMap_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
@@ -523,24 +523,27 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
         self.assertEquals(dv.getResults().get(id).getProperties()['price'], 320)
         self.assertEquals(dv.getResults().get(id).getProperties()['value'], 123)
 
-#Load tests
-def loadSuites():
-    suites = [
-        unittest.TestLoader().loadTestsFromTestCase(Parse_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(Group_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(Result_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(Property_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(hQueue_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(GroupsMap_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(ResultsMap_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(PropertiesMap_TestsSequence),
-        unittest.TestLoader().loadTestsFromTestCase(Validator_TestsSequence)
+
+# Load test suites
+def _suites():
+    return [
+        Parse_TestsSequence,
+        Group_TestsSequence,
+        Result_TestsSequence,
+        Property_TestsSequence,
+        hQueue_TestsSequence,
+        GroupsMap_TestsSequence,
+        ResultsMap_TestsSequence,
+        PropertiesMap_TestsSequence,
+        Validator_TestsSequence
     ]
 
+# Load tests
+def loadSuites():
     #global test suite for this module
     gsuite = unittest.TestSuite()
-    for suite in suites: gsuite.addTest(suite)
-
+    for suite in _suites():
+        gsuite.addTest(unittest.TestLoader().loadTestsFromTestCase(suite))
     return gsuite
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
-import property as p
-import checkerror as c
+import analytics.datavalidation.property as p
+import analytics.datavalidation.exceptions.checkerror as c
 
 class PropertiesMap(object):
     'Class to store properties'

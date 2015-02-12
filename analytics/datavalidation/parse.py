@@ -1,5 +1,5 @@
 import uuid
-import checkerror as c
+import analytics.datavalidation.exceptions.checkerror as c
 from types import DictType, StringType
 
 class Parse(object):

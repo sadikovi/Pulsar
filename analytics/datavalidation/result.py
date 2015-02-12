@@ -1,8 +1,8 @@
 from types import DictType, StringType, ListType
-import parse as p
-import checkerror as c
-import property as pr
-import propertiesmap as pm
+import analytics.datavalidation.parse as p
+import analytics.datavalidation.exceptions.checkerror as c
+import analytics.datavalidation.property as pr
+import analytics.datavalidation.propertiesmap as pm
 import json
 
 class Result(object):

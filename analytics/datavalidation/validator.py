@@ -1,11 +1,11 @@
 from types import DictType, ListType
-import result as r
-import group as g
-import property as p
-import resultsmap as rm
-import groupsmap as gm
-import propertiesmap as pm
-import checkerror as c
+import analytics.datavalidation.result as r
+import analytics.datavalidation.group as g
+import analytics.datavalidation.property as p
+import analytics.datavalidation.resultsmap as rm
+import analytics.datavalidation.groupsmap as gm
+import analytics.datavalidation.propertiesmap as pm
+import analytics.datavalidation.exceptions.checkerror as c
 
 class Validator(object):
     'Data validation and conversion of raw data into particular format for Analytics'

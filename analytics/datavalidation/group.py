@@ -1,5 +1,5 @@
-import parse as p
-import checkerror as c
+import analytics.datavalidation.parse as p
+import analytics.datavalidation.exceptions.checkerror as c
 from types import DictType, ListType
 
 class Group(object):

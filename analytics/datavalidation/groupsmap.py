@@ -1,7 +1,6 @@
 from types import ListType
-import group as g
-import checkerror as c
-import hqueue as h
+import analytics.datavalidation.group as g
+import analytics.datavalidation.exceptions.checkerror as c
 
 class GroupsMap(object):
     'Class to store groups'

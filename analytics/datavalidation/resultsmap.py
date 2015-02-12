@@ -1,5 +1,5 @@
-import result as r
-import checkerror as c
+import analytics.datavalidation.result as r
+import analytics.datavalidation.exceptions.checkerror as c
 
 class ResultsMap(object):
     'Class to store results'
