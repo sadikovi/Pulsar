@@ -1,42 +1,108 @@
+# import classes
 import analytics.datavalidation.result as r
 import analytics.datavalidation.exceptions.checkerror as c
 
+
 class ResultsMap(object):
-    'Class to store results'
+    """
+        ResultsMap class helps to consolidate all the Result instances and
+        maintain them. It is quite similar to GroupsMap and PropertiesMap
+        classes. Dictionary _map is used to keep track of the results.
+
+        Pair {id, result} is used, where id is unique guid of the object and
+        result is a reference to that object.
+
+        Attributes:
+            _map (dict<str, Result>): dictionary of the Result instances
+    """
 
     def __init__(self):
         self._map = {}
         self.reset()
 
-    '#Public - Resets map'
+    # [Public]
     def reset(self):
+        """
+            Resets the attributes to the default values. In case of _map, it
+            will be reset to {}.
+        """
         self._map = {}
 
-    '#Public - Checks whether id is in map'
+    # [Public]
     def has(self, id):
+        """
+            Checks whether id provided is in _map attribute. Id is a unique
+            guid of the Result object.
+            Returns True, if id is in _map dictionary, otherwise False.
+
+            Args:
+                id (str): unique guid that is _map is checked upon
+
+            Returns:
+                bool: flag indicating if id is in dictionary
+        """
         return True if id in self._map else False
 
-    '#Public - Adds result to the map'
+    # [Public]
     def assign(self, result):
+        """
+            Adds Result object to the dictionary. If instance is already in
+            the _map attribute then action is ignored, otherwise it is added
+            to the _map.
+
+            Args:
+                result (Result): new Result instance
+        """
         if type(result) is not r.Result:
             raise c.CheckError("<type 'Result'>", str(type(result)))
 
         if self.has(result.getId()) is False:
             self._map[result.getId()] = result
 
-    '#Public - Removes result from map'
+    # [Public]
     def remove(self, id):
+        """
+            Removes result from dictionary by id provided. Id is unique guid of
+            the object. If id does not exist in _map attribute, then action is
+            ignored, otherwise object is removed.
+
+            Args:
+                id (str): unique guid of the Result object
+        """
         if self.has(id):
             del self._map[id]
 
-    '#Public - Returns result for a particular id'
+    # [Public]
     def get(self, id):
+        """
+            Returns Result object by id provided. Id is unique guid of the
+            object. If there is no such id in _map, then None is returned.
+
+            Args:
+                id (str): unique internal guid of the Result object
+
+            Returns:
+                Result: the Result object with guid specified
+        """
         return self._map[id] if self.has(id) else None
 
-    '#Public - Checks whether map is empty or not'
+    # [Public]
     def isEmpty(self):
+        """
+            Checks whether _map attribute is empty or not. Returns True if
+            dictionary has at least one key, otherwise, returns False.
+
+            Returns:
+                bool: flag indicating whether _map is empty or not
+        """
         return True if len(self._map.keys()) == 0 else False
 
-    '#Public - Returns keys in map'
+    # [Public]
     def keys(self):
+        """
+            Returns keys in the _map attribute.
+
+            Returns:
+                list<str>: list of key values of the _map dictionary
+        """
         return self._map.keys()

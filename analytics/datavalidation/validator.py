@@ -1,4 +1,6 @@
+# import libs
 from types import DictType, ListType
+# import classes
 import analytics.datavalidation.result as r
 import analytics.datavalidation.group as g
 import analytics.datavalidation.property as p
@@ -7,18 +9,36 @@ import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.propertiesmap as pm
 import analytics.datavalidation.exceptions.checkerror as c
 
-class Validator(object):
-    'Data validation and conversion of raw data into particular format for Analytics'
 
-    'Create instance of validator with results, groups and properties arrays'
-    '   to convert them later into json for comparison algorithms'
+class Validator(object):
+    """
+        Validator class performs data validation and conversion of raw data to
+        a particular format for Analytics engine.
+
+        Instance that is created holds results, groups and properties using
+        attributes _results, _groups, _properties to perform update operations
+        and convert into JSON for comparison algorithms.
+
+        Attributes:
+            _results (ResultsMap)   : map to hold all the Result objects
+            _groups (GroupsMap)     : map to hold all the Group objects
+            _properties (PropertiesMap): map to hold all the Property objects
+    """
+
     def __init__(self):
         self._results = rm.ResultsMap()
         self._groups = gm.GroupsMap()
         self._properties = pm.PropertiesMap()
 
-    '#Private - Loads groups from an array'
+    # [Private]
     def _loadGroups(self, groups):
+        """
+            Loads groups into _groups map. Also updates parent ids to be
+            unique guids.
+
+            Args:
+                groups (dict<str, object>): groups raw data as dictionary
+        """
         if type(groups) is not ListType:
             raise c.CheckError("<type 'list'>", str(type(groups)))
         for obj in groups:
@@ -26,8 +46,15 @@ class Validator(object):
             self._groups.assign(group)
         self._groups.updateParentIdsToGuids()
 
-    '#Private - Loads results by providing raw data array'
+    # [Private]
     def _loadResults(self, results):
+        """
+            Loads results into _results map. Also updates group to match
+            unique group guids.
+
+            Args:
+                results (dict<str, object>): results raw data as dictionary
+        """
         if type(results) is not ListType:
             raise c.CheckError("<type 'list'>", str(type(results)))
         for obj in results:
@@ -35,8 +62,16 @@ class Validator(object):
             result.updateGroup(self._groups.guid(result.getGroup()))
             self._results.assign(result)
 
-    '#Private - Loads properties from properties dict'
+    # [Private]
     def _loadProperties(self, properties):
+        """
+            Loads properties into _properties map. Tries to create a Property
+            object from raw data provided. If it fails, then property is
+            ignored.
+
+            Args:
+                properties (dict<str, object>): properties raw data
+        """
         if type(properties) is not DictType:
             raise c.CheckError("<type 'dict'>", str(type(properties)))
         for key in properties:
@@ -45,38 +80,69 @@ class Validator(object):
             except KeyError:
                 continue
 
-    '#Public - Loads and validates groups, results, and properties'
+    # [Public]
     def prepareData(self, groups, results, properties={}):
-        #load groups, results, and properties
+        """
+            Prepares data by loading all groups, results and properties.
+            Supports feature of discovering properties, when attribute is not
+            provided.
+
+            Updates results with changed groups and properties (along with
+            unknown group changes). Builds hierarchy from _groups map.
+
+            Args:
+                groups (dict<str, object>)      : groups raw data
+                results (dict<str, object>)     : results raw data
+                properties (dict<str, object>)  : properties raw data
+        """
+        # load groups, results, and properties
         self._loadGroups(groups)
         self._loadResults(results)
         self._loadProperties(properties)
-        #check if we need to discover properties
+        # check if we need to discover properties
         if self._properties.isEmpty() is True:
-            #TODO: review this!
+            # TODO: review this!
             for id in self._results.keys():
                 sp = self._results.get(id).getProperties()
                 for key in sp:
                     self._properties.assign(p.Property(key, sp[key]))
-        #update results with all group changes and new properies
+        # update results with all group changes and new properies
         for id in self._results.keys():
             temp = self._results.get(id)
-            #update properties
+            # update properties
             temp.updateProperties(self._properties)
-            #update unknown group in case group is None
+            # update unknown group in case group is None
             if temp.getGroup() is None:
                 temp.updateGroup(self._groups.unknownGroup().getId())
-        #build hierarchy
+        # build hierarchy
         self._groups.buildHierarchy()
 
-    '#Public - Returns results map'
+    # [Public]
     def getResults(self):
+        """
+            Returns _results attribute.
+
+            Returns:
+                ResultsMap: instance of the ResultsMap
+        """
         return self._results
 
-    '#Public - Returns groups map'
+    # [Public]
     def getGroups(self):
+        """
+            Returns _groups attribute.
+
+            Returns:
+                GroupsMap: instance of the GroupsMap
+        """
         return self._groups
 
-    '#Public - Returns properties map'
+    # [Public]
     def getProperties(self):
+        """
+            Returns _properties attribute.
+
+            Returns:
+                PropertiesMap: instance of the PropertiesMap
+        """
         return self._properties
