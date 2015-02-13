@@ -145,7 +145,7 @@ class Group_TestsSequence(DataValidation_TestsSequence):
         group.addChild(subgroup)
         self.assertEqual(len(group.getChildren()), 1)
 
-    def test_group_json(self):
+    def test_group_getDictAndJson(self):
         group = g.Group.createFromObject(self._testGroup)
         group.addChild(g.Group.createFromObject(self._testGroup))
         obj = json.loads(group.getJSON())
@@ -210,7 +210,7 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getDesc(), self._testResult['description'])
         self.assertEqual(result.getGroup(), group.getId())
 
-    def test_result_jsonDump(self):
+    def test_result_getDictAndJson(self):
         result = r.Result(self._testResult)
         jsonString = result.getJSON()
         obj = json.loads(jsonString)

@@ -1,4 +1,5 @@
 # import libs
+import json
 from types import DictType, ListType
 # import classes
 import analytics.datavalidation.parse as p
@@ -192,9 +193,9 @@ class Group(object):
         self._children = children
 
     # [Public]
-    def getJSON(self):
+    def getDict(self):
         """
-            Returns JSON representation of the current group.
+            Returns dictionary representation of the current group.
             {
                 "id": "group guid",
                 externalId: "group external id",
@@ -205,6 +206,23 @@ class Group(object):
             }
 
             Returns:
+                dict<str, object>: dictionary that represents current group
+        """
+        return {
+            "id": self._id,
+            "externalId": self._externalId,
+            "name": self._name,
+            "desc": self._desc,
+            "parent": self._parent,
+            "children": [obj.getDict() for obj in self._children]
+        }
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns JSON representation of the current group.
+
+            Returns:
                 str: group JSON string
         """
-        return """{ "id": "%s", "externalId": "%s", "name": "%s", "desc": "%s", "parent": "%s", "children": [%s] }""" % (self._id, self._externalId, self._name, self._desc, self._parent, ','.join([child.getJSON() for child in self._children]))
+        return json.dumps(self.getDict())

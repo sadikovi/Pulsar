@@ -142,6 +142,32 @@ class Result(object):
         return self._properties
 
     # [Public]
+    def getDict(self):
+        """
+            Returns dictionary representation of the current result.
+            {
+                "id": "result guid",
+                "externalId": "result external id",
+                "name": "result name",
+                "desc": "result desc",
+                "group": "result group",
+                "properties": {"properties dictionary"}
+            }
+
+            Returns:
+                dict<str, object>: dictionary that represents current result
+        """
+        return {
+                "id": self._id,
+                "externalId": self._externalId,
+                "name": self._name,
+                "desc": self._desc,
+                "group": self._group,
+                "properties": self._properties
+            }
+
+
+    # [Public]
     def getJSON(self):
         """
             Returns JSON representation of the Result instance
@@ -149,4 +175,4 @@ class Result(object):
             Returns:
                 str: JSON representation of the object
         """
-        return """{ "id": "%s", "externalId": "%s", "name": "%s", "desc": "%s", "group": "%s", "properties": %s }""" % (self._id, self._externalId, self._name, self._desc, self._group, json.dumps(self._properties))
+        return json.dumps(self.getDict())
