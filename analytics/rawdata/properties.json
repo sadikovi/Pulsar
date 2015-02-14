@@ -1,4 +1,6 @@
 {
-    "value": 1,
-    "price": 2
+    "value": 123,
+    "price": 320,
+    "bedrooms": 1,
+    "bathrooms": 1
 }

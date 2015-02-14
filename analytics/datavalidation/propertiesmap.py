@@ -104,3 +104,13 @@ class PropertiesMap(object):
                 list<str>: keys list that are in dictionary
         """
         return self._map.keys()
+
+    # [Public]
+    def values(self):
+        """
+            Returns values list (list<Property>) of the _map attribute.
+
+            Returns:
+                list<Property>: values list that are in dictionary
+        """
+        return self._map.values()

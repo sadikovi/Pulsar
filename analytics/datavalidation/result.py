@@ -58,14 +58,19 @@ class Result(object):
         """
             Updates _properties dictionary by @properties dictionary provided.
             If key is not in the dictionary then it is added with value as
-            None.
+            None. If key is in the dictionary, then property adds value to the
+            set.
 
             Args:
-                properties (dict<str, object>): properties to be checked upon
+                properties (PropertiesMap): properties to be checked upon
         """
-        for id in properties.keys():
-            if id not in self._properties:
-                self._properties[id] = None
+        for prop in properties.values():
+            pid = prop.getName()
+            if pid not in self._properties:
+                self._properties[pid] = None
+            else:
+                prop.add(self._properties[pid])
+
 
     # [Public]
     def getExternalId(self):

@@ -73,7 +73,7 @@ class Validator(object):
                 properties (dict<str, object>): properties raw data
         """
         if type(properties) is not DictType:
-            raise c.CheckError("<type 'dict'>", str(type(properties)))
+            raise c.CheckError("dict<str, object>", str(type(properties)))
         for key in properties:
             try:
                 self._properties.assign(p.Property(key, properties[key]))

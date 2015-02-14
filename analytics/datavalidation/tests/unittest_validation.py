@@ -242,7 +242,17 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         property = pr.Property('value', 123)
         self.assertTrue(len(property.getId()) > 10)
         self.assertEquals(property.getName(), 'value')
-        self.assertEquals(property.getType(), pr.Property.PROPERTY_NUMBER)
+        self.assertEquals(property.getType(), pr.Property.PROPERTY_INT)
+
+    def test_property_add(self):
+        property = pr.Property("property", 122)
+        with self.assertRaises(TypeError):
+            property.add("self")
+        with self.assertRaises(TypeError):
+            property.add(123.23)
+        property.add(123)
+        self.assertEqual(len(property._values), 1)
+        self.assertTrue(123 in property._values)
 
 # hQueue tests
 class hQueue_TestsSequence(DataValidation_TestsSequence):
@@ -296,7 +306,12 @@ class hQueue_TestsSequence(DataValidation_TestsSequence):
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
-        self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
+        self._testGroup = {
+            'id': 'group id',
+            'name': 'group name',
+            'desc': 'desc',
+            'parent': '123'
+        }
         self._group = g.Group.createFromObject(self._testGroup)
 
     def test_groupsmap_init(self):
@@ -508,6 +523,8 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
         self.assertEquals(dv.getResults().get(id).getProperties()['value'], 123)
         self.assertEquals(dv.getResults().get(id).getProperties()['delight'], None)
         self.assertEquals(dv.getResults().get(id).getProperties()['wombat'], None)
+        self.assertEquals(dv.getProperties().has('price'), False)
+        self.assertEquals(dv.getProperties().has('value'), False)
 
     def test_validator_loadDataWithDiscover(self):
         dv = v.Validator()
@@ -517,6 +534,7 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
         self.assertEquals(len(dv.getProperties().keys()), 2)
         id = dv.getResults().keys()[0]
         self.assertEquals(dv.getProperties().has('value'), True)
+        self.assertTrue(123 in dv.getProperties().get('value')._values, True)
         self.assertEquals(dv.getProperties().has('price'), True)
         self.assertEquals(dv.getProperties().has('delight'), False)
         self.assertEquals(dv.getProperties().has('wombat'), False)
