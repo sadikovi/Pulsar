@@ -7,7 +7,7 @@ import analytics.datavalidation.property as p
 import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.propertiesmap as pm
-import analytics.datavalidation.exceptions.checkerror as c
+import analytics.exceptions.checkerror as c
 
 
 class Validator(object):

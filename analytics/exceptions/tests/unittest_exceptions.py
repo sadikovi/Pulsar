@@ -1,7 +1,7 @@
 # import libs
 import unittest
 # import classes
-import analytics.datavalidation.exceptions.checkerror as c
+import analytics.exceptions.checkerror as c
 
 # Superclass for this tests sequence
 class Exceptions_TestsSequence(unittest.TestCase):

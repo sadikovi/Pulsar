@@ -10,8 +10,8 @@ import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.propertiesmap as pm
 import analytics.datavalidation.property as pr
-import analytics.datavalidation.exceptions.checkerror as c
-import analytics.datavalidation.utils.hqueue as hq
+import analytics.exceptions.checkerror as c
+import analytics.utils.hqueue as hq
 
 # Superclass for this tests sequence
 class DataValidation_TestsSequence(unittest.TestCase):

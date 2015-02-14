@@ -1,6 +1,6 @@
 # import classes
 import analytics.datavalidation.property as p
-import analytics.datavalidation.exceptions.checkerror as c
+import analytics.exceptions.checkerror as c
 
 
 class PropertiesMap(object):

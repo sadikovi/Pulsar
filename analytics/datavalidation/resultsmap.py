@@ -1,6 +1,6 @@
 # import classes
 import analytics.datavalidation.result as r
-import analytics.datavalidation.exceptions.checkerror as c
+import analytics.exceptions.checkerror as c
 
 
 class ResultsMap(object):

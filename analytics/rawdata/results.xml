@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<elements>
+    <element name="result" type="str">
+        <attr name="id" type="str">A</attr>
+        <attr name="name" type="str">A name</attr>
+        <attr name="desc" type="str">A description</attr>
+        <attr name="group" type="str">1</attr>
+        <attr name="value" type="int">123</attr>
+        <attr name="price" type="int">320</attr>
+        <attr name="bedrooms" type="int">3</attr>
+        <attr name="bathrooms" type="int">1</attr>
+    </element>
+    <element name="result" type="str">
+        <attr name="id" type="str">B</attr>
+        <attr name="name" type="str">B name</attr>
+        <attr name="desc" type="str">B description</attr>
+        <attr name="group" type="str">1</attr>
+        <attr name="value" type="int">234</attr>
+        <attr name="price" type="int">223</attr>
+        <attr name="bedrooms" type="int">4</attr>
+        <attr name="bathrooms" type="int">2</attr>
+    </element>
+    <element name="result" type="str">
+        <attr name="id" type="str">C</attr>
+        <attr name="name" type="str">C name</attr>
+        <attr name="desc" type="str">C description</attr>
+        <attr name="group" type="str">1</attr>
+        <attr name="value" type="int">345</attr>
+        <attr name="price" type="int">129</attr>
+        <attr name="bedrooms" type="int">3</attr>
+        <attr name="bathrooms" type="int">2</attr>
+    </element>
+</elements>

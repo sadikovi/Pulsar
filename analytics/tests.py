@@ -7,14 +7,17 @@ sys.path.append(DIR_PATH)
 # import libs
 import unittest
 # import classes
-import analytics.datavalidation.tests.unittest_exceptions as unittest_exceptions
+import analytics.exceptions.tests.unittest_exceptions as unittest_exceptions
 import analytics.datavalidation.tests.unittest_validation as unittest_validation
+import analytics.loading.tests.unittest_loading as unittest_loading
 
 def _collectSystemTests(suites):
     # datavalidation - exceptions
     suites.addTest(unittest_exceptions.loadSuites())
     # datavlidation - validation
     suites.addTest(unittest_validation.loadSuites())
+    # datavlidation - loading
+    suites.addTest(unittest_loading.loadSuites())
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()
