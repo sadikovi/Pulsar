@@ -11,7 +11,6 @@ import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.propertiesmap as pm
 import analytics.datavalidation.property as pr
 import analytics.exceptions.checkerror as c
-import analytics.utils.hqueue as hq
 
 # Superclass for this tests sequence
 class DataValidation_TestsSequence(unittest.TestCase):
@@ -254,54 +253,6 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(len(property._values), 1)
         self.assertTrue(123 in property._values)
 
-# hQueue tests
-class hQueue_TestsSequence(DataValidation_TestsSequence):
-
-    def setUp(self):
-        self._array = [1, 2, 3, 4, 5]
-
-    def test_hqueue_init(self):
-        with self.assertRaises(c.CheckError):
-            queue = hq.hQueue({})
-        queue = hq.hQueue(self._array)
-        self.assertEqual(queue._queue, self._array)
-
-    def test_hqueue_randomize(self):
-        queue = hq.hQueue(self._array)
-        queue.randomize()
-        queue._queue.sort()
-        self.assertEqual(queue._queue, self._array)
-
-    def test_hqueue_isEmpty(self):
-        queue = hq.hQueue([])
-        self.assertEqual(queue.isEmpty(), True)
-        queue.enqueue(1)
-        self.assertEqual(queue.isEmpty(), False)
-        queue.dequeue()
-        self.assertEqual(queue.isEmpty(), True)
-
-    def test_hqueue_enqueue(self):
-        queue = hq.hQueue([])
-        queue.enqueue(1)
-        self.assertEqual(queue._queue, [1])
-
-    def test_hqueue_dequeue(self):
-        queue = hq.hQueue([])
-        queue.enqueue(1)
-        queue.enqueue(2)
-        queue.dequeue()
-        self.assertEqual(queue._queue, [2])
-
-    def test_hqueue_peek(self):
-        queue = hq.hQueue(self._array)
-        obj = queue.peek()
-        self.assertEqual(obj, queue._queue[0])
-        self.assertEqual(len(queue._queue), len(self._array))
-
-    def test_hqueue_getList(self):
-        queue = hq.hQueue(self._array)
-        self.assertEqual(queue.getList(), self._array)
-
 # GroupsMap tests
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):
 
@@ -331,6 +282,11 @@ class GroupsMap_TestsSequence(DataValidation_TestsSequence):
         map = gm.GroupsMap()
         map.assign(self._group)
         self.assertTrue(map.has(self._group.getId()))
+
+    def test_groupsmap_isHierarchy(self):
+        map = gm.GroupsMap()
+        map.assign(self._group)
+        self.assertEqual(map._isHierarchy, False)
 
     def test_groupsmap_remove(self):
         map = gm.GroupsMap()
@@ -375,9 +331,38 @@ class GroupsMap_TestsSequence(DataValidation_TestsSequence):
         for gr in self._testGroups:
             map.assign(g.Group.createFromObject(gr))
         map.updateParentIdsToGuids()
+        self.assertEqual(map.isHierarchy(), False)
         map.buildHierarchy()
         self.assertEqual(len(map.keys()), 4)
         #self.assertEqual(len(map.get(map.keys()[0]).getChildren()), 2)
+        self.assertEqual(map.isHierarchy(), True)
+
+    def test_groupsmap_findElementInMap(self):
+        self._testGroups = [
+            {'id': '1', 'name': '1', 'desc': '1', 'parent': None},
+            {'id': '2', 'name': '2', 'desc': '2', 'parent': '1'},
+            {'id': '3', 'name': '3', 'desc': '3', 'parent': '1'},
+            {'id': '4', 'name': '4', 'desc': '4', 'parent': '2'},
+            {'id': '5', 'name': '5', 'desc': '5', 'parent': '2'},
+            {'id': '6', 'name': '6', 'desc': '6', 'parent': '3'},
+            {'id': '7', 'name': '7', 'desc': '7', 'parent': '8'},
+            {'id': '8', 'name': '8', 'desc': '8', 'parent': '10'},
+            {'id': '9', 'name': '9', 'desc': '9', 'parent': '10'},
+            {'id': '10', 'name': '10', 'desc': '10', 'parent': '7'},
+            {'id': '11', 'name': '11', 'desc': '11', 'parent': '12'}
+        ]
+        map = gm.GroupsMap()
+        for gr in self._testGroups:
+            map.assign(g.Group.createFromObject(gr))
+        map.updateParentIdsToGuids()
+        # select element with id 5
+        group5 = map.get(map.guid('5')).getJSON()
+        map.buildHierarchy()
+        self.assertEqual(map._findElementInMap('12', map.values()), None)
+        self.assertEqual(map.isHierarchy(), True)
+        self.assertEqual(map._findElementInMap(map.guid('1'), map.values()).getName(), '1')
+        self.assertEqual(map._findElementInMap(map.guid('6'), map.values()).getName(), '6')
+        self.assertEqual(map._findElementInMap(map.guid('5'), map.values()).getJSON(), group5)
 
 # ResultsMap tests
 class ResultsMap_TestsSequence(DataValidation_TestsSequence):
@@ -549,7 +534,6 @@ def _suites():
         Group_TestsSequence,
         Result_TestsSequence,
         Property_TestsSequence,
-        hQueue_TestsSequence,
         GroupsMap_TestsSequence,
         ResultsMap_TestsSequence,
         PropertiesMap_TestsSequence,

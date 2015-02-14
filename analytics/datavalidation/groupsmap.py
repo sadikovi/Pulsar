@@ -22,9 +22,14 @@ class GroupsMap(object):
         the last object. Usually, it is used to exchange parent external ids
         with new guids.
 
+        _isHierarchy is a flag indicating that groups represent trees /
+        hierarchy, and have to be traversed accordingly, if there is need to
+        find element by it's id.
+
         Attributes:
             _map (dict<str, Group>)     : dict to hold pairs {guid, group}
             _guidmap (dict<str, str>)   : dict to hold pairs {externalId, guid}
+            _isHierarchy (bool)         : indicator that hierarchy is used
     """
 
     def __init__(self):
@@ -39,6 +44,38 @@ class GroupsMap(object):
         """
         self._map = {}
         self._guidmap = {}
+        self._isHierarchy = False
+
+    # [Private]
+    def _findElementInMap(self, id, list=[]):
+        """
+            Finds element in map. If map is built into hierarchy then it
+            searches tree recursively until it founds element. If hierarchy is
+            off, then _map is checked against a id as key.
+
+            When map is constructed into tree, it is requiered to pass list
+            with elements to search in, it can be self.values() to begin with.
+
+            Args:
+                id (str): id to search element for
+                list (list<Group>): list of Group instances to check id
+
+            Returns:
+                Group: Group instance with specified id, otherwise, None
+        """
+        if id is None:
+            return None
+        if self.isHierarchy() is False:
+            return self._map[id] if id in self._map else None
+        else:
+            for group in list:
+                if group.getId() == id:
+                    return group
+            for group in list:
+                el = self._findElementInMap(id, group.getChildren())
+                if el is not None:
+                    return el
+            return None
 
     # [Public]
     def has(self, id):
@@ -53,7 +90,10 @@ class GroupsMap(object):
             Returns:
                 bool: indicator whether group is in _map or not
         """
-        return True if id is not None and id in self._map else False
+        if self._findElementInMap(id, self.values()) is not None:
+            return True
+        else:
+            return False
 
     # [Public]
     def assign(self, group):
@@ -62,11 +102,15 @@ class GroupsMap(object):
             If groupsmap already has this group, action is ignored. Otherwise,
             group is added to groupsmap.
 
+            Action is ignored, when hierarchy is built.
+
             Args:
                 group (Group): to be added to the groupsmap
         """
         if type(group) is not g.Group:
             raise c.CheckError("<type 'Group'>", str(type(group)))
+        if self.isHierarchy() is True:
+            return None
         if self.has(group.getId()) is False:
             self._map[group.getId()] = group
             self._guidmap[group.getExternalId()] = group.getId()
@@ -78,9 +122,13 @@ class GroupsMap(object):
             If groupsmap does not have id as a key, action is ignored.
             Otherwise, group is removed from groupsmap.
 
+            Action is ignored, if hierarchy is built.
+
             Args:
                 id (str): a group's guid
         """
+        if self.isHierarchy() is True:
+            return None
         if self.has(id):
             group = self._map[id]
             del self._map[id]
@@ -98,7 +146,7 @@ class GroupsMap(object):
             Returns:
                 Group: object with id specified or None
         """
-        return self._map[id] if self.has(id) else None
+        return self._findElementInMap(id, self.values())
 
     # [Public]
     def guid(self, id):
@@ -130,6 +178,17 @@ class GroupsMap(object):
                 bool: indicator whether map is empty or not
         """
         return True if len(self._map.keys()) == 0 else False
+
+    # [Public]
+    def isHierarchy(self):
+        """
+            Returns True if hierarchy is built, False otherwise. Essential to
+            know in case of finding a particular element by it's id.
+
+            Returns:
+                bool: _isHierarchy flag to indicate that hierarchy is used
+        """
+        return self._isHierarchy
 
     # [Public]
     def keys(self):
@@ -164,10 +223,14 @@ class GroupsMap(object):
             calling method, uknown group would be created and automatically
             added to groupsmap and then fetched from groupsmap.
 
+            Action is ignored, if hierarchy is built.
+
             Returns:
                 Group: unique unknown group
         """
         guid = "6120-31c2-4177-ad03-6d93a3a87976-unknown_id"
+        if self.isHierarchy() is True:
+            return None
         if self.has(guid) is False:
             unknown = g.Group(guid, guid, "Unknown Group", "Unknown Group", None)
             self.assign(unknown)
@@ -180,7 +243,11 @@ class GroupsMap(object):
         """
             Updates parent external id with internal guid for all the groups
             that are in _map dictionary. Parent id can be None.
+
+            Action is ignored, hierarchy is built.
         """
+        if self.isHierarchy() is True:
+            return None
         for gid in self.keys():
             group = self.get(gid)
             group.updateParent(self.guid(group.getParent()))
@@ -215,6 +282,8 @@ class GroupsMap(object):
                     element9, children: []
                 ]
         """
+        if self.isHierarchy() is True:
+            return None
         # create dictionary {"parent_id":["child1", "child2",..]}
         pmap = {}   # map where all the children are mapped to their parent ids
         roots = []  # roots - elements with parent "None"
@@ -237,10 +306,12 @@ class GroupsMap(object):
         # check cycles and break them
         for cycle in cycles:
             self._traverseCycle(roots, cycle)
-        #done, update groups
+        # done, update groups
         self._map = {}
         for root in roots:
             self._map[root.getId()] = root
+        # everything is okay, hierarchy is built
+        self._isHierarchy = True
 
     # [Private]
     def _collectTree(self, array, root):

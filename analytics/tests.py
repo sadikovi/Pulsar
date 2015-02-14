@@ -10,14 +10,17 @@ import unittest
 import analytics.exceptions.tests.unittest_exceptions as unittest_exceptions
 import analytics.datavalidation.tests.unittest_validation as unittest_validation
 import analytics.loading.tests.unittest_loading as unittest_loading
+import analytics.utils.tests.unittest_utils as unittest_utils
 
 def _collectSystemTests(suites):
-    # datavalidation - exceptions
+    # exceptions
     suites.addTest(unittest_exceptions.loadSuites())
-    # datavlidation - validation
+    # datavalidation
     suites.addTest(unittest_validation.loadSuites())
-    # datavlidation - loading
+    # loading
     suites.addTest(unittest_loading.loadSuites())
+    # utils
+    suites.addTest(unittest_utils.loadSuites())
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()
