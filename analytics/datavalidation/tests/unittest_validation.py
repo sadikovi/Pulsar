@@ -10,7 +10,7 @@ import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.propertiesmap as pm
 import analytics.datavalidation.property as pr
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 # Superclass for this tests sequence
 class DataValidation_TestsSequence(unittest.TestCase):

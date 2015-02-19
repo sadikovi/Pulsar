@@ -3,7 +3,7 @@ import json
 from types import StringType
 # import classes
 import analytics.loading.loader as l
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class JsonLoader(l.Loader):

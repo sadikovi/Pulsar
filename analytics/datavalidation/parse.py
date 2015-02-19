@@ -2,7 +2,7 @@
 import uuid
 from types import DictType, StringType
 # import classes
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class Parse(object):

@@ -11,6 +11,8 @@ import analytics.exceptions.tests.unittest_exceptions as unittest_exceptions
 import analytics.datavalidation.tests.unittest_validation as unittest_validation
 import analytics.loading.tests.unittest_loading as unittest_loading
 import analytics.utils.tests.unittest_utils as unittest_utils
+import analytics.algorithm.tests.unittest_algorithm as unittest_algorithm
+import analytics.utils.tests.unittest_queryengine as unittest_queryengine
 
 def _collectSystemTests(suites):
     # exceptions
@@ -21,6 +23,10 @@ def _collectSystemTests(suites):
     suites.addTest(unittest_loading.loadSuites())
     # utils
     suites.addTest(unittest_utils.loadSuites())
+    # algorithms
+    suites.addTest(unittest_algorithm.loadSuites())
+    # query engine
+    suites.addTest(unittest_queryengine.loadSuites())
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()

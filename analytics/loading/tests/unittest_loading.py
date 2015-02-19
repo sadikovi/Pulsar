@@ -5,7 +5,7 @@ from types import ListType
 import analytics.loading.loader as l
 import analytics.loading.jsonloader as jsl
 import analytics.loading.xmlloader as xmll
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 # Superclass for this tests sequence
 class Loading_TestsSequence(unittest.TestCase):

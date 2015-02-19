@@ -1,7 +1,7 @@
 # import libs
 import unittest
 # import classes
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 import analytics.utils.hqueue as hq
 
 # Superclass for this tests sequence

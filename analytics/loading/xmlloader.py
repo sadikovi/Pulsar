@@ -3,7 +3,7 @@ from xml.dom import minidom
 from types import StringType, DictType
 # import classes
 import analytics.loading.loader as l
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class XmlLoader(l.Loader):

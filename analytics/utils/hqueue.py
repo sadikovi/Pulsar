@@ -2,7 +2,7 @@
 import random
 from types import ListType
 # import classes
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class hQueue(object):

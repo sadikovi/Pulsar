@@ -2,7 +2,7 @@
 from types import StringType, IntType, FloatType
 # import classes
 import analytics.datavalidation.parse as p
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class Property(object):

@@ -3,7 +3,7 @@ import json
 from types import DictType, ListType
 # import classes
 import analytics.datavalidation.parse as p
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class Group(object):

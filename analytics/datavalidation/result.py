@@ -3,7 +3,7 @@ import json
 from types import DictType, StringType, ListType
 # import classes
 import analytics.datavalidation.parse as p
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 import analytics.datavalidation.property as pr
 import analytics.datavalidation.propertiesmap as pm
 

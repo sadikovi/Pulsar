@@ -2,7 +2,7 @@
 from types import ListType
 # import classes
 import analytics.datavalidation.group as g
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 
 class GroupsMap(object):

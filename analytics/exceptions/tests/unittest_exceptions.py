@@ -1,14 +1,14 @@
 # import libs
 import unittest
 # import classes
-import analytics.exceptions.checkerror as c
+import analytics.exceptions.exceptions as c
 
 # Superclass for this tests sequence
 class Exceptions_TestsSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
 
-# VValueError tests
+# CheckError tests
 class CheckError_TestsSequence(Exceptions_TestsSequence):
 
     def test_checkerror_raise(self):
@@ -23,11 +23,27 @@ class CheckError_TestsSequence(Exceptions_TestsSequence):
             msg = arg.errmsg
         self.assertEqual(msg, "[!] Expected 1, received 2")
 
+# SyntaxError tests
+class SyntaxError_TestsSequence(Exceptions_TestsSequence):
+
+    def test_syntaxerror_raise(self):
+        with self.assertRaises(c.SyntaxError):
+            raise c.SyntaxError(1, "; and 1=0")
+
+    def test_syntaxerror_tryCatch(self):
+        msg = ""
+        try:
+            raise c.SyntaxError(1, "; and 1=0")
+        except c.SyntaxError as arg:
+            msg = arg.errmsg
+        self.assertEqual(msg, "Wrong syntax at position 1 near ; and 1=0")
+
 
 # Load test suites
 def _suites():
     return [
-        CheckError_TestsSequence
+        CheckError_TestsSequence,
+        SyntaxError_TestsSequence
     ]
 
 # Load tests
