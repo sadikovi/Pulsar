@@ -1,3 +1,5 @@
+# import libs
+from types import ListType
 # import classes
 import analytics.datavalidation.property as p
 import analytics.exceptions.exceptions as c
@@ -114,3 +116,24 @@ class PropertiesMap(object):
                 list<Property>: values list that are in dictionary
         """
         return self._map.values()
+
+    # [Public]
+    def setDynamic(self, ids):
+        """
+            Sets property with id to be dynamic. Maintains the rule that
+            maximum one property can be dynamic.
+
+            Args:
+                ids (list<str>): property ids list
+        """
+        if type(ids) is not ListType:
+            raise c.CheckError("list<str>", type(ids))
+        # max number of dynamic properties
+        DYN_NUMBER = 1
+        # list with dynamic properties ids
+        dynamic = ids[0:DYN_NUMBER]
+        for key in self.keys():
+            if key in dynamic:
+                self.get(key).setDynamic(True)
+            else:
+                self.get(key).setDynamic(False)

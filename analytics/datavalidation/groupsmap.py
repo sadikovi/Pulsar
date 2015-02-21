@@ -5,6 +5,10 @@ import analytics.datavalidation.group as g
 import analytics.exceptions.exceptions as c
 
 
+# unknown guid
+GROUP_UNKNOWN_GUID = "6120-31c2-4177-ad03-6d93a3a87976-unknown_id"
+
+
 class GroupsMap(object):
     """
         GroupsMap class helps to consolidate and maintain groups. Each group
@@ -228,15 +232,26 @@ class GroupsMap(object):
             Returns:
                 Group: unique unknown group
         """
-        guid = "6120-31c2-4177-ad03-6d93a3a87976-unknown_id"
         if self.isHierarchy() is True:
             return None
-        if self.has(guid) is False:
-            unknown = g.Group(guid, guid, "Unknown Group", "Unknown Group", None)
+        if self.hasUnknownGroup() is False:
+            unknown = g.Group(GROUP_UNKNOWN_GUID, GROUP_UNKNOWN_GUID,
+                                "Unknown Group", "Unknown Group", None)
             self.assign(unknown)
             return unknown
         else:
             return self.get(guid)
+
+    # [Public]
+    def hasUnknownGroup(self):
+        """
+            Checks if map has unknown group without adding it.
+
+            Returns:
+                bool: flag indicating if unknown group is in map
+        """
+        return self.has(GROUP_UNKNOWN_GUID)
+
 
     # [Public]
     def updateParentIdsToGuids(self):
@@ -373,3 +388,27 @@ class GroupsMap(object):
         vlist[element.getId()] = True
         for child in element.getChildren():
             self._traverseCycle(collector, child, vlist)
+
+    # [Public]
+    def makeRoot(self, group):
+        """
+            Sets group provided as a root of the map. Works only if hierarchy
+            is built, otherwise action is ignored. If map has unknown group,
+            then unknown group is automatically added to roots of the map.
+
+            Args:
+                group (Group): new group instance as a root
+        """
+        if type(group) is not g.Group:
+            raise c.CheckError("Group", type(group))
+        if self._isHierarchy:
+            # check unknown group
+            unknown = None
+            if self.hasUnknownGroup():
+                unknown = self.get(GROUP_UNKNOWN_GUID)
+            # reset map and add new group as a root
+            self._map = {}
+            self._map[group.getId()] = group
+            # add unknown group if it was in the map previously
+            if unknown is not None:
+                self._map[unknown.getId()] = unknown

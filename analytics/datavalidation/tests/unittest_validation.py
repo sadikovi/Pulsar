@@ -253,6 +253,39 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(len(property._values), 1)
         self.assertTrue(123 in property._values)
 
+    def test_property_setDynamic(self):
+        property = pr.Property("property", 122)
+        self.assertEqual(property._dynamic, False)
+        property.setDynamic(True)
+        self.assertEqual(property._dynamic, True)
+
+    def test_property_getDynamic(self):
+        property = pr.Property("property", 122)
+        self.assertEqual(property.getDynamic(), False)
+        property.setDynamic(True)
+        self.assertEqual(property.getDynamic(), True)
+
+    def test_property_setDefault(self):
+        property = pr.Property("param", "str")
+        self.assertEqual(property._default, None)
+        property.setDefault("value")
+        self.assertEqual(property._default, "value")
+
+    def test_property_getDefault(self):
+        property = pr.Property("param", "str")
+        property.setDefault("value")
+        self.assertEqual(property.getDefault(), "value")
+
+        dynamic = pr.Property("param", 1)
+        dynamic.add(1)
+        dynamic.add(2)
+        dynamic.add(3)
+        dynamic.add(4)
+        dynamic.add(5)
+        self.assertEqual(dynamic.getDefault(), None)
+        dynamic.setDynamic(True)
+        self.assertEqual(dynamic.getDefault(), 3)
+
 # GroupsMap tests
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):
 
@@ -364,6 +397,27 @@ class GroupsMap_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(map._findElementInMap(map.guid('6'), map.values()).getName(), '6')
         self.assertEqual(map._findElementInMap(map.guid('5'), map.values()).getJSON(), group5)
 
+    def test_groupsmap_makeRoot(self):
+        self._testGroups = [
+            {'id': '1', 'name': '1', 'desc': '1', 'parent': None},
+            {'id': '2', 'name': '2', 'desc': '2', 'parent': '1'},
+            {'id': '3', 'name': '3', 'desc': '3', 'parent': '1'},
+            {'id': '4', 'name': '4', 'desc': '4', 'parent': '2'},
+            {'id': '5', 'name': '5', 'desc': '5', 'parent': '2'},
+            {'id': '6', 'name': '6', 'desc': '6', 'parent': '3'}
+        ]
+        map = gm.GroupsMap()
+        for gr in self._testGroups:
+            map.assign(g.Group.createFromObject(gr))
+        map.updateParentIdsToGuids()
+        unknown = map.unknownGroup()
+        map.buildHierarchy()
+        self.assertEqual(len(map.keys()), 2)
+        group = map.get(map.guid("4"))
+        map.makeRoot(group)
+        self.assertEqual(len(map.keys()), 2)
+        self.assertEqual(map.keys(), [group.getId(),unknown.getId()])
+
 # ResultsMap tests
 class ResultsMap_TestsSequence(DataValidation_TestsSequence):
 
@@ -453,6 +507,32 @@ class PropertiesMap_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(map.isEmpty(), False)
         map.remove(self._property.getName())
         self.assertEqual(map.isEmpty(), True)
+
+    def test_propertiesmap_setDynamic(self):
+        map = pm.PropertiesMap()
+        map.assign(pr.Property("a", 123))
+        map.assign(pr.Property("b", 123.12))
+        map.assign(pr.Property("c", "str"))
+        self.assertEqual(len(map.values()), 3)
+
+        ids = ["a"]
+        map.setDynamic(ids)
+        self.assertEqual(map.get("a")._dynamic, True)
+        self.assertEqual(map.get("b")._dynamic, False)
+        self.assertEqual(map.get("c")._dynamic, False)
+
+        ids = ["b", "a"]
+        map.setDynamic(ids)
+        self.assertEqual(map.get("a")._dynamic, False)
+        self.assertEqual(map.get("b")._dynamic, True)
+        self.assertEqual(map.get("c")._dynamic, False)
+
+        ids = ["c", "b"]
+        map.setDynamic(ids)
+        self.assertEqual(map.get("a")._dynamic, False)
+        self.assertEqual(map.get("b")._dynamic, False)
+        self.assertEqual(map.get("c")._dynamic, False)
+
 
 # Validator tests
 class Validator_TestsSequence(DataValidation_TestsSequence):

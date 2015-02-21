@@ -1,8 +1,10 @@
 # import libs
 import unittest
+from types import DictType, ListType
 # import classes
 import analytics.exceptions.exceptions as c
 import analytics.utils.hqueue as hq
+import analytics.utils.misc as misc
 
 # Superclass for this tests sequence
 class Utils_TestsSequence(unittest.TestCase):
@@ -57,10 +59,37 @@ class hQueue_TestsSequence(Utils_TestsSequence):
         queue = hq.hQueue(self._array)
         self.assertEqual(queue.getList(), self._array)
 
+# misc tests
+class misc_TestsSequence(Utils_TestsSequence):
+
+    def test_misc_checkTypeAgainst(self):
+        a = {"id":"1"}
+        with self.assertRaises(c.CheckError):
+            misc.checkTypeAgainst(type(a), ListType)
+        t = misc.checkTypeAgainst(type(a), DictType)
+        self.assertEqual(t, True)
+
+    def test_misc_checkInstanceAgainst(self):
+        class A(object):
+            pass
+        class B(A):
+            pass
+        class C(B):
+            pass
+        a = A(); b = B(); c = C()
+        self.assertTrue(misc.checkInstanceAgainst(a, A))
+        self.assertTrue(misc.checkInstanceAgainst(b, B))
+        self.assertTrue(misc.checkInstanceAgainst(c, C))
+        self.assertTrue(misc.checkInstanceAgainst(b, A))
+        self.assertTrue(misc.checkInstanceAgainst(c, A))
+        with self.assertRaises(TypeError):
+            self.assertTrue(misc.checkInstanceAgainst(a, B))
+
 # Load test suites
 def _suites():
     return [
-        hQueue_TestsSequence
+        hQueue_TestsSequence,
+        misc_TestsSequence
     ]
 
 # Load tests

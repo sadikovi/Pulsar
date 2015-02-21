@@ -106,3 +106,13 @@ class ResultsMap(object):
                 list<str>: list of key values of the _map dictionary
         """
         return self._map.keys()
+
+    # [Public]
+    def values(self):
+        """
+            Returns values list (list<Result>) of the _map attribute.
+
+            Returns:
+                list<Result>: values list that are in dictionary
+        """
+        return self._map.values()
