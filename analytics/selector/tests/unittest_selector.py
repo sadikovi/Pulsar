@@ -39,7 +39,10 @@ class Selector_TestsSequence(unittest.TestCase):
             {"id": "B", "name": "Bname", "group": "b", "a": 125, "b": 320},
             {"id": "C", "name": "Cname", "group": "b", "a": 127, "b": 90}
         ]
-        self._testProps = {'a': 1, 'b': 1}
+        self._testProps = [
+            {"name": "a", "sample": 1},
+            {"name": "b", "sample": 1},
+        ]
 
         self._dv = v.Validator()
         self._dv.prepareData(self._testGroups, self._testRes, self._testProps)

@@ -66,22 +66,20 @@ class Validator(object):
     def _loadProperties(self, properties):
         """
             Loads properties into _properties map. Tries to create a Property
-            object from raw data provided. If it fails, then property is
-            ignored.
+            object from raw data provided. If something is wrong it fails
+            (mostly because name is not specified).
 
             Args:
                 properties (dict<str, object>): properties raw data
         """
-        if type(properties) is not DictType:
-            raise c.CheckError("dict<str, object>", str(type(properties)))
-        for key in properties:
-            try:
-                self._properties.assign(p.Property(key, properties[key]))
-            except KeyError:
-                continue
+        if type(properties) is not ListType:
+            raise c.CheckError("list<object>", str(type(properties)))
+        for obj in properties:
+            prop = p.Property.createFromObject(obj)
+            self._properties.assign(prop)
 
     # [Public]
-    def prepareData(self, groups, results, properties={}):
+    def prepareData(self, groups, results, properties=[]):
         """
             Prepares data by loading all groups, results and properties.
             Supports feature of discovering properties, when attribute is not
@@ -91,9 +89,9 @@ class Validator(object):
             unknown group changes). Builds hierarchy from _groups map.
 
             Args:
-                groups (dict<str, object>)      : groups raw data
-                results (dict<str, object>)     : results raw data
-                properties (dict<str, object>)  : properties raw data
+                groups (list<object>)      : groups raw data
+                results (list<object>)     : results raw data
+                properties (list<object>)  : properties raw data
         """
         # load groups, results, and properties
         self._loadGroups(groups)
@@ -116,6 +114,8 @@ class Validator(object):
                 temp.updateGroup(self._groups.unknownGroup().getId())
         # build hierarchy
         self._groups.buildHierarchy()
+        # update dynamic properties
+        self._properties.updateDynamic()
 
     # [Public]
     def getResults(self):

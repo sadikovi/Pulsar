@@ -1,5 +1,5 @@
 # import libs
-from types import StringType, IntType, FloatType
+from types import StringType, IntType, FloatType, DictType
 # import classes
 import analytics.datavalidation.parse as p
 import analytics.exceptions.exceptions as c
@@ -12,10 +12,10 @@ class Property(object):
         property.
 
         Example of properties stored in file:
-            {
-                "property1": 1,
-                "property2": "two"
-            }
+            [
+                {"name": "value", "sample": 123, "dynamic": true},
+                {"name": "price", "sample": 320.0, "dynamic": false}
+            ]
 
         The class provides default constructor where name and sample have to
         be specified explicitly. Property internal id (which is mostly used
@@ -37,18 +37,16 @@ class Property(object):
     PROPERTY_STRING = 3
     DYNAMIC_PROPERTIES = [PROPERTY_INT, PROPERTY_FLOAT]
 
-    def __init__(self, name, sample):
+    def __init__(self, name, sample, dynamic=False):
         if name is None or sample is None:
             raise c.CheckError("value", "None")
         if type(name) is not StringType:
             raise c.CheckError("str", str(type(name)))
-
-        self._id = p.Parse.guidBasedId()
-        self._name = name
+        # set id to be equal to name, that is true only for the property
+        self._id = self._name = name
         self._values = set()
         self._dynamic = False
         self._default = None
-
         # check type to identify whether sample is a number or string
         if type(sample) is IntType:
             self._type = Property.PROPERTY_INT
@@ -58,6 +56,35 @@ class Property(object):
             self._type = Property.PROPERTY_STRING
         else:
             raise TypeError("The Property type is not supported")
+        # set dynamic and default value
+        self.setDynamic(dynamic)
+
+    # [Public]
+    @classmethod
+    def createFromObject(cls, obj):
+        """
+            Creates Property object from dictionary that is passed as an
+            argument. Checks strictly properties specified.
+
+            Args:
+                obj (dict<str, object>): object to create Property instance
+
+            Returns:
+                Property: instance of the Property class
+        """
+        if type(obj) is not DictType:
+            raise c.CheckError("dict", str(type(obj)))
+        PROPERTY_NAME = "name"
+        PROPERTY_SAMPLE = "sample"
+        PROPERTY_DYNAMIC = "dynamic"
+        # check name
+        if PROPERTY_NAME not in obj:
+            raise ValueError("Property object does not have a name")
+        name = obj[PROPERTY_NAME]
+        # sample and dynamic are checked with some default values
+        sample = obj[PROPERTY_SAMPLE] if PROPERTY_SAMPLE in obj else "str"
+        dynamic = obj[PROPERTY_DYNAMIC] if PROPERTY_DYNAMIC in obj else False
+        return cls(name, sample, dynamic)
 
     # [Public]
     def add(self, obj):

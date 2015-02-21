@@ -21,9 +21,12 @@ class DataValidation_TestsSequence(unittest.TestCase):
 class Parse_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
-        self._testResult = {'id': 'pid', 'name': 'pname', 'description': 'desc', 'group': 'a', 'value': 123, 'price': 302}
+        self._testResult = {'id': 'pid', 'name': 'pname',
+                            'description': 'desc', 'group': 'a', 'value': 123,
+                            'price': 302}
         self._failTestObject = {'UID': 'pid', 'value': 23, 'price': 403}
-        self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
+        self._testGroup = {'id': 'group id', 'name': 'group name',
+                            'desc': 'desc', 'parent': '123'}
 
     def test_parse_init(self):
         with self.assertRaises(c.CheckError):
@@ -100,7 +103,8 @@ class Parse_TestsSequence(DataValidation_TestsSequence):
 # Group tests
 class Group_TestsSequence(DataValidation_TestsSequence):
     def setUp(self):
-        self._testGroup = {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
+        self._testGroup = {'id': 'group id', 'name': 'group name',
+                            'desc': 'desc', 'parent': '123'}
 
     def test_group_createFromObject(self):
         with self.assertRaises(c.CheckError):
@@ -110,7 +114,9 @@ class Group_TestsSequence(DataValidation_TestsSequence):
         group = g.Group.createFromObject(self._testGroup)
 
     def test_group_init(self):
-        group1 = g.Group(p.Parse.guidBasedId(), self._testGroup['id'], self._testGroup['name'], self._testGroup['desc'], self._testGroup['parent'])
+        group1 = g.Group(p.Parse.guidBasedId(), self._testGroup['id'],
+                        self._testGroup['name'], self._testGroup['desc'],
+                        self._testGroup['parent'])
         group2 = g.Group.createFromObject(self._testGroup)
         self.assertEqual(group1.getId() != group2.getId(), True)
         self.assertEqual(group1.getExternalId(), group2.getExternalId())
@@ -185,8 +191,11 @@ class Group_TestsSequence(DataValidation_TestsSequence):
 class Result_TestsSequence(DataValidation_TestsSequence):
 
     def setUp(self):
-        self._testResult = {'id': 'pid', 'name': 'pname', 'description': 'desc', 'group': 'a', 'value': 123, 'price': 302}
-        self._testGroup =  {'id': 'group id', 'name': 'group name', 'desc': 'desc', 'parent': '123'}
+        self._testResult = {'id': 'pid', 'name': 'pname',
+                            'description': 'desc', 'group': 'a',
+                            'value': 123, 'price': 302}
+        self._testGroup =  {'id': 'group id', 'name': 'group name',
+                            'desc': 'desc', 'parent': '123'}
 
     def test_result_init(self):
         with self.assertRaises(c.CheckError):
@@ -239,7 +248,7 @@ class Property_TestsSequence(DataValidation_TestsSequence):
             property = pr.Property(None, None)
 
         property = pr.Property('value', 123)
-        self.assertTrue(len(property.getId()) > 10)
+        self.assertEquals(property.getId(), 'value')
         self.assertEquals(property.getName(), 'value')
         self.assertEquals(property.getType(), pr.Property.PROPERTY_INT)
 
@@ -285,6 +294,24 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(dynamic.getDefault(), None)
         dynamic.setDynamic(True)
         self.assertEqual(dynamic.getDefault(), 3)
+
+    def test_property_createFromObject(self):
+        with self.assertRaises(ValueError):
+            prop = pr.Property.createFromObject({"dynamic": True})
+
+        testProp = {"name": "test", "sample": 1, "dynamic": True}
+        prop = pr.Property.createFromObject(testProp)
+        self.assertEqual(prop._id, "test")
+        self.assertEqual(prop._name, "test")
+        self.assertEqual(prop._type, pr.Property.PROPERTY_INT)
+        self.assertEqual(prop._dynamic, True)
+
+        testProp = {"name": "test"}
+        prop = pr.Property.createFromObject(testProp)
+        self.assertEqual(prop._id, "test")
+        self.assertEqual(prop._name, "test")
+        self.assertEqual(prop._type, pr.Property.PROPERTY_STRING)
+        self.assertEqual(prop._dynamic, False)
 
 # GroupsMap tests
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):
@@ -533,6 +560,20 @@ class PropertiesMap_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(map.get("b")._dynamic, False)
         self.assertEqual(map.get("c")._dynamic, False)
 
+    def test_propertiesmap_updateDynamic(self):
+        map = pm.PropertiesMap()
+        map.assign(pr.Property("a", 123, True))
+        map.assign(pr.Property("b", 123.12, True))
+        map.assign(pr.Property("c", "str", False))
+        # update dynamic
+        map.updateDynamic()
+        i = 0 # number of dynamic properties
+        iid = None
+        for key in map.keys():
+            if map.get(key).getDynamic():
+                i+=1; iid = key
+        self.assertEqual(i, 1)
+        self.assertEqual(map.get(iid).getId(), "a")
 
 # Validator tests
 class Validator_TestsSequence(DataValidation_TestsSequence):
@@ -546,7 +587,10 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
             {"id": "A", "name": "Aname", "desc": "A", "group": "a", "value": 123, "price": 320},
             {"id": "B", "name": "Bname", "desc": "B", "group": "b", "value": 123, "price": 320}
         ]
-        self._testProperties = {'delight': 123, 'wombat': 'wer'}
+        self._testProperties = [
+            {"name": "delight", "sample": 123, "dynamic": True},
+            {"name": "wombat", "sample": "wer", "dynamic": False},
+        ]
 
     def test_validator_init(self):
         dv = v.Validator()
@@ -571,7 +615,7 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
     def test_validator_loadProperties(self):
         dv = v.Validator()
         with  self.assertRaises(c.CheckError):
-            dv._loadProperties([])
+            dv._loadProperties({})
         dv._loadProperties(self._testProperties)
         self.assertEquals(len(dv.getProperties().keys()), 2)
 

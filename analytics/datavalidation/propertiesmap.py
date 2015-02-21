@@ -137,3 +137,12 @@ class PropertiesMap(object):
                 self.get(key).setDynamic(True)
             else:
                 self.get(key).setDynamic(False)
+
+    # [Public]
+    def updateDynamic(self):
+        """
+            Updates dynamic for properties inside the map. Recommended to call
+            once as finishing operation or in the end of some parsing/loading.
+        """
+        dyn = [key for key in self.keys() if self.get(key).getDynamic()]
+        self.setDynamic(dyn)

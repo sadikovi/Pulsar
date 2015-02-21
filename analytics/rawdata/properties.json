@@ -1,6 +1,6 @@
-{
-    "value": 123,
-    "price": 320,
-    "bedrooms": 1,
-    "bathrooms": 1
-}
+[
+    {"name": "value", "sample": 123, "dynamic": true},
+    {"name": "price", "sample": 320.0, "dynamic": false},
+    {"name": "bedrooms", "sample": 1, "dynamic": false},
+    {"name": "bathrooms", "sample": 1, "dynamic": false}
+]

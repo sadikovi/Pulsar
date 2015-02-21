@@ -17,6 +17,10 @@ _TABLE_GROUPS = "groups"
 _TABLE_PROPERTIES = "properties"
 _TABLE_ALGORITHM = "algorithms"
 
+# keywords to search in queries
+_QUERY_ID = "id"
+_QUERY_NAME = "name"
+
 class Selector(object):
     """
         Selector class performs filtering of the coming data. For example, if
@@ -189,14 +193,13 @@ class Selector(object):
         for predicate in queryBlock._predicates:
             if predicate._type is not q._PREDICATE_TYPES.EQUAL:
                 continue
-            if predicate._parameter == "id":
+            if predicate._parameter == _QUERY_ID:
                 group = groupsMap.get(predicate._values[0])
                 if group is not None:
                     break
         # if group is found, update map to contain only the group and children
         if group is not None:
             groupsMap.makeRoot(group)
-
 
     # [Private]
     def _filterProperties(self, propertiesMap, queryBlock):
@@ -221,10 +224,10 @@ class Selector(object):
             if predicate._type is not q._PREDICATE_TYPES.EQUAL:
                 continue
             for prop in propertiesMap.values():
-                if predicate._parameter == "id":
-                    if prop.getName() == predicate._values[0]:
+                if predicate._parameter == _QUERY_ID:
+                    if prop.getId() == predicate._values[0]:
                         names.append(prop.getName())
-                elif predicate._parameter == "name":
+                elif predicate._parameter == _QUERY_NAME:
                     if prop.getName() == predicate._values[0]:
                         names.append(prop.getName())
         # remove not matching algorithms
@@ -253,10 +256,10 @@ class Selector(object):
             if predicate._type is not q._PREDICATE_TYPES.EQUAL:
                 continue
             for algorithm in algorithmsMap.values():
-                if predicate._parameter == "id":
+                if predicate._parameter == _QUERY_ID:
                     if algorithm.getId() == predicate._values[0]:
                         ids.append(algorithm.getId())
-                elif predicate._parameter == "name":
+                elif predicate._parameter == _QUERY_NAME:
                     if algorithm.getName() == predicate._values[0]:
                         ids.append(algorithm.getId())
         # remove not matching algorithms
