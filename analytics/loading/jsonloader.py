@@ -3,7 +3,7 @@ import json
 from types import StringType
 # import classes
 import analytics.loading.loader as l
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class JsonLoader(l.Loader):
@@ -37,8 +37,7 @@ class JsonLoader(l.Loader):
             Args:
                 filepath (str): json file path
         """
-        if type(filepath) is not StringType:
-            raise c.CheckError('str', type(filepath))
+        misc.checkTypeAgainst(type(filepath), StringType)
         return cls(filepath)
 
     # [Public]

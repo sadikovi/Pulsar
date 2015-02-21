@@ -1,9 +1,10 @@
 # import libs
 import json
-from types import DictType, ListType
+from types import DictType, ListType, StringType
 # import classes
 import analytics.datavalidation.parse as p
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
+
 
 
 class Group(object):
@@ -34,8 +35,7 @@ class Group(object):
     """
 
     def __init__(self, pguid, pid, pname, pdesc, pparent):
-        if pguid is None:
-            raise c.CheckError("<type 'str'>", "None")
+        misc.checkTypeAgainst(type(pguid), StringType)
         self._id = pguid
         self._externalId = pid
         self._name = pname
@@ -45,8 +45,7 @@ class Group(object):
 
     @classmethod
     def createFromObject(cls, object):
-        if type(object) is not DictType:
-            raise c.CheckError("<type 'dict'>", str(type(object)))
+        misc.checkTypeAgainst(type(object), DictType)
         prs = p.Parse(object)
         return cls(p.Parse.guidBasedId(), prs.getExternalId(), \
                     prs.getName(), prs.getDesc(), prs.getParent())
@@ -154,11 +153,11 @@ class Group(object):
             Args:
                 child (Group): a group instance to be added as child
         """
-        if child is None: return None
-        if type(child) is not Group:
-            raise c.CheckError("Group instance", str(type(child)))
+        if child is None:
+            return None
+        misc.checkTypeAgainst(type(child), Group)
         if child == self:
-            raise c.CheckError("Group instance", "itself as a child")
+            raise ValueError("Group instance cannot add itself as child")
         if self.hasChild(child) is False:
             self._children.append(child)
 
@@ -171,8 +170,7 @@ class Group(object):
             Args:
                 children (list<Group>): children list to be added
         """
-        if type(children) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(children)))
+        misc.checkTypeAgainst(type(children), ListType)
         for child in children:
             self.addChild(child)
 
@@ -188,8 +186,7 @@ class Group(object):
             Args:
                 children (list<Group>): children list to be assigned
         """
-        if type(children) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(children)))
+        misc.checkTypeAgainst(type(children), ListType)
         self._children = children
 
     # [Public]

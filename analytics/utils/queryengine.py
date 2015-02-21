@@ -3,7 +3,8 @@ from types import StringType, ListType, DictType, TupleType
 import re
 from urllib import quote, unquote
 # import classes
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
+from analytics.exceptions.exceptions import SyntaxError
 
 ###########################################################
 """
@@ -161,8 +162,7 @@ class QueryEngine(object):
                 list<QueryBlock>: list of QueryBlock instances that
                                     represent each query
         """
-        if type(queryset) is not StringType:
-            raise c.CheckError("str", type(queryset))
+        misc.checkTypeAgainst(type(queryset), StringType)
         if len(queryset) == 0:
             raise ValueError("Query set is empty")
 
@@ -185,7 +185,7 @@ class QueryEngine(object):
             # check syntax
             group = re.match(_QUERY_PATTERN, query, re.I)
             if group is None or group.group() != query:
-                raise c.SyntaxError(1, query)
+                raise SyntaxError(1, query)
             # start creating query block
             queryStatement = None
             for table in self._tablesMap.values():
@@ -221,14 +221,10 @@ class QueryEngine(object):
             Returns:
                 str: modified string containing keys on match places
         """
-        if type(pattern) is not StringType:
-            raise c.CheckError("str", type(pattern))
-        if type(querySet) is not StringType:
-            raise c.CheckError("str", type(querySet))
-        if type(key) is not StringType:
-            raise c.CheckError("str", type(key))
-        if type(pmap) is not DictType:
-            raise c.CheckError("dict<str, str>", type(pmap))
+        misc.checkTypeAgainst(type(pattern), StringType)
+        misc.checkTypeAgainst(type(querySet), StringType)
+        misc.checkTypeAgainst(type(key), StringType)
+        misc.checkTypeAgainst(type(pmap), DictType)
         i = 0
         while True:
             group = re.search(pattern, querySet, re.I)
@@ -255,12 +251,10 @@ class QueryEngine(object):
             Returns:
                 str: string representation of query blocks
         """
-        if type(blocks) is not ListType:
-            raise c.CheckError("list<QueryBlock>", type(blocks))
+        misc.checkTypeAgainst(type(blocks), ListType)
         query = []
         for block in blocks:
-            if type(block) is not QueryBlock:
-                raise c.CheckError("QueryBlock", type(block))
+            misc.checkTypeAgainst(type(block), QueryBlock)
             query.append(block.queryToString())
         return _QUERY_DELIMITER.join(query)
 
@@ -275,10 +269,8 @@ class QueryBlock(object):
             _predicates (list<QueryPredicate>): list of query predicates
     """
     def __init__(self, queryStatement, queryPredicates=[]):
-        if type(queryStatement) is not QueryStatement:
-            raise c.CheckError("QueryStatement", type(queryStatement))
-        if type(queryPredicates) is not ListType:
-            raise c.CheckError("list<QueryPredicate>", type(queryPredicates))
+        misc.checkTypeAgainst(type(queryStatement), QueryStatement)
+        misc.checkTypeAgainst(type(queryPredicates), ListType)
         self._statement = queryStatement
         self._predicates = queryPredicates
 
@@ -290,8 +282,7 @@ class QueryBlock(object):
             Args:
                 queryPredicate (QueryPredicate): predicate to add
         """
-        if type(queryPredicate) is not QueryPredicate:
-            raise c.CheckError("QueryPredicate", type(queryPredicate))
+        misc.checkTypeAgainst(type(queryPredicate), QueryPredicate)
         self._predicates.append(queryPredicate)
 
     # [Public]
@@ -352,19 +343,16 @@ class QueryStatement(object):
             Returns:
                 QueryStatement: statement instance
         """
-        if type(statement) is not StringType:
-            raise c.CheckError("str", type(statement))
+        misc.checkTypeAgainst(type(statement), StringType)
         statement = statement.strip()
         group = re.search(_TABLE_PATTERN, statement, re.I)
         if group is None:
-            raise c.SyntaxError(1, statement)
+            raise SyntaxError(1, statement)
         return cls.createWithTable(group.group())
 
     def __init__(self, table, arguments=[]):
-        if type(table) is not StringType:
-            raise c.CheckError("str", type(table))
-        if type(arguments) is not ListType:
-            raise c.CheckError("list<str>", type(arguments))
+        misc.checkTypeAgainst(type(table), StringType)
+        misc.checkTypeAgainst(type(arguments), ListType)
         self._table = table
         self._arguments = arguments
 
@@ -419,8 +407,7 @@ class QueryPredicate(object):
             Returns:
                 QueryPredicate: query predicate with all the information
         """
-        if type(predicate) is not StringType:
-            raise c.CheckError("str", type(predicate))
+        misc.checkTypeAgainst(type(predicate), StringType)
         # prepare predicate
         predicate = predicate \
                 .replace(_PREDICATE_KW_IS.lower(),_PREDICATE_KW_IS) \
@@ -469,8 +456,7 @@ class QueryPredicate(object):
             Returns:
                 QueryPredicate: query predicate with all the information
         """
-        if type(predicate) is not StringType:
-            raise c.CheckError("str", type(predicate))
+        misc.checkTypeAgainst(type(predicate), StringType)
         predicate = predicate.strip()
         # loop through the list of patterns
         for pattern in _PREDICATE_IND_PATTERNS.keys():
@@ -482,10 +468,8 @@ class QueryPredicate(object):
         raise ValueError("Invalid predicate, or non-supported format")
 
     def __init__(self, ptype, valueType, key, values):
-        if type(key) is not StringType:
-            raise c.CheckError("str", type(key))
-        if type(values) is not TupleType:
-            raise c.CheckError("tuple", type(values))
+        misc.checkTypeAgainst(type(key), StringType)
+        misc.checkTypeAgainst(type(values), TupleType)
         # type
         self._type = ptype
         # value type

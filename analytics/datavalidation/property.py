@@ -2,7 +2,7 @@
 from types import StringType, IntType, FloatType, DictType
 # import classes
 import analytics.datavalidation.parse as p
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class Property(object):
@@ -39,9 +39,8 @@ class Property(object):
 
     def __init__(self, name, sample, dynamic=False):
         if name is None or sample is None:
-            raise c.CheckError("value", "None")
-        if type(name) is not StringType:
-            raise c.CheckError("str", str(type(name)))
+            raise ValueError("Property name and sample cannot be None")
+        misc.checkTypeAgainst(type(name), StringType)
         # set id to be equal to name, that is true only for the property
         self._id = self._name = name
         self._values = set()
@@ -72,8 +71,8 @@ class Property(object):
             Returns:
                 Property: instance of the Property class
         """
-        if type(obj) is not DictType:
-            raise c.CheckError("dict", str(type(obj)))
+        misc.checkTypeAgainst(type(obj), DictType)
+        
         PROPERTY_NAME = "name"
         PROPERTY_SAMPLE = "sample"
         PROPERTY_DYNAMIC = "dynamic"

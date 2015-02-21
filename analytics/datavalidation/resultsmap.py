@@ -1,6 +1,6 @@
 # import classes
 import analytics.datavalidation.result as r
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class ResultsMap(object):
@@ -53,9 +53,7 @@ class ResultsMap(object):
             Args:
                 result (Result): new Result instance
         """
-        if type(result) is not r.Result:
-            raise c.CheckError("<type 'Result'>", str(type(result)))
-
+        misc.checkTypeAgainst(type(result), r.Result)
         if self.has(result.getId()) is False:
             self._map[result.getId()] = result
 

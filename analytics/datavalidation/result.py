@@ -3,7 +3,7 @@ import json
 from types import DictType, StringType, ListType
 # import classes
 import analytics.datavalidation.parse as p
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 import analytics.datavalidation.property as pr
 import analytics.datavalidation.propertiesmap as pm
 
@@ -37,12 +37,10 @@ class Result(object):
     # properties dict has to be a dict<str, Property> instance
     # group is a group id that result relates to
     def __init__(self, obj, group="", properties=pm.PropertiesMap()):
-        if type(obj) is not DictType:
-            raise c.CheckError("<type 'dict'>", str(type(obj)))
-        if type(group) is not StringType:
-            raise c.CheckError("<type 'str'>", str(type(group)))
-        if type(properties) is not pm.PropertiesMap:
-            raise c.CheckError("<type 'PropertiesMap'>", str(type(properties)))
+        misc.checkTypeAgainst(type(obj), DictType)
+        misc.checkTypeAgainst(type(group), StringType)
+        misc.checkTypeAgainst(type(properties), pm.PropertiesMap)
+        # use parse for getting parameters
         parse = p.Parse(obj)
         self._id = p.Parse.guidBasedId()
         self._externalId = parse.getExternalId()
@@ -70,7 +68,6 @@ class Result(object):
                 self._properties[pid] = None
             else:
                 prop.add(self._properties[pid])
-
 
     # [Public]
     def getExternalId(self):

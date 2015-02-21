@@ -2,7 +2,7 @@
 import uuid
 from types import DictType, StringType
 # import classes
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class Parse(object):
@@ -52,7 +52,7 @@ class Parse(object):
             Returns:
                 object: value for a key found in a set of possible keys
         """
-        if (self._object is None): raise c.CheckError("object", "None")
+        misc.checkTypeAgainst(type(self._object), DictType)
         for key in array:
             if key in self._object:
                 self._primaryKeys.append(key)
@@ -68,8 +68,7 @@ class Parse(object):
             Args:
                 object (dict<str, object>): object to update reference to
         """
-        if type(object) is not DictType:
-            raise c.CheckError("<type 'dict'>", str(type(object)))
+        misc.checkTypeAgainst(type(object), DictType)
         self._resetParse()
         self._object = object
 

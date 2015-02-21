@@ -2,7 +2,7 @@
 from types import ListType
 # import classes
 import analytics.datavalidation.property as p
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class PropertiesMap(object):
@@ -53,8 +53,7 @@ class PropertiesMap(object):
             Args:
                 property (Property): Property instance to be added to _map
         """
-        if type(property) is not p.Property:
-            raise c.CheckError("<type 'Property'>", str(type(property)))
+        misc.checkTypeAgainst(type(property), p.Property)
         if self.has(property.getName()) is False:
             self._map[property.getName()] = property
 
@@ -126,8 +125,7 @@ class PropertiesMap(object):
             Args:
                 ids (list<str>): property ids list
         """
-        if type(ids) is not ListType:
-            raise c.CheckError("list<str>", type(ids))
+        misc.checkTypeAgainst(type(ids), ListType)
         # max number of dynamic properties
         DYN_NUMBER = 1
         # list with dynamic properties ids

@@ -244,7 +244,7 @@ class Property_TestsSequence(DataValidation_TestsSequence):
     def test_property_init(self):
         with self.assertRaises(c.CheckError):
             property = pr.Property({}, [])
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(ValueError):
             property = pr.Property(None, None)
 
         property = pr.Property('value', 123)

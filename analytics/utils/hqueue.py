@@ -2,7 +2,7 @@
 import random
 from types import ListType
 # import classes
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class hQueue(object):
@@ -15,8 +15,7 @@ class hQueue(object):
     """
 
     def __init__(self, array=[]):
-        if type(array) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(array)))
+        misc.checkTypeAgainst(type(array), ListType)
         self._queue = list(array)
 
     # [Public]

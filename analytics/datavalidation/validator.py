@@ -7,7 +7,7 @@ import analytics.datavalidation.property as p
 import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.propertiesmap as pm
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class Validator(object):
@@ -39,8 +39,7 @@ class Validator(object):
             Args:
                 groups (dict<str, object>): groups raw data as dictionary
         """
-        if type(groups) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(groups)))
+        misc.checkTypeAgainst(type(groups), ListType)
         for obj in groups:
             group = g.Group.createFromObject(obj)
             self._groups.assign(group)
@@ -55,8 +54,7 @@ class Validator(object):
             Args:
                 results (dict<str, object>): results raw data as dictionary
         """
-        if type(results) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(results)))
+        misc.checkTypeAgainst(type(results), ListType)
         for obj in results:
             result = r.Result(obj)
             result.updateGroup(self._groups.guid(result.getGroup()))
@@ -72,8 +70,7 @@ class Validator(object):
             Args:
                 properties (dict<str, object>): properties raw data
         """
-        if type(properties) is not ListType:
-            raise c.CheckError("list<object>", str(type(properties)))
+        misc.checkTypeAgainst(type(properties), ListType)
         for obj in properties:
             prop = p.Property.createFromObject(obj)
             self._properties.assign(prop)

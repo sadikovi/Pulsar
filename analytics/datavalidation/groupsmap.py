@@ -2,7 +2,7 @@
 from types import ListType
 # import classes
 import analytics.datavalidation.group as g
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 # unknown guid
@@ -111,8 +111,7 @@ class GroupsMap(object):
             Args:
                 group (Group): to be added to the groupsmap
         """
-        if type(group) is not g.Group:
-            raise c.CheckError("<type 'Group'>", str(type(group)))
+        misc.checkTypeAgainst(type(group), g.Group)
         if self.isHierarchy() is True:
             return None
         if self.has(group.getId()) is False:
@@ -340,10 +339,8 @@ class GroupsMap(object):
                 array (list<Group>): list to collect scanned elements
                 root (Group): element to scan and retrieve children
         """
-        if type(array) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(array)))
-        if type(root) is not g.Group:
-            raise c.CheckError("<type 'Group'>", str(type(root)))
+        misc.checkTypeAgainst(type(array), ListType)
+        misc.checkTypeAgainst(type(root), g.Group)
 
         if root is None or len(root.getChildren()) == 0:
             return False
@@ -370,10 +367,8 @@ class GroupsMap(object):
                 vlist (dict<str, bool>): dictionary to collect already
                                             traversed elements
         """
-        if type(collector) is not ListType:
-            raise c.CheckError("<type 'list'>", str(type(collector)))
-        if type(element) is not g.Group:
-            raise c.CheckError("<type 'Group'>", str(type(element)))
+        misc.checkTypeAgainst(type(collector), ListType)
+        misc.checkTypeAgainst(type(element), g.Group)
 
         if element is None or len(element.getChildren()) == 0: return False
         # check whether element is in vlist / is a cycle element
@@ -399,8 +394,7 @@ class GroupsMap(object):
             Args:
                 group (Group): new group instance as a root
         """
-        if type(group) is not g.Group:
-            raise c.CheckError("Group", type(group))
+        misc.checkTypeAgainst(type(group), g.Group)
         if self._isHierarchy:
             # check unknown group
             unknown = None

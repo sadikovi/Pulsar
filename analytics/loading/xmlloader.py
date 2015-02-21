@@ -3,7 +3,7 @@ from xml.dom import minidom
 from types import StringType, DictType
 # import classes
 import analytics.loading.loader as l
-import analytics.exceptions.exceptions as c
+import analytics.utils.misc as misc
 
 
 class XmlLoader(l.Loader):
@@ -51,8 +51,7 @@ class XmlLoader(l.Loader):
             Args:
                 filepath (str): json file path
         """
-        if type(filepath) is not StringType:
-            raise c.CheckError('str', type(filepath))
+        misc.checkTypeAgainst(type(filepath), StringType)
         return cls(filepath)
 
     # [Public]
@@ -96,18 +95,14 @@ class XmlLoader(l.Loader):
                 pvalue (str)    : value of the element
                 pstore (dict<str, str>): dictionary for pair {name, value}
         """
-        if type(pstore) is not DictType:
-            raise c.CheckError("dict<str, str>", type(pstore))
+        # check that properties store
+        misc.checkTypeAgainst(type(pstore), DictType)
         # check name
-        if type(pname) is not StringType:
-            raise c.CheckError("str", type(pname))
-        else:
-            pname = str(pname)
+        misc.checkTypeAgainst(type(pname), StringType)
+        pname = str(pname)
         # check type
-        if type(ptype) is not StringType:
-            raise c.CheckError("str", type(ptype))
-        else:
-            ptype = str(ptype)
+        misc.checkTypeAgainst(type(ptype), StringType)
+        ptype = str(ptype)
 
         if len(pname) == 0: return False
         # convert value
