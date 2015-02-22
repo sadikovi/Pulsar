@@ -51,6 +51,15 @@ class Selector_TestsSequence(unittest.TestCase):
         self.assertEqual(self._sel._blocks, [])
         self.assertEqual(self._sel._readyToFilter, False)
 
+    def test_selector_setSkipFiltering(self):
+        self.assertEqual(self._sel._skipFiltering, False)
+        self._sel.setSkipFiltering(True)
+        self.assertEqual(self._sel._skipFiltering, True)
+        self._sel.setSkipFiltering(None)
+        self.assertEqual(self._sel._skipFiltering, False)
+        self._sel.setSkipFiltering(1)
+        self.assertEqual(self._sel._skipFiltering, True)
+
     # not testing loadQueriesFromBlocks, because we are calling it with a
     # little overhead
     def test_selector_loadQueriesFromQueryset(self):
@@ -155,7 +164,7 @@ class Selector_TestsSequence(unittest.TestCase):
         self._sel._matchGroupsAndResults(groups, results)
         self.assertEqual(len(results.keys()), 1)
 
-    def test_selector_startFiltering(self):
+    def test_selector_startFiltering1(self):
         results = self._dv.getResults()
         groups = self._dv.getGroups()
         # extract group id for filtering
@@ -178,6 +187,17 @@ class Selector_TestsSequence(unittest.TestCase):
         self.assertEqual(groups.values()[0].getId(), gid)
         self.assertEquals(len(results.values()), 2)
         self.assertEquals(len(props.values()), 1)
+
+    def test_selector_startFiltering2(self):
+        results = self._dv.getResults()
+        groups = self._dv.getGroups()
+        props = self._dv.getProperties()
+        self._sel.setSkipFiltering(True)
+        self._sel.startFiltering(results, groups, props, None)
+        # make sure that nothing has changed
+        self.assertEqual(len(groups.values()), 2)
+        self.assertEquals(len(results.values()), 3)
+        self.assertEquals(len(props.values()), 2)
 
 # Load test suites
 def _suites():

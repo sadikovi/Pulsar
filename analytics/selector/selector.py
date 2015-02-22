@@ -46,9 +46,10 @@ class Selector(object):
         self._initialised = True
         self._blocks = []
         self._readyToFilter = False
+        self._skipFiltering = False
 
     # [Public]
-    def loadQueriesFromQueryset(self, queryset):
+    def loadQueriesFromQueryset(self, queryset=""):
         """
             Loads queries set and parses them using QueryEngine. Assigns them
             to _blocks property for later filtering.
@@ -57,10 +58,14 @@ class Selector(object):
                 queryset (str): string contains queries set
         """
         misc.checkTypeAgainst(type(queryset), StringType)
+        # if queryset is empty then skip loading
+        if queryset == "":
+            return False
         # initialise engine
         engine = q.QueryEngine()
         # load queries from query blocks
         self.loadQueriesFromBlocks(engine.parse(queryset))
+        return True
 
     # [Public]
     def loadQueriesFromBlocks(self, queryblocks):
@@ -74,6 +79,19 @@ class Selector(object):
         # fill properties
         self._blocks = queryblocks
         self._readyToFilter = True
+        return True
+
+    # [Public]
+    def setSkipFiltering(self, flag):
+        """
+            Sets skip filtering property as True or False. If property is True
+            then the whole filtering is skipped and no modifications are made
+            to the existing maps.
+
+            Args:
+                flag (bool): flag to set the property
+        """
+        self._skipFiltering = not not flag
 
     # [Public]
     def startFiltering(self, resultsMap, groupsMap, propsMap, algorithmsMap):
@@ -88,6 +106,10 @@ class Selector(object):
                 propsMap (PropertiesMap)     : map of properties
                 algorithmsMap (AlgorithmsMap): map of algorithms
         """
+        # check if selector was told to skip filtering
+        if self._skipFiltering:
+            # skip filtering and notify about it
+            return False
         # check if selector is ready to filter
         if self._readyToFilter is False:
             raise StandardError('Selector is not ready to filter')
@@ -119,6 +141,7 @@ class Selector(object):
         # match groups and results after filtering
         self._matchGroupsAndResults(groupsMap, resultsMap)
         # ... and that is it
+        return True
 
     # [Private]
     def _filterResults(self, resultsMap, propertiesMap, queryBlock):
