@@ -1,6 +1,7 @@
 # import libs
 from datetime import date
 import os
+import fnmatch
 # import classes
 from analytics.errorhandler.errorblock import ErrorBlock
 import analytics.utils.misc as misc
@@ -10,23 +11,81 @@ class Logger(object):
         Logger class is a global class to log data. Must not be instantiated
         and must be used with class methods only.
     """
-
-    ERR_LOG_PATH = "/Users/sadikovi/Developer/Pulsar/analytics/logs/log_error_"
+    # constants
+    LOG_DIRECTORY = "/Users/sadikovi/Developer/Pulsar/analytics/logs/"
+    ERR_LOG_PREFIX = "log_error"
+    LOG_PIECE_SEPARATOR = "_"
     FILE_EXTENSION = ".log"
     MAX_FILE_SIZE = 256
 
+    def __init__(self):
+        raise StandardError('Logger class cannot be instantiated')
+
     # [Public]
     @classmethod
-    def logError(cls, error):
+    def logError(cls, error, checkFileSize=False):
         """
-            Logging error for specified filepath.
+            Logging ErrorBlock instance for specified filepath as a constant.
 
             Args:
                 error (ErrorBlock): error to log
+
+            Returns:
+                bool: flag indicating that logging was successful
         """
         misc.checkTypeAgainst(type(error), ErrorBlock)
-        file = cls.ERR_LOG_PATH + cls._currentDateString() + cls.FILE_EXTENSION
-        return cls.log(file, error.toString())
+        # check file size
+        pattern = cls.ERR_LOG_PREFIX + cls.LOG_PIECE_SEPARATOR + \
+                    cls._currentDateString() + cls.LOG_PIECE_SEPARATOR + \
+                    "*" + cls.FILE_EXTENSION
+        index = cls._getLastFileIndex(cls.LOG_DIRECTORY, pattern)
+        filepath = cls.LOG_DIRECTORY + cls.ERR_LOG_PREFIX + \
+                    cls.LOG_PIECE_SEPARATOR + cls._currentDateString() + \
+                    cls.LOG_PIECE_SEPARATOR + str(index) + cls.FILE_EXTENSION
+        # check if flag is True and we have to check file size
+        if checkFileSize:
+            # override index the next index
+            newIndex = index + 1 if cls._sizeExceedsMax(filepath) else index
+            # update filepath with new index
+            filepath = cls.LOG_DIRECTORY + cls.ERR_LOG_PREFIX + \
+                    cls.LOG_PIECE_SEPARATOR + cls._currentDateString() + \
+                    cls.LOG_PIECE_SEPARATOR + str(newIndex) + cls.FILE_EXTENSION
+        return cls.log(filepath, error.toString())
+
+    # [Private]
+    @classmethod
+    def _getLastFileIndex(cls, dir, pattern):
+        """
+            Returns the last file index without parsing file name, basically
+            returns the number of matching results as the last file index.
+
+            Args:
+                dir (str): directory to search
+                pattern (str): pattern to match
+
+            Returns:
+                int: last file index
+        """
+        files = [x for x in os.listdir(dir) if fnmatch.fnmatch(x, pattern)]
+        if len(files) == 0:
+            return 1
+        else:
+            return len(files)
+
+    # [Private]
+    @classmethod
+    def _nextFileIndex(cls, dir, pattern):
+        """
+            Returns the next file index for pattern within directory.
+
+            Args:
+                dir (str): directory to search
+                pattern (str): pattern to match
+
+            Returns:
+                int: next file index
+        """
+        return cls._getLastFileIndex(dir, pattern) + 1
 
     # [Public]
     @classmethod
@@ -39,6 +98,9 @@ class Logger(object):
                 date (str): string representation of date
                 message (str): log message
                 details (str): log details
+
+            Returns:
+                bool: flag indicating that logging was successful
         """
         msg = """
         \r\n
@@ -51,15 +113,16 @@ class Logger(object):
 
     # [Public]
     @classmethod
-    def log(cls, file, message):
+    def log(cls, filepath, message):
         """
-            Standard loggin action.
+            Standard logging action. Logs message into file with file path
+            specified as @filepath.
 
             Args:
                 file (str): filepath
                 message (str): log message
         """
-        with open(file, 'a') as f:
+        with open(filepath, 'a') as f:
             f.write(message)
         return True
 
@@ -67,7 +130,8 @@ class Logger(object):
     @classmethod
     def _currentDateString(cls):
         """
-            Returns current date as string in format YYYY-MM-DD.
+            Returns current date as string in default format YYYY-MM-DD, though
+            it may depend on the operating system or version of Python.
 
             Returns:
                 str: string representation of current date
@@ -76,24 +140,28 @@ class Logger(object):
 
     # [Private]
     @classmethod
-    def _sizeExceedsMax(cls, file):
+    def _sizeExceedsMax(cls, path):
         """
-            Checks if file exceeds maximum log file size.
-            Returns True if file does, False otherwise.
+            Checks if file exceeds maximum log file size. Returns True if file
+            does exceed that maximum, False otherwise. If file does not exist
+            returns True.
 
             Args:
-                file (str): filepath
+                path (str): file path
 
             Returns:
                 bool: flag indicating whether file exceeds max size or not
         """
-        return True if cls._filesize(file) >= MAX_LOG_FILE_SIZE else False
+        if not os.path.isfile(path):
+            return True
+        else:
+            return True if cls._filesize(path) >= cls.MAX_FILE_SIZE else False
 
     # [Private]
     @classmethod
     def _filesize(cls, file):
         """
-            Returns file size in bytes.
+            Returns file size in bytes as int typed variable.
 
             Args:
                 file (str): file path

@@ -3,16 +3,20 @@ import analytics.utils.misc as misc
 from analytics.errorhandler.errorblock import ErrorBlock
 from analytics.errorhandler.logger import Logger
 
+
 class ErrorHandler(object):
     """
-        ErrorHandler class is a global class to handle errors of the
-        application. Must not be instantiated. Only class methods must be used.
+        ErrorHandler is a global class to handle errors of the application.
+        Must not be instantiated. Only class methods must be used.
 
         Attributes:
             _errorList (list<Error>): list of errors
     """
     # list of errors
     _errorList = []
+
+    def __init__(self):
+        raise StandardError("ErrorHandler cannot be instantiated")
 
     # [Public]
     @classmethod
@@ -57,7 +61,7 @@ class ErrorHandler(object):
     @classmethod
     def _errorList_push(cls, error):
         """
-            Pushes error to the list.
+            Pushes error to the list. Also marks error as registered.
 
             Args:
                 error (ErrorBlock): error to be added
@@ -80,7 +84,7 @@ class ErrorHandler(object):
         """
         misc.checkTypeAgainst(type(error), ErrorBlock)
         # log error
-        flag = Logger.logError(error)
+        flag = Logger.logError(error, True)
         # mark error as logged
         if flag is True:
             error.makeLogged()

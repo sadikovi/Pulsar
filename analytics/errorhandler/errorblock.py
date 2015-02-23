@@ -19,9 +19,15 @@ class ErrorBlock(object):
             _isRegistered (bool): flag to indicate if error is registered
             _isLogged (bool): flag to indicate if error is logged
     """
+    # date format constant for errors
+    ERRORBLOCK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
     def __init__(self, message, description=""):
         misc.checkTypeAgainst(type(message), StringType)
         misc.checkTypeAgainst(type(description), StringType)
+        if message == "":
+            raise ValueError("Error message cannot be empty")
+        # fill the attributes
         self._message = message
         self._description = description
         self._isRegistered = False
@@ -45,8 +51,8 @@ class ErrorBlock(object):
     # [Private]
     def _getCurrentTimestamp(self):
         """
-            Returns current Unix timestamp as number of seconds with
-            milliseconds.
+            Returns current Unix timestamp as number of seconds [main part]
+            with milliseconds [decimal part], using format /##########.######/
 
             Returns:
                 float: Unix timestamp
@@ -56,7 +62,8 @@ class ErrorBlock(object):
     # [Public]
     def getTimestampString(self):
         """
-            Returns timestamp as string.
+            Returns timestamp as string. Aborts milliseconds part, returns
+            only the main [seconds] part.
 
             Returns:
                 str: timestamp as string
@@ -64,7 +71,7 @@ class ErrorBlock(object):
         if self._timestamp is None:
             return ""
         else:
-            return str(self._timestamp).split(".")[0]
+            return str(int(self._timestamp))
 
     # [Public]
     def getFormattedDatetime(self):
@@ -74,19 +81,22 @@ class ErrorBlock(object):
             Returns:
                 str: formatted datetime
         """
-        format = "%Y-%m-%d %H:%M:%S"
         if self._timestamp is None:
             return ""
         else:
-            return datetime.fromtimestamp(self._timestamp).strftime(format)
+            return datetime.fromtimestamp(self._timestamp).\
+                    strftime(ErrorBlock.ERRORBLOCK_DATE_FORMAT)
 
     # [Public]
     def toString(self):
         """
-            Returns string representation of error for logging.
+            Returns string representation of error for logging. Uses format:
+
+                Date (timestamp): error message
+                Error description (details)
 
             Returns:
                 str: string representation of error
         """
-        return """\r\n%s: %s\r\n%s
-        """ % (self.getFormattedDatetime(), self._message, self._description)
+        return """\r\n%s (%s): %s\r\n%s\r\n""" % (self.getFormattedDatetime(),
+                self.getTimestampString(), self._message, self._description)

@@ -68,6 +68,10 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
     def setUp(self):
         ErrorHandler.reset()
 
+    def test_errorhandler_init(self):
+        with self.assertRaises(StandardError):
+            handler = ErrorHandler()
+
     def test_errorhandler_reset(self):
         self.assertEqual(ErrorHandler._errorList, [])
         ErrorHandler._errorList.append({})
@@ -115,7 +119,12 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
 
     def setUp(self):
         self._file = "/Users/sadikovi/Developer/Pulsar/analytics/logs/test.txt"
+        self._dir = "/Users/sadikovi/Developer/Pulsar/analytics/logs/"
         with open(self._file, 'w') as f: f.write('')
+
+    def test_logger_init(self):
+        with self.assertRaises(StandardError):
+            logger = Logger()
 
     def test_logger_log(self):
         flag = Logger.log(self._file, "Test")
@@ -131,11 +140,24 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
         self.assertEqual(flag, True)
 
     def test_logger_logError(self):
-        error = ErrorBlock("ValueError")
+        error = ErrorBlock("Log Error")
         with self.assertRaises(c.CheckError):
             flag = Logger.logError(None)
         flag = Logger.logError(error)
         self.assertEqual(flag, True)
+        # test check-file-size
+        pattern = Logger.ERR_LOG_PREFIX + Logger.LOG_PIECE_SEPARATOR + \
+                    Logger._currentDateString() + Logger.LOG_PIECE_SEPARATOR + \
+                    "*" + Logger.FILE_EXTENSION
+        prev = Logger._getLastFileIndex(self._dir, pattern)
+        for x in range(0, Logger.MAX_FILE_SIZE/50):
+            Logger.logError(error, True)
+        cur = Logger._getLastFileIndex(self._dir, pattern)
+        self.assertTrue(3>=cur-prev>=1)
+
+    def test_logger_getLastFileIndex(self):
+        pattern = "*.txt"
+        self.assertEqual(Logger._getLastFileIndex(self._dir, pattern), 1)
 
 # Load test suites
 def _suites():
