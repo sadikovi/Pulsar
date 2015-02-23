@@ -443,7 +443,8 @@ class GroupsMap_TestsSequence(DataValidation_TestsSequence):
         group = map.get(map.guid("4"))
         map.makeRoot(group)
         self.assertEqual(len(map.keys()), 2)
-        self.assertEqual(map.keys(), [group.getId(),unknown.getId()])
+        self.assertEqual(map.keys().sort(),
+                        [group.getId(),unknown.getId()].sort())
 
 # ResultsMap tests
 class ResultsMap_TestsSequence(DataValidation_TestsSequence):
