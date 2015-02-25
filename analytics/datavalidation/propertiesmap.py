@@ -54,7 +54,7 @@ class PropertiesMap(object):
                 property (Property): Property instance to be added to _map
         """
         misc.checkTypeAgainst(type(property), p.Property)
-        if self.has(property.getName()) is False:
+        if not self.has(property.getName()):
             self._map[property.getName()] = property
 
     # [Public]

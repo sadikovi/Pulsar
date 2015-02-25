@@ -95,7 +95,7 @@ class Validator(object):
         self._loadResults(results)
         self._loadProperties(properties)
         # check if we need to discover properties
-        if self._properties.isEmpty() is True:
+        if self._properties.isEmpty():
             # TODO: review this!
             for id in self._results.keys():
                 sp = self._results.get(id).getProperties()

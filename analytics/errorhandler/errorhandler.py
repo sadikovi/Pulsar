@@ -86,6 +86,6 @@ class ErrorHandler(object):
         # log error
         flag = Logger.logError(error, True)
         # mark error as logged
-        if flag is True:
+        if flag:
             error.makeLogged()
         return flag

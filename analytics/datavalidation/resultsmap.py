@@ -54,7 +54,7 @@ class ResultsMap(object):
                 result (Result): new Result instance
         """
         misc.checkTypeAgainst(type(result), r.Result)
-        if self.has(result.getId()) is False:
+        if not self.has(result.getId()):
             self._map[result.getId()] = result
 
     # [Public]

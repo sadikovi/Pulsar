@@ -69,7 +69,7 @@ class GroupsMap(object):
         """
         if id is None:
             return None
-        if self.isHierarchy() is False:
+        if not self.isHierarchy():
             return self._map[id] if id in self._map else None
         else:
             for group in list:
@@ -94,10 +94,10 @@ class GroupsMap(object):
             Returns:
                 bool: indicator whether group is in _map or not
         """
-        if self._findElementInMap(id, self.values()) is not None:
-            return True
-        else:
+        if self._findElementInMap(id, self.values()) is None:
             return False
+        else:
+            return True
 
     # [Public]
     def assign(self, group):
@@ -112,9 +112,9 @@ class GroupsMap(object):
                 group (Group): to be added to the groupsmap
         """
         misc.checkTypeAgainst(type(group), g.Group)
-        if self.isHierarchy() is True:
+        if self.isHierarchy():
             return None
-        if self.has(group.getId()) is False:
+        if not self.has(group.getId()):
             self._map[group.getId()] = group
             self._guidmap[group.getExternalId()] = group.getId()
 
@@ -130,7 +130,7 @@ class GroupsMap(object):
             Args:
                 id (str): a group's guid
         """
-        if self.isHierarchy() is True:
+        if self.isHierarchy():
             return None
         if self.has(id):
             group = self._map[id]
@@ -231,9 +231,9 @@ class GroupsMap(object):
             Returns:
                 Group: unique unknown group
         """
-        if self.isHierarchy() is True:
+        if self.isHierarchy():
             return None
-        if self.hasUnknownGroup() is False:
+        if not self.hasUnknownGroup():
             unknown = g.Group(GROUP_UNKNOWN_GUID, GROUP_UNKNOWN_GUID,
                                 "Unknown Group", "Unknown Group", None)
             self.assign(unknown)
@@ -260,7 +260,7 @@ class GroupsMap(object):
 
             Action is ignored, hierarchy is built.
         """
-        if self.isHierarchy() is True:
+        if self.isHierarchy():
             return None
         for gid in self.keys():
             group = self.get(gid)
@@ -296,7 +296,7 @@ class GroupsMap(object):
                     element9, children: []
                 ]
         """
-        if self.isHierarchy() is True:
+        if self.isHierarchy():
             return None
         # create dictionary {"parent_id":["child1", "child2",..]}
         pmap = {}   # map where all the children are mapped to their parent ids
