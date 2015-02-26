@@ -5,19 +5,13 @@ import fnmatch
 # import classes
 from analytics.errorhandler.errorblock import ErrorBlock
 import analytics.utils.misc as misc
+from analytics.utils.constants import Const
 
 class Logger(object):
     """
         Logger class is a global class to log data. Must not be instantiated
         and must be used with class methods only.
     """
-    # constants
-    LOG_DIRECTORY = "/Users/sadikovi/Developer/Pulsar/analytics/logs/"
-    ERR_LOG_PREFIX = "log_error"
-    LOG_PIECE_SEPARATOR = "_"
-    FILE_EXTENSION = ".log"
-    MAX_FILE_SIZE = 256
-
     def __init__(self):
         raise StandardError('Logger class cannot be instantiated')
 
@@ -35,21 +29,21 @@ class Logger(object):
         """
         misc.checkTypeAgainst(type(error), ErrorBlock)
         # check file size
-        pattern = cls.ERR_LOG_PREFIX + cls.LOG_PIECE_SEPARATOR + \
-                    cls._currentDateString() + cls.LOG_PIECE_SEPARATOR + \
-                    "*" + cls.FILE_EXTENSION
-        index = cls._getLastFileIndex(cls.LOG_DIRECTORY, pattern)
-        filepath = cls.LOG_DIRECTORY + cls.ERR_LOG_PREFIX + \
-                    cls.LOG_PIECE_SEPARATOR + cls._currentDateString() + \
-                    cls.LOG_PIECE_SEPARATOR + str(index) + cls.FILE_EXTENSION
+        pattern = Const.ERR_LOG_PREFIX + Const.LOG_PIECE_SEPARATOR + \
+                    cls._currentDateString() + Const.LOG_PIECE_SEPARATOR + \
+                    "*" + Const.FILE_EXTENSION
+        index = cls._getLastFileIndex(Const.LOG_DIRECTORY, pattern)
+        filepath = Const.LOG_DIRECTORY+Const.ERR_LOG_PREFIX + \
+                    Const.LOG_PIECE_SEPARATOR+cls._currentDateString() + \
+                    Const.LOG_PIECE_SEPARATOR+str(index)+Const.FILE_EXTENSION
         # check if flag is True and we have to check file size
         if checkFileSize:
             # override index the next index
             newIndex = index + 1 if cls._sizeExceedsMax(filepath) else index
             # update filepath with new index
-            filepath = cls.LOG_DIRECTORY + cls.ERR_LOG_PREFIX + \
-                    cls.LOG_PIECE_SEPARATOR + cls._currentDateString() + \
-                    cls.LOG_PIECE_SEPARATOR + str(newIndex) + cls.FILE_EXTENSION
+            filepath = Const.LOG_DIRECTORY+Const.ERR_LOG_PREFIX + \
+                    Const.LOG_PIECE_SEPARATOR+cls._currentDateString() + \
+                    Const.LOG_PIECE_SEPARATOR+str(newIndex)+Const.FILE_EXTENSION
         return cls.log(filepath, error.toString())
 
     # [Private]
@@ -155,7 +149,7 @@ class Logger(object):
         if not os.path.isfile(path):
             return True
         else:
-            return True if cls._filesize(path) >= cls.MAX_FILE_SIZE else False
+            return True if cls._filesize(path) >= Const.MAX_FILE_SIZE else False
 
     # [Private]
     @classmethod

@@ -3,6 +3,7 @@ from types import ListType
 # import classes
 import analytics.datavalidation.property as p
 import analytics.utils.misc as misc
+from utils.constants import Const
 
 
 class PropertiesMap(object):
@@ -126,10 +127,8 @@ class PropertiesMap(object):
                 ids (list<str>): property ids list
         """
         misc.checkTypeAgainst(type(ids), ListType)
-        # max number of dynamic properties
-        DYN_NUMBER = 1
         # list with dynamic properties ids
-        dynamic = ids[0:DYN_NUMBER]
+        dynamic = ids[0:Const.DYNAMIC_PROP_NUMBER]
         for key in self.keys():
             if key in dynamic:
                 self.get(key).setDynamic(True)

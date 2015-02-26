@@ -7,6 +7,7 @@ from analytics.errorhandler.errorblock import ErrorBlock
 from analytics.errorhandler.errorhandler import ErrorHandler
 from analytics.errorhandler.logger import Logger
 import analytics.exceptions.exceptions as c
+from analytics.utils.constants import Const
 
 # Superclass for this tests sequence
 class ErrorHandling_TestsSequence(unittest.TestCase):
@@ -146,11 +147,11 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
         flag = Logger.logError(error)
         self.assertEqual(flag, True)
         # test check-file-size
-        pattern = Logger.ERR_LOG_PREFIX + Logger.LOG_PIECE_SEPARATOR + \
-                    Logger._currentDateString() + Logger.LOG_PIECE_SEPARATOR + \
-                    "*" + Logger.FILE_EXTENSION
+        pattern = Const.ERR_LOG_PREFIX + Const.LOG_PIECE_SEPARATOR + \
+                    Logger._currentDateString() + Const.LOG_PIECE_SEPARATOR + \
+                    "*" + Const.FILE_EXTENSION
         prev = Logger._getLastFileIndex(self._dir, pattern)
-        for x in range(0, Logger.MAX_FILE_SIZE/50):
+        for x in range(0, Const.MAX_FILE_SIZE/50):
             Logger.logError(error, True)
         cur = Logger._getLastFileIndex(self._dir, pattern)
         self.assertTrue(3>=cur-prev>=1)

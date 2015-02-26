@@ -3,10 +3,7 @@ from types import ListType
 # import classes
 import analytics.datavalidation.group as g
 import analytics.utils.misc as misc
-
-
-# unknown guid
-GROUP_UNKNOWN_GUID = "6120-31c2-4177-ad03-6d93a3a87976-unknown_id"
+from analytics.utils.constants import Const
 
 
 class GroupsMap(object):
@@ -234,7 +231,8 @@ class GroupsMap(object):
         if self.isHierarchy():
             return None
         if not self.hasUnknownGroup():
-            unknown = g.Group(GROUP_UNKNOWN_GUID, GROUP_UNKNOWN_GUID,
+            unknown = g.Group(Const.GROUP_UNKNOWN_GUID,
+                                Const.GROUP_UNKNOWN_GUID,
                                 "Unknown Group", "Unknown Group", None)
             self.assign(unknown)
             return unknown
@@ -249,7 +247,7 @@ class GroupsMap(object):
             Returns:
                 bool: flag indicating if unknown group is in map
         """
-        return self.has(GROUP_UNKNOWN_GUID)
+        return self.has(Const.GROUP_UNKNOWN_GUID)
 
 
     # [Public]
@@ -399,7 +397,7 @@ class GroupsMap(object):
             # check unknown group
             unknown = None
             if self.hasUnknownGroup():
-                unknown = self.get(GROUP_UNKNOWN_GUID)
+                unknown = self.get(Const.GROUP_UNKNOWN_GUID)
             # reset map and add new group as a root
             self._map = {}
             self._map[group.getId()] = group

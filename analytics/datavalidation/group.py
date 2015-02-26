@@ -6,7 +6,6 @@ import analytics.datavalidation.parse as p
 import analytics.utils.misc as misc
 
 
-
 class Group(object):
     """
         Group class keeps all the information about group object and provides

@@ -3,6 +3,7 @@ from types import StringType, IntType, FloatType, DictType
 # import classes
 import analytics.datavalidation.parse as p
 import analytics.utils.misc as misc
+from analytics.utils.constants import Const
 
 
 class Property(object):
@@ -30,13 +31,6 @@ class Property(object):
             _dynamic (bool): flag to show whether property is dynamic or not
             _default (type): default value for a property instance
     """
-
-    # Types of the property's sample
-    PROPERTY_INT = 1
-    PROPERTY_FLOAT = 2
-    PROPERTY_STRING = 3
-    DYNAMIC_PROPERTIES = [PROPERTY_INT, PROPERTY_FLOAT]
-
     def __init__(self, name, sample, dynamic=False):
         if name is None or sample is None:
             raise ValueError("Property name and sample cannot be None")
@@ -48,11 +42,11 @@ class Property(object):
         self._default = None
         # check type to identify whether sample is a number or string
         if type(sample) is IntType:
-            self._type = Property.PROPERTY_INT
+            self._type = Const.PROPERTY_INT
         elif type(sample) is FloatType:
-            self._type = Property.PROPERTY_FLOAT
+            self._type = Const.PROPERTY_FLOAT
         elif type(sample) is StringType:
-            self._type = Property.PROPERTY_STRING
+            self._type = Const.PROPERTY_STRING
         else:
             raise TypeError("The Property type is not supported")
         # set dynamic and default value
@@ -72,17 +66,15 @@ class Property(object):
                 Property: instance of the Property class
         """
         misc.checkTypeAgainst(type(obj), DictType)
-        
-        PROPERTY_NAME = "name"
-        PROPERTY_SAMPLE = "sample"
-        PROPERTY_DYNAMIC = "dynamic"
         # check name
-        if PROPERTY_NAME not in obj:
+        if Const.PROPERTY_NAME not in obj:
             raise ValueError("Property object does not have a name")
-        name = obj[PROPERTY_NAME]
+        name = obj[Const.PROPERTY_NAME]
         # sample and dynamic are checked with some default values
-        sample = obj[PROPERTY_SAMPLE] if PROPERTY_SAMPLE in obj else "str"
-        dynamic = obj[PROPERTY_DYNAMIC] if PROPERTY_DYNAMIC in obj else False
+        sample = obj[Const.PROPERTY_SAMPLE] \
+                                if Const.PROPERTY_SAMPLE in obj else "str"
+        dynamic = obj[Const.PROPERTY_DYNAMIC] \
+                                if Const.PROPERTY_DYNAMIC in obj else False
         return cls(name, sample, dynamic)
 
     # [Public]
@@ -95,11 +87,11 @@ class Property(object):
             Args:
                 obj (object): a value that property can have
         """
-        if self._type == Property.PROPERTY_INT and type(obj) is IntType:
+        if self._type == Const.PROPERTY_INT and type(obj) is IntType:
             self._values.add(obj)
-        elif self._type == Property.PROPERTY_FLOAT and type(obj) is FloatType:
+        elif self._type == Const.PROPERTY_FLOAT and type(obj) is FloatType:
             self._values.add(obj)
-        elif self._type == Property.PROPERTY_STRING and type(obj) is StringType:
+        elif self._type == Const.PROPERTY_STRING and type(obj) is StringType:
             self._values.add(obj)
         else:
             raise TypeError("Object type does not match specified type")
@@ -145,7 +137,7 @@ class Property(object):
             Args:
                 flag (bool): flag to set dynamic property (True or False)
         """
-        if flag and self._type in Property.DYNAMIC_PROPERTIES:
+        if flag and self._type in Const.DYNAMIC_PROPERTIES:
             self._dynamic = not not flag
         else:
             self._dynamic = False
@@ -168,11 +160,11 @@ class Property(object):
             Args:
                 value (object): default value
         """
-        if self._type == Property.PROPERTY_INT:
+        if self._type == Const.PROPERTY_INT:
             value = int(value)
-        elif self._type == Property.PROPERTY_FLOAT:
+        elif self._type == Const.PROPERTY_FLOAT:
             value = float(value)
-        elif self._type == Property.PROPERTY_STRING:
+        elif self._type == Const.PROPERTY_STRING:
             value = str(value)
         self._default = value
 

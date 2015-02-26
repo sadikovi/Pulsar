@@ -4,6 +4,7 @@ from types import StringType, DictType
 # import classes
 import analytics.loading.loader as l
 import analytics.utils.misc as misc
+from analytics.utils.constants import Const
 
 
 class XmlLoader(l.Loader):
@@ -26,19 +27,6 @@ class XmlLoader(l.Loader):
         Attributes:
             _filepath (str): json file path
     """
-    # xml root
-    XML_ELEMENTS = "elements"
-    # xml element
-    XML_ELEMENT = "element"
-    # xml attribute
-    XML_ATTRIBUTE = "attr"
-    XML_ATTR_NAME = "name"
-    XML_ATTR_TYPE = "type"
-    # data types
-    XML_TYPE_STRING = "str"
-    XML_TYPE_INT = "int"
-    XML_TYPE_FLOAT = "float"
-
     def __init__(self, filepath):
         self._filepath = filepath
 
@@ -69,13 +57,13 @@ class XmlLoader(l.Loader):
         """
         json = []
         xmldoc = minidom.parse(self._filepath)
-        for element in xmldoc.getElementsByTagName(XmlLoader.XML_ELEMENT):
+        for element in xmldoc.getElementsByTagName(Const.XML_ELEMENT):
             js = {}
-            for attr in element.getElementsByTagName(XmlLoader.XML_ATTRIBUTE):
+            for attr in element.getElementsByTagName(Const.XML_ATTRIBUTE):
                 # recover name, type and value
                 self._processNode(
-                    str(attr.getAttribute(XmlLoader.XML_ATTR_NAME)),
-                    str(attr.getAttribute(XmlLoader.XML_ATTR_TYPE)),
+                    str(attr.getAttribute(Const.XML_ATTR_NAME)),
+                    str(attr.getAttribute(Const.XML_ATTR_TYPE)),
                     str(attr.firstChild.nodeValue),
                     js)
             json.append(js)
@@ -106,9 +94,9 @@ class XmlLoader(l.Loader):
 
         if len(pname) == 0: return False
         # convert value
-        if ptype == XmlLoader.XML_TYPE_INT: pvalue = int(pvalue)
-        elif ptype == XmlLoader.XML_TYPE_FLOAT: pvalue = float(pvalue)
-        elif ptype == XmlLoader.XML_TYPE_STRING: pvalue == str(pvalue)
+        if ptype == Const.XML_TYPE_INT: pvalue = int(pvalue)
+        elif ptype == Const.XML_TYPE_FLOAT: pvalue = float(pvalue)
+        elif ptype == Const.XML_TYPE_STRING: pvalue == str(pvalue)
         else: pvalue = str(pvalue)
         # store value
         pstore[pname] = pvalue

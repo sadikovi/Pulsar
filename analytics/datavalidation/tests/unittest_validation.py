@@ -11,6 +11,7 @@ import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.propertiesmap as pm
 import analytics.datavalidation.property as pr
 import analytics.exceptions.exceptions as c
+from analytics.utils.constants import Const
 
 # Superclass for this tests sequence
 class DataValidation_TestsSequence(unittest.TestCase):
@@ -250,7 +251,7 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         property = pr.Property('value', 123)
         self.assertEquals(property.getId(), 'value')
         self.assertEquals(property.getName(), 'value')
-        self.assertEquals(property.getType(), pr.Property.PROPERTY_INT)
+        self.assertEquals(property.getType(), Const.PROPERTY_INT)
 
     def test_property_add(self):
         property = pr.Property("property", 122)
@@ -303,14 +304,14 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         prop = pr.Property.createFromObject(testProp)
         self.assertEqual(prop._id, "test")
         self.assertEqual(prop._name, "test")
-        self.assertEqual(prop._type, pr.Property.PROPERTY_INT)
+        self.assertEqual(prop._type, Const.PROPERTY_INT)
         self.assertEqual(prop._dynamic, True)
 
         testProp = {"name": "test"}
         prop = pr.Property.createFromObject(testProp)
         self.assertEqual(prop._id, "test")
         self.assertEqual(prop._name, "test")
-        self.assertEqual(prop._type, pr.Property.PROPERTY_STRING)
+        self.assertEqual(prop._type, Const.PROPERTY_STRING)
         self.assertEqual(prop._dynamic, False)
 
 # GroupsMap tests

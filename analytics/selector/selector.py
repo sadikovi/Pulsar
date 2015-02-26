@@ -8,18 +8,8 @@ import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.propertiesmap as pm
 import analytics.algorithms.algorithmsmap as am
+from analytics.utils.constants import Const
 
-# constants for selector
-# tables to check for in queries
-_TABLE_NONE = "none"
-_TABLE_RESULTS = "results"
-_TABLE_GROUPS = "groups"
-_TABLE_PROPERTIES = "properties"
-_TABLE_ALGORITHM = "algorithms"
-
-# keywords to search in queries
-_QUERY_ID = "id"
-_QUERY_NAME = "name"
 
 class Selector(object):
     """
@@ -117,13 +107,13 @@ class Selector(object):
         _results = None; _groups = None; _props = None; _algorithms = None
         for block in self._blocks:
             statement = block._statement or q.QueryStatement(_TABLE_NONE)
-            if statement._table == _TABLE_RESULTS:
+            if statement._table == Const._TABLE_RESULTS:
                 _results = block
-            elif statement._table == _TABLE_GROUPS:
+            elif statement._table == Const._TABLE_GROUPS:
                 _groups = block
-            elif statement._table == _TABLE_PROPERTIES:
+            elif statement._table == Const._TABLE_PROPERTIES:
                 _props = block
-            elif statement._table == _TABLE_ALGORITHM:
+            elif statement._table == Const._TABLE_ALGORITHM:
                 _algorithms = block
         # filter maps
         # 1. filter results
@@ -216,7 +206,7 @@ class Selector(object):
         for predicate in queryBlock._predicates:
             if predicate._type is not q._PREDICATE_TYPES.EQUAL:
                 continue
-            if predicate._parameter == _QUERY_ID:
+            if predicate._parameter == Const._QUERY_ID:
                 group = groupsMap.get(predicate._values[0])
                 if group is not None:
                     break
@@ -247,10 +237,10 @@ class Selector(object):
             if predicate._type is not q._PREDICATE_TYPES.EQUAL:
                 continue
             for prop in propertiesMap.values():
-                if predicate._parameter == _QUERY_ID:
+                if predicate._parameter == Const._QUERY_ID:
                     if prop.getId() == predicate._values[0]:
                         names.append(prop.getName())
-                elif predicate._parameter == _QUERY_NAME:
+                elif predicate._parameter == Const._QUERY_NAME:
                     if prop.getName() == predicate._values[0]:
                         names.append(prop.getName())
         # remove not matching algorithms
@@ -279,10 +269,10 @@ class Selector(object):
             if predicate._type is not q._PREDICATE_TYPES.EQUAL:
                 continue
             for algorithm in algorithmsMap.values():
-                if predicate._parameter == _QUERY_ID:
+                if predicate._parameter == Const._QUERY_ID:
                     if algorithm.getId() == predicate._values[0]:
                         ids.append(algorithm.getId())
-                elif predicate._parameter == _QUERY_NAME:
+                elif predicate._parameter == Const._QUERY_NAME:
                     if algorithm.getName() == predicate._values[0]:
                         ids.append(algorithm.getId())
         # remove not matching algorithms

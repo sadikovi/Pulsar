@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 # import classes
 import analytics.utils.misc as misc
+from analytics.utils.constants import Const
 
 
 class ErrorBlock(object):
@@ -19,9 +20,6 @@ class ErrorBlock(object):
             _isRegistered (bool): flag to indicate if error is registered
             _isLogged (bool): flag to indicate if error is logged
     """
-    # date format constant for errors
-    ERRORBLOCK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-
     def __init__(self, message, description=""):
         misc.checkTypeAgainst(type(message), StringType)
         misc.checkTypeAgainst(type(description), StringType)
@@ -85,7 +83,7 @@ class ErrorBlock(object):
             return ""
         else:
             return datetime.fromtimestamp(self._timestamp).\
-                    strftime(ErrorBlock.ERRORBLOCK_DATE_FORMAT)
+                    strftime(Const.ERRORBLOCK_DATE_FORMAT)
 
     # [Public]
     def toString(self):

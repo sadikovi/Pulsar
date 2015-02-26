@@ -3,6 +3,7 @@ import uuid
 from types import DictType, StringType
 # import classes
 import analytics.utils.misc as misc
+from analytics.utils.constants import Const
 
 
 class Parse(object):
@@ -17,15 +18,6 @@ class Parse(object):
             _primaryKeys (list<str>): a list of primary attributes, such as
                                             id, name, desc and etc.
     """
-
-    # Arrays for primary attributes
-    KEY_ID = ['id', 'uuid', 'Id', 'ID']
-    KEY_NAME = ['name', 'Name', 'NAME']
-    KEY_DESC = ['desc', 'DESC', 'description', 'DESCRIPTION']
-    KEY_GROUP = ['group', 'parent', 'Group', 'Parent', 'GROUP', 'PARENT']
-    KEY_PARENT = ['parent', 'Parent', 'PARENT']
-    KEY_SAMPLE = ['sample', 'value']
-
     def __init__(self, object):
         self.updateInstance(object)
 
@@ -81,7 +73,7 @@ class Parse(object):
             Returns:
                 str: external system id
         """
-        return self._getValueForKeyArray(Parse.KEY_ID)
+        return self._getValueForKeyArray(Const.KEY_ID)
 
     @classmethod
     def guidBasedId(self, id=''):
@@ -109,7 +101,7 @@ class Parse(object):
             Returns:
                 str: name of the object
         """
-        return self._getValueForKeyArray(Parse.KEY_NAME)
+        return self._getValueForKeyArray(Const.KEY_NAME)
 
     # [Public]
     def getDesc(self):
@@ -120,7 +112,7 @@ class Parse(object):
             Returns:
                 str: description of the object
         """
-        return self._getValueForKeyArray(Parse.KEY_DESC)
+        return self._getValueForKeyArray(Const.KEY_DESC)
 
     # [Public]
     def getGroup(self):
@@ -131,7 +123,7 @@ class Parse(object):
             Returns:
                 str: object's group
         """
-        return self._getValueForKeyArray(Parse.KEY_GROUP)
+        return self._getValueForKeyArray(Const.KEY_GROUP)
 
     # [Public]
     def getParent(self):
@@ -142,7 +134,7 @@ class Parse(object):
             Returns:
                 str: parent id of the object
         """
-        return self._getValueForKeyArray(Parse.KEY_PARENT)
+        return self._getValueForKeyArray(Const.KEY_PARENT)
 
     # [Public]
     def getSample(self):
@@ -154,7 +146,7 @@ class Parse(object):
             Returns:
                 str: sample value of the object
         """
-        return self._getValueForKeyArray(Parse.KEY_SAMPLE)
+        return self._getValueForKeyArray(Const.KEY_SAMPLE)
 
     # [Public]
     'excluding id, name, desc, group and other primary attributes'
