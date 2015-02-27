@@ -6,6 +6,7 @@ import analytics.datavalidation.parse as p
 import analytics.utils.misc as misc
 import analytics.datavalidation.property as pr
 import analytics.datavalidation.propertiesmap as pm
+from analytics.algorithms.rank import Rank
 
 
 class Result(object):
@@ -32,6 +33,7 @@ class Result(object):
             _desc (str)        : result description
             _group (str)       : external id of the group result belongs to
             _properties (dict<str, object>): dictionary of other properties
+            _rank (Rank)       : result's rank
     """
 
     # properties dict has to be a dict<str, Property> instance
@@ -50,6 +52,7 @@ class Result(object):
         self._properties = parse.getSecondaryProperties()
         # ensure that each object contains searching properties
         self.updateProperties(properties)
+        self._rank = None
 
     # [Public]
     def updateProperties(self, properties):
@@ -178,3 +181,24 @@ class Result(object):
                 str: JSON representation of the object
         """
         return json.dumps(self.getDict())
+
+    # [Public]
+    def setRank(self, rank):
+        """
+            Sets rank for the current Result instance.
+
+            Args:
+                rank (Rank): rank for current Result instance
+        """
+        misc.checkTypeAgainst(type(rank), Rank)
+        self._rank = rank
+
+    # [Public]
+    def getRank(self):
+        """
+            Returns rank of the current instance.
+
+            Returns:
+                Rank: rank of the current instance
+        """
+        return self._rank

@@ -12,6 +12,8 @@ import analytics.datavalidation.propertiesmap as pm
 import analytics.datavalidation.property as pr
 import analytics.exceptions.exceptions as c
 from analytics.utils.constants import Const
+import analytics.algorithms.rank as rank
+
 
 # Superclass for this tests sequence
 class DataValidation_TestsSequence(unittest.TestCase):
@@ -218,6 +220,7 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getName(), self._testResult['name'])
         self.assertEqual(result.getDesc(), self._testResult['description'])
         self.assertEqual(result.getGroup(), group.getId())
+        self.assertEqual(result._rank, None)
 
     def test_result_getDictAndJson(self):
         result = r.Result(self._testResult)
@@ -238,6 +241,22 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getProperties()['value'], self._testResult['value'])
         self.assertEqual(result.getProperties()['price'], self._testResult['price'])
         self.assertEqual(result.getProperties()['delight'], None)
+
+    def test_result_setRank(self):
+        result = r.Result(self._testResult)
+        with self.assertRaises(c.CheckError):
+            result.setRank([])
+        self.assertEqual(result._rank, None)
+        result.setRank(rank.RSYS.O)
+        self.assertEqual(result._rank, rank.RSYS.O)
+        self.assertTrue(result._rank is not None)
+
+    def test_result_getRank(self):
+        result = r.Result(self._testResult)
+        self.assertEqual(result.getRank(), None)
+        result.setRank(rank.RSYS.O)
+        self.assertTrue(result._rank is not None)
+        self.assertEqual(result.getRank(), rank.RSYS.O)
 
 # Property tests
 class Property_TestsSequence(DataValidation_TestsSequence):
