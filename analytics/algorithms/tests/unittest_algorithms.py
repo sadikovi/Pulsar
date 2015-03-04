@@ -168,6 +168,16 @@ class RSYS_TestsSequence(Algorithms_TestsSequence):
         self.assertEqual(rank.RSYS.T._value, 100)
         self.assertEqual(rank.RSYS.T._class, rank.RSYS.ClassIII)
 
+        # test undefined class
+        self.assertEqual(rank.RSYS.UND_CLASS._name, "Class Undefined")
+        self.assertEqual(rank.RSYS.UND_CLASS._value, 0)
+        self.assertEqual(len(rank.RSYS.UND_CLASS._ranks), 1)
+        # test undefined rank
+        self.assertEqual(rank.RSYS.UND_RANK._name, "Rank Undefined")
+        self.assertEqual(rank.RSYS.UND_RANK._value, 0)
+        self.assertEqual(rank.RSYS.UND_RANK._class, rank.RSYS.UND_CLASS)
+
+
 
 # Load test suites
 def _suites():

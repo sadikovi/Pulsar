@@ -6,7 +6,7 @@ import analytics.datavalidation.parse as p
 import analytics.utils.misc as misc
 import analytics.datavalidation.property as pr
 import analytics.datavalidation.propertiesmap as pm
-from analytics.algorithms.rank import Rank
+from analytics.algorithms.rank import Rank, RSYS
 
 
 class Result(object):
@@ -52,7 +52,7 @@ class Result(object):
         self._properties = parse.getSecondaryProperties()
         # ensure that each object contains searching properties
         self.updateProperties(properties)
-        self._rank = None
+        self._rank = RSYS.UND_RANK
 
     # [Public]
     def updateProperties(self, properties):

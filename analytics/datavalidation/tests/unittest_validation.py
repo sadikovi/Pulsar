@@ -220,7 +220,7 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getName(), self._testResult['name'])
         self.assertEqual(result.getDesc(), self._testResult['description'])
         self.assertEqual(result.getGroup(), group.getId())
-        self.assertEqual(result._rank, None)
+        self.assertEqual(result._rank, rank.RSYS.UND_RANK)
 
     def test_result_getDictAndJson(self):
         result = r.Result(self._testResult)
@@ -246,14 +246,14 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         result = r.Result(self._testResult)
         with self.assertRaises(c.CheckError):
             result.setRank([])
-        self.assertEqual(result._rank, None)
+        self.assertEqual(result._rank, rank.RSYS.UND_RANK)
         result.setRank(rank.RSYS.O)
         self.assertEqual(result._rank, rank.RSYS.O)
         self.assertTrue(result._rank is not None)
 
     def test_result_getRank(self):
         result = r.Result(self._testResult)
-        self.assertEqual(result.getRank(), None)
+        self.assertEqual(result.getRank(), rank.RSYS.UND_RANK)
         result.setRank(rank.RSYS.O)
         self.assertTrue(result._rank is not None)
         self.assertEqual(result.getRank(), rank.RSYS.O)

@@ -144,6 +144,11 @@ class RSYS:
             cls.M = Rank("M", cls.ClassIII, 300); cls.ClassIII.addRank(cls.M)
             cls.L = Rank("L", cls.ClassIII, 200); cls.ClassIII.addRank(cls.L)
             cls.T = Rank("T", cls.ClassIII, 100); cls.ClassIII.addRank(cls.T)
+            # add undefined rank and class
+            # for cases when we cannot identify or assign rank
+            cls.UND_CLASS = Class("Class Undefined", 0)
+            cls.UND_RANK = Rank("Rank Undefined", cls.UND_CLASS, 0)
+            cls.UND_CLASS.addRank(cls.UND_RANK)
 
 # build ranking system
 RSYS.buildRankSystem()
