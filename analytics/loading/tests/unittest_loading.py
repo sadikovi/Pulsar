@@ -11,8 +11,8 @@ import analytics.exceptions.exceptions as c
 class Loading_TestsSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
-        self.jsonfile = 'rawdata/groups.json'
-        self.xmlfile = 'rawdata/groups.xml'
+        self.jsonfile = './analytics/rawdata/groups.json'
+        self.xmlfile = './analytics/rawdata/groups.xml'
 
 # JsonLoader tests
 class JsonLoader_TestsSequence(Loading_TestsSequence):
