@@ -27,11 +27,12 @@ class Property(object):
             _id (str)   : unique internal id, mostly for internal purposes
             _name (str) : name of the properties, acts like an property id
             _type (int) : type indicates the type of the sample
-            _values (set<_type>): set to keep all values of property
+            _values (set<type>): set to keep all values of property
             _dynamic (bool): flag to show whether property is dynamic or not
             _default (type): default value for a property instance
+            _priorityOrder (int): priority order for dynamic properties
     """
-    def __init__(self, name, sample, dynamic=False):
+    def __init__(self, name, sample, dynamic=False, order=Const.PRIORITY_INC):
         if name is None or sample is None:
             raise ValueError("Property name and sample cannot be None")
         misc.checkTypeAgainst(type(name), StringType)
@@ -52,6 +53,10 @@ class Property(object):
         # set default value and initialise values set
         self._default = None
         self._values = set()
+        # priority order
+        if order is not Const.PRIORITY_INC and order is not Const.PRIORITY_DEC:
+            order = Const.PRIORITY_INC
+        self._priorityOrder = order
 
     # [Public]
     @classmethod
@@ -74,10 +79,13 @@ class Property(object):
         # assign to temp variables
         _prop_sample = Const.PROPERTY_SAMPLE
         _prop_dynamic = Const.PROPERTY_DYNAMIC
+        _prop_prOrder = Const.PROPERY_PRIORITY_ORDER
         # sample and dynamic are checked with some default values
         sample = obj[_prop_sample] if _prop_sample in obj else "str"
-        dynamic = obj[_prop_dynamic] if _prop_dynamic in obj else False
-        return cls(name, sample, dynamic)
+        dynamic = obj[_prop_dynamic] if _prop_dynamic in obj else None
+        # check priority order
+        priority = obj[_prop_prOrder] if _prop_prOrder in obj else None
+        return cls(name, sample, dynamic, priority)
 
     # [Public]
     def add(self, obj):
@@ -187,3 +195,13 @@ class Property(object):
             med = (len(self._values) - 1)/2
             self._default = sorted(self._values)[med] if med >= 0 else None
         return self._default
+
+    # [Public]
+    def getPriorityOrder(self):
+        """
+            Returns priority order for a particular property.
+
+            Returns:
+                int: priority order (see constants for more details)
+        """
+        return self._priorityOrder

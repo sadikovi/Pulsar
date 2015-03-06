@@ -319,12 +319,13 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         with self.assertRaises(ValueError):
             prop = pr.Property.createFromObject({"dynamic": True})
 
-        testProp = {"name": "test", "sample": 1, "dynamic": True}
+        testProp = {"name": "test", "sample": 1, "dynamic": True, "priority": -1}
         prop = pr.Property.createFromObject(testProp)
         self.assertEqual(prop._id, "test")
         self.assertEqual(prop._name, "test")
         self.assertEqual(prop._type, Const.PROPERTY_INT)
         self.assertEqual(prop._dynamic, True)
+        self.assertEqual(prop._priorityOrder, Const.PRIORITY_DEC)
 
         testProp = {"name": "test"}
         prop = pr.Property.createFromObject(testProp)
@@ -332,6 +333,13 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(prop._name, "test")
         self.assertEqual(prop._type, Const.PROPERTY_STRING)
         self.assertEqual(prop._dynamic, False)
+        self.assertEqual(prop._priorityOrder, Const.PRIORITY_INC)
+
+    def test_property_getPriorityOrder(self):
+        testProp = {"name": "test", "priority": {}}
+        prop = pr.Property.createFromObject(testProp)
+        self.assertEqual(prop._priorityOrder, Const.PRIORITY_INC)
+        self.assertEqual(prop.getPriorityOrder(), prop._priorityOrder)
 
 # GroupsMap tests
 class GroupsMap_TestsSequence(DataValidation_TestsSequence):

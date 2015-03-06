@@ -34,7 +34,11 @@ Const.DYNAMIC_PROPERTIES = [Const.PROPERTY_INT, Const.PROPERTY_FLOAT]
 Const.PROPERTY_NAME = "name"
 Const.PROPERTY_SAMPLE = "sample"
 Const.PROPERTY_DYNAMIC = "dynamic"
+Const.PROPERY_PRIORITY_ORDER = "priority"
 
+# priority order constants
+Const.PRIORITY_INC = 1
+Const.PRIORITY_DEC = -1
 
 ################################################################
 # Error handler constants                                      #
