@@ -37,9 +37,6 @@ class Property(object):
         misc.checkTypeAgainst(type(name), StringType)
         # set id to be equal to name, that is true only for the property
         self._id = self._name = name
-        self._values = set()
-        self._dynamic = False
-        self._default = None
         # check type to identify whether sample is a number or string
         if type(sample) is IntType:
             self._type = Const.PROPERTY_INT
@@ -49,8 +46,12 @@ class Property(object):
             self._type = Const.PROPERTY_STRING
         else:
             raise TypeError("The Property type is not supported")
-        # set dynamic and default value
+        # set dynamic
+        self._dynamic = False
         self.setDynamic(dynamic)
+        # set default value and initialise values set
+        self._default = None
+        self._values = set()
 
     # [Public]
     @classmethod
@@ -70,11 +71,12 @@ class Property(object):
         if Const.PROPERTY_NAME not in obj:
             raise ValueError("Property object does not have a name")
         name = obj[Const.PROPERTY_NAME]
+        # assign to temp variables
+        _prop_sample = Const.PROPERTY_SAMPLE
+        _prop_dynamic = Const.PROPERTY_DYNAMIC
         # sample and dynamic are checked with some default values
-        sample = obj[Const.PROPERTY_SAMPLE] \
-                                if Const.PROPERTY_SAMPLE in obj else "str"
-        dynamic = obj[Const.PROPERTY_DYNAMIC] \
-                                if Const.PROPERTY_DYNAMIC in obj else False
+        sample = obj[_prop_sample] if _prop_sample in obj else "str"
+        dynamic = obj[_prop_dynamic] if _prop_dynamic in obj else False
         return cls(name, sample, dynamic)
 
     # [Public]
@@ -166,6 +168,8 @@ class Property(object):
             value = float(value)
         elif self._type == Const.PROPERTY_STRING:
             value = str(value)
+        else:
+            raise TypeError("The Property type is not supported")
         self._default = value
 
     # [Public]
