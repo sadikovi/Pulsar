@@ -7,7 +7,7 @@ import analytics.utils.misc as misc
 class Rank(object):
     """
         Rank class is a holder for ranks that are used for estimating each
-        result. System supports 9 ranks and 3 classes:
+        result. System supports 10 ranks and 4 classes:
         [
             {
                 "class": "Class I",
@@ -31,6 +31,12 @@ class Rank(object):
                     {"rank": "M", "value": 300},
                     {"rank": "L", "value": 200},
                     {"rank": "T", "value": 100}
+                ]
+            },
+            {
+                "class": "Class Undefined",
+                "ranks": [
+                    {"rank": "Rank Undefined", "value": 0}
                 ]
             }
         ]

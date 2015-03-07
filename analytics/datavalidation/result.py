@@ -18,7 +18,7 @@ class Result(object):
         {
             "id"    :   "62345",
             "name"  :   "Result name",
-            "desc"  :   "Result description"
+            "desc"  :   "Result description",
             "group" :   "12898"
         }
 

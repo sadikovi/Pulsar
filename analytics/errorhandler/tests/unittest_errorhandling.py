@@ -2,6 +2,7 @@
 import unittest
 import time
 from datetime import datetime
+import os
 # import classes
 from analytics.errorhandler.errorblock import ErrorBlock
 from analytics.errorhandler.errorhandler import ErrorHandler

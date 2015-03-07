@@ -12,6 +12,7 @@ import analytics.datavalidation.tests.unittest_validation as unittest_validation
 import analytics.loading.tests.unittest_loading as unittest_loading
 import analytics.utils.tests.unittest_utils as unittest_utils
 import analytics.algorithms.tests.unittest_algorithms as unittest_algorithms
+import analytics.algorithms.tests.unittest_relativecomp as unittest_relativecomp
 import analytics.utils.tests.unittest_queryengine as unittest_queryengine
 import analytics.selector.tests.unittest_selector as unittest_selector
 import analytics.errorhandler.tests.unittest_errorhandling as unittest_errorhandling
@@ -27,6 +28,8 @@ def _collectSystemTests(suites):
     suites.addTest(unittest_utils.loadSuites())
     # algorithms
     suites.addTest(unittest_algorithms.loadSuites())
+    # relative comparion algorithm
+    suites.addTest(unittest_relativecomp.loadSuites())
     # query engine
     suites.addTest(unittest_queryengine.loadSuites())
     # selector
