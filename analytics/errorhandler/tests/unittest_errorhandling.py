@@ -124,6 +124,11 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
         self._dir = "/Users/sadikovi/Developer/Pulsar/analytics/logs/"
         with open(self._file, 'w') as f: f.write('')
 
+    def tearDown(self):
+        for root, dirs, files in os.walk(self._dir):
+            for f in files:
+                os.unlink(os.path.join(root, f))
+
     def test_logger_init(self):
         with self.assertRaises(StandardError):
             logger = Logger()
@@ -152,9 +157,10 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
                     Logger._currentDateString() + Const.LOG_PIECE_SEPARATOR + \
                     "*" + Const.FILE_EXTENSION
         prev = Logger._getLastFileIndex(self._dir, pattern)
-        for x in range(0, Const.MAX_FILE_SIZE/50):
+        for x in range(0, Const.MAX_FILE_SIZE/30):
             Logger.logError(error, True)
         cur = Logger._getLastFileIndex(self._dir, pattern)
+        # now we clean directory after every test, so cur will be equal to prev
         self.assertTrue(3>=cur-prev>=1)
 
     def test_logger_getLastFileIndex(self):
