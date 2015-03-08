@@ -16,6 +16,7 @@ import analytics.algorithms.tests.unittest_relativecomp as unittest_relativecomp
 import analytics.utils.tests.unittest_queryengine as unittest_queryengine
 import analytics.selector.tests.unittest_selector as unittest_selector
 import analytics.errorhandler.tests.unittest_errorhandling as unittest_errorhandling
+import analytics.analyser.tests.unittest_analyser as unittest_analyser
 
 def _collectSystemTests(suites):
     # exceptions
@@ -36,6 +37,8 @@ def _collectSystemTests(suites):
     suites.addTest(unittest_selector.loadSuites())
     # error handler
     suites.addTest(unittest_errorhandling.loadSuites())
+    # analyser
+    suites.addTest(unittest_analyser.loadSuites())
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()
