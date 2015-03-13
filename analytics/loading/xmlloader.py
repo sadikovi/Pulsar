@@ -43,20 +43,22 @@ class XmlLoader(l.Loader):
         return cls(filepath)
 
     # [Public]
-    def processData(self):
+    def processData(self, filepath=None):
         """
             Process data from the file specified as _filepath attribute.
             Returns standard dictionary / list as json object, or raises
-            exception, if file does not exist or xml is invalid.
+            exception, if file does not exist or xml is invalid. If file path
+            is not specified then instance uses _filepath property.
 
             Args:
-                elementToSearch (str): element to search XML DOM for
+                filepath (str): file path
 
             Returns:
                 dict<str, object> / list<object>: json object from the file
         """
-        json = []
-        xmldoc = minidom.parse(self._filepath)
+        json = [];
+        fpath = filepath if filepath is not None else self._filepath
+        xmldoc = minidom.parse(fpath)
         for element in xmldoc.getElementsByTagName(Const.XML_ELEMENT):
             js = {}
             for attr in element.getElementsByTagName(Const.XML_ATTRIBUTE):

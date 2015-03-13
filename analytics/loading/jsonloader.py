@@ -41,16 +41,21 @@ class JsonLoader(l.Loader):
         return cls(filepath)
 
     # [Public]
-    def processData(self):
+    def processData(self, filepath=None):
         """
             Process data from the file specified as _filepath attribute.
             Returns standard dictionary / list as json object, or raises
-            exception, if file does not exist or json is invalid.
+            exception, if file does not exist or json is invalid. If filepath
+            is not specified then instance uses _filepath property.
+
+            Args:
+                filepath (str): file path
 
             Returns:
                 dict<str, object> / list<object>: json object from the file
         """
-        file = open(self._filepath)
+        fpath = filepath if filepath is not None else self._filepath
+        file = open(fpath)
         jsonObject = json.load(file)
         file.close()
         return jsonObject
