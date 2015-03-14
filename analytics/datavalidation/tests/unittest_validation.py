@@ -153,10 +153,10 @@ class Group_TestsSequence(DataValidation_TestsSequence):
         group.addChild(subgroup)
         self.assertEqual(len(group.getChildren()), 1)
 
-    def test_group_getDictAndJson(self):
+    def test_group_getJson(self):
         group = g.Group.createFromObject(self._testGroup)
         group.addChild(g.Group.createFromObject(self._testGroup))
-        obj = json.loads(group.getJSON())
+        obj = group.getJSON()
         self.assertEqual(obj['id'], group.getId())
         self.assertEqual(obj['externalId'], group.getExternalId())
         self.assertEqual(obj['name'], group.getName())
@@ -222,10 +222,9 @@ class Result_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(result.getGroup(), group.getId())
         self.assertEqual(result._rank, rank.RSYS.UND_RANK)
 
-    def test_result_getDictAndJson(self):
+    def test_result_getJson(self):
         result = r.Result(self._testResult)
-        jsonString = result.getJSON()
-        obj = json.loads(jsonString)
+        obj = result.getJSON()
         self.assertEqual(obj['id'], result.getId())
         self.assertEqual(obj['name'], result.getName())
         self.assertEqual(obj['desc'], result.getDesc())

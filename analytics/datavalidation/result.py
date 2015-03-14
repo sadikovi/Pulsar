@@ -1,5 +1,4 @@
 # import libs
-import json
 from types import DictType, StringType, ListType
 # import classes
 import analytics.datavalidation.parse as p
@@ -147,7 +146,7 @@ class Result(object):
         return self._properties
 
     # [Public]
-    def getDict(self):
+    def getJSON(self):
         """
             Returns dictionary representation of the current result.
             {
@@ -168,19 +167,9 @@ class Result(object):
                 "name": self._name,
                 "desc": self._desc,
                 "group": self._group,
-                "properties": self._properties
+                "properties": self._properties,
+                "rank": self._rank.getJSON()
             }
-
-
-    # [Public]
-    def getJSON(self):
-        """
-            Returns JSON representation of the Result instance
-
-            Returns:
-                str: JSON representation of the object
-        """
-        return json.dumps(self.getDict())
 
     # [Public]
     def setRank(self, rank):

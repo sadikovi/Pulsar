@@ -19,7 +19,7 @@ def checkTypeAgainst(found, expected):
             bool: flag that check was successful
     """
     if found is not expected:
-        raise ex.CheckError(str(expected), str(found))
+        raise ex.CheckError(expected, found)
     return True
 
 def checkInstanceAgainst(instance, classType):

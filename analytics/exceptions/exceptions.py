@@ -9,7 +9,10 @@ class CheckError(BaseException):
     """
 
     def __init__(self, expected, received):
-        self.errmsg = "[!] Expected "+str(expected)+", received "+str(received)
+        exp = "<type '%s'>" %(expected.__name__)
+        rec = "<type '%s'>" %(received.__name__)
+        self.errmsg = "[!] Expected %s, received %s" %(exp, rec)
+        super(CheckError, self).__init__(self.errmsg)
 
 
 class SyntaxError(BaseException):
@@ -24,4 +27,5 @@ class SyntaxError(BaseException):
     """
 
     def __init__(self, pos, sample):
-        self.errmsg = "Wrong syntax at position "+str(pos)+" near "+sample
+        self.errmsg = "Wrong syntax at position %s near %s" %(str(pos), sample)
+        super(SyntaxError, self).__init__(self.errmsg)

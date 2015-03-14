@@ -21,6 +21,7 @@ class Analyser(object):
     def __init__(self):
         self._algorithmsmap = None
         self._defaultAlgorithm = None
+        self._selectedAlgorithm = None
         # prepare algorithms map
         self._prepareAlgorithms()
 
@@ -88,6 +89,38 @@ class Analyser(object):
         self._hasAlgorithmsMap()
         return self._algorithmsmap.get(id)
 
+    # [Private]
+    def _setSelectedAlgorithm(self, algorithm):
+        """
+            Sets algorithm as selected.
+
+            Args:
+                algorithm (Algorithm): algorithm that has been selected
+        """
+        self._selectedAlgorithm = algorithm
+
+    # [Public]
+    def getSelectedAlgorithm(self):
+        """
+            Returns selected algorithm. Can be None or any algorithm that has
+            been selected lately. Make sure that it is not retrieved without
+            calling analysing method.
+
+            Returns:
+                Algorithm: selected algorithm
+        """
+        return self._selectedAlgorithm
+
+    # [Public]
+    def getAlgorithmsMap(self):
+        """
+            Returns algorithms map.
+
+            Returns:
+                AlgorithmsMap: algorithms map
+        """
+        return self._algorithmsmap
+
     # [Public]
     def analyseUsingAlgorithm(self, algorithm, resultsMap, propertiesMap):
         """
@@ -106,6 +139,8 @@ class Analyser(object):
         misc.checkInstanceAgainst(algorithm, Algorithm)
         misc.checkTypeAgainst(type(resultsMap), rsmap.ResultsMap)
         misc.checkTypeAgainst(type(propertiesMap), prmap.PropertiesMap)
+        # set selected algorithm
+        self._setSelectedAlgorithm(algorithm)
         # rank results using algorithm
         return algorithm.rankResults(resultsMap, propertiesMap)
 

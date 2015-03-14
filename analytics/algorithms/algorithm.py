@@ -32,5 +32,10 @@ class Algorithm(object):
         return self._short
 
     # [Abstract]
-    def rankResults(resultsMap, propertiesMap):
+    def rankResults(self, resultsMap, propertiesMap):
         return resultsMap
+
+    # [Abstract]
+    def getJSON(self):
+        obj = {"id": self._id, "name": self._name}
+        return obj

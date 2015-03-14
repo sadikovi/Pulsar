@@ -13,15 +13,15 @@ class CheckError_TestsSequence(Exceptions_TestsSequence):
 
     def test_checkerror_raise(self):
         with self.assertRaises(c.CheckError):
-            raise c.CheckError("1", "2")
+            raise c.CheckError(type(1), type(2.1))
 
     def test_checkerror_tryCatch(self):
         msg = ""
         try:
-            raise c.CheckError("1", "2")
+            raise c.CheckError(type(1), type(1.2))
         except c.CheckError as arg:
             msg = arg.errmsg
-        self.assertEqual(msg, "[!] Expected 1, received 2")
+        self.assertEqual(msg, str(arg))
 
 # SyntaxError tests
 class SyntaxError_TestsSequence(Exceptions_TestsSequence):

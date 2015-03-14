@@ -1,3 +1,4 @@
 *.pyc
 analytics/logs/*
 .DS_Store
+appengine

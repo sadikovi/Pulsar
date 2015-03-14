@@ -1,6 +1,6 @@
 # import libs
 import json
-from types import StringType
+from types import StringType, UnicodeType
 # import classes
 import analytics.loading.loader as l
 import analytics.utils.misc as misc
@@ -55,7 +55,22 @@ class JsonLoader(l.Loader):
                 dict<str, object> / list<object>: json object from the file
         """
         fpath = filepath if filepath is not None else self._filepath
-        file = open(fpath)
-        jsonObject = json.load(file)
-        file.close()
+        with open(fpath) as file:
+            jsonObject = json.load(file, object_hook=self._decode_dict)
         return jsonObject
+
+    # [Private]
+    def _decode_dict(self, data):
+        """
+            Hook to convert any unicode string to StringType.
+
+            Args:
+                data (dict<str, obj>): data item
+
+            Returns:
+                dict<str, obj>: updated data item with StringType
+        """
+        for key in data.keys():
+            if type(data[key]) is UnicodeType:
+                data[key] = str(data[key])
+        return data

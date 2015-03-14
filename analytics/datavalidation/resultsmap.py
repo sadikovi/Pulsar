@@ -114,3 +114,13 @@ class ResultsMap(object):
                 list<Result>: values list that are in dictionary
         """
         return self._map.values()
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json object from the results map.
+
+            Returns:
+                list<dict>: json representation of results map
+        """
+        return [x.getJSON() for x in self.values()]

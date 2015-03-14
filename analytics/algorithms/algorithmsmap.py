@@ -112,3 +112,13 @@ class AlgorithmsMap(object):
                 list<Algorithm>: values list that are in dictionary
         """
         return self._map.values()
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json object from the algorithms map.
+
+            Returns:
+                list<dict>: json representation of algorithms map
+        """
+        return [x.getJSON() for x in self.values()]

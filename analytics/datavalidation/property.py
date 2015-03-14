@@ -205,3 +205,20 @@ class Property(object):
                 int: priority order (see constants for more details)
         """
         return self._priorityOrder
+
+    # [Public]
+    def getJSON(self):
+        """
+            JSON representation of the Property instance.
+
+            Returns:
+                dict<str, obj>: json object of the instance
+        """
+        return {
+            "id": self.getId(),
+            "name": self.getName(),
+            "type": self.getType(),
+            "dynamic": self.getDynamic(),
+            "default": self.getDefault(),
+            "values": sorted(self._values)
+        }

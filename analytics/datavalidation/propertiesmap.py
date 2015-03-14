@@ -143,3 +143,13 @@ class PropertiesMap(object):
         """
         dyn = [key for key in self.keys() if self.get(key).getDynamic()]
         self.setDynamic(dyn)
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json object from the properties map.
+
+            Returns:
+                list<dict>: json representation of properties map
+        """
+        return [x.getJSON() for x in self.values()]

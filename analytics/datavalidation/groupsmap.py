@@ -37,6 +37,16 @@ class GroupsMap(object):
         self.reset()
 
     # [Public]
+    def getJSON(self):
+        """
+            Returns json object from the groups map.
+
+            Returns:
+                list<dict>: json representation of groups map
+        """
+        return [x.getJSON() for x in self.values()]
+
+    # [Public]
     def reset(self):
         """
             Resets all the attributes of the instance to the empty

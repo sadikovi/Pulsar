@@ -58,6 +58,20 @@ class Rank(object):
         self._value = value
         self._class = pclass
 
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json representation of the rank.
+
+            Returns:
+                dict<str, obj>: json representation of rank
+        """
+        return {
+            "name": self._name,
+            "value": self._value,
+            "class": self._class.getJSON()
+        }
+
 
 class Class(object):
     """
@@ -80,6 +94,7 @@ class Class(object):
         for x in ranks:
              self.addRank(x)
 
+    # [Public]
     def addRank(self, rank):
         """
             Adds rank to a dictionary of the Class instance.
@@ -90,6 +105,7 @@ class Class(object):
         misc.checkTypeAgainst(type(rank), Rank)
         self._ranks[rank._name] = rank
 
+    # [Public]
     def allRanks(self):
         """
             Returns list of all ranks in this class.
@@ -99,6 +115,7 @@ class Class(object):
         """
         return self._ranks.values()
 
+    # [Public]
     def getRank(self, name):
         """
             Returns particular rank for name provided. If name does not exist
@@ -111,6 +128,19 @@ class Class(object):
                 Rank: rank object for the key
         """
         return self._ranks[name] if name in self._ranks else None
+
+    # [Public]
+    def getJSON(self):
+        """
+            JSON representation of the Class instance.
+
+            Returns:
+                dict<str, obj>: json representation of the instance
+        """
+        return {
+            "name": self._name,
+            "value": self._value
+        }
 
 class RSYS:
     """
