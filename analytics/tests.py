@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import sys and update path
 import sys
 
@@ -6,44 +8,114 @@ sys.path.append(DIR_PATH)
 
 # import libs
 import unittest
-# import classes
-import analytics.exceptions.tests.unittest_exceptions as unittest_exceptions
-import analytics.datavalidation.tests.unittest_validation as unittest_validation
-import analytics.loading.tests.unittest_loading as unittest_loading
-import analytics.utils.tests.unittest_utils as unittest_utils
-import analytics.algorithms.tests.unittest_algorithms as unittest_algorithms
-import analytics.algorithms.tests.unittest_relativecomp as unittest_relativecomp
-import analytics.utils.tests.unittest_queryengine as unittest_queryengine
-import analytics.selector.tests.unittest_selector as unittest_selector
-import analytics.errorhandler.tests.unittest_errorhandling as unittest_errorhandling
-import analytics.analyser.tests.unittest_analyser as unittest_analyser
+
+# select what tests to run
+_RUN_TESTS = {
+    "exceptions":       True,
+    "datavalidation":   True,
+    "loading":          True,
+    "utils":            True,
+    "algorithms":       True,
+    "relcomp_alg":      True,
+    "query_engine":     True,
+    "selector":         True,
+    "error_handler":    True,
+    "analyser":         True,
+    "datamanager":      True
+}
+
+def _checkTest(key):
+    return key in _RUN_TESTS and _RUN_TESTS[key]
 
 def _collectSystemTests(suites):
     # exceptions
-    suites.addTest(unittest_exceptions.loadSuites())
+    if _checkTest("exceptions"):
+        import analytics.exceptions.tests.unittest_exceptions as unittest_exceptions
+        suites.addTest(unittest_exceptions.loadSuites())
+    else:
+        print "@skip: exceptions tests"
+
     # datavalidation
-    suites.addTest(unittest_validation.loadSuites())
+    if _checkTest("datavalidation"):
+        import analytics.datavalidation.tests.unittest_validation as unittest_validation
+        suites.addTest(unittest_validation.loadSuites())
+    else:
+        print "@skip: data validation tests"
+
     # loading
-    suites.addTest(unittest_loading.loadSuites())
+    if _checkTest("loading"):
+        import analytics.loading.tests.unittest_loading as unittest_loading
+        suites.addTest(unittest_loading.loadSuites())
+    else:
+        print "@skip: loading tests"
+
     # utils
-    suites.addTest(unittest_utils.loadSuites())
+    if _checkTest("utils"):
+        import analytics.utils.tests.unittest_utils as unittest_utils
+        suites.addTest(unittest_utils.loadSuites())
+    else:
+        print "@skip: utils tests"
+
     # algorithms
-    suites.addTest(unittest_algorithms.loadSuites())
+    if _checkTest("algorithms"):
+        import analytics.algorithms.tests.unittest_algorithms as unittest_algorithms
+        suites.addTest(unittest_algorithms.loadSuites())
+    else:
+        print "@skip: algorithms tests"
+
     # relative comparion algorithm
-    suites.addTest(unittest_relativecomp.loadSuites())
+    if _checkTest("relcomp_alg"):
+        import analytics.algorithms.tests.unittest_relativecomp as unittest_relativecomp
+        suites.addTest(unittest_relativecomp.loadSuites())
+    else:
+        print "@skip: relative comparison algorithm tests"
+
     # query engine
-    suites.addTest(unittest_queryengine.loadSuites())
+    if _checkTest("query_engine"):
+        import analytics.utils.tests.unittest_queryengine as unittest_queryengine
+        suites.addTest(unittest_queryengine.loadSuites())
+    else:
+        print "@skip: query engine tests"
+
     # selector
-    suites.addTest(unittest_selector.loadSuites())
+    if _checkTest("selector"):
+        import analytics.selector.tests.unittest_selector as unittest_selector
+        suites.addTest(unittest_selector.loadSuites())
+    else:
+        print "@skip: selector tests"
+
     # error handler
-    suites.addTest(unittest_errorhandling.loadSuites())
+    if _checkTest("error_handler"):
+        import analytics.errorhandler.tests.unittest_errorhandling as unittest_errorhandling
+        suites.addTest(unittest_errorhandling.loadSuites())
+    else:
+        print "@skip: error handler tests"
+
     # analyser
-    suites.addTest(unittest_analyser.loadSuites())
+    if _checkTest("analyser"):
+        import analytics.analyser.tests.unittest_analyser as unittest_analyser
+        suites.addTest(unittest_analyser.loadSuites())
+    else:
+        print "@skip: analyser tests"
+
+    # datamanager
+    if _checkTest("datamanager"):
+        import analytics.datamanager.tests.unittest_datamanager as unittest_datamanager
+        suites.addTest(unittest_datamanager.loadSuites())
+    else:
+        print "@skip: data manager tests"
+
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()
+    print ""
+    print "### [:Analytics] Gathering tests info ###"
+    print "-" * 70
     _collectSystemTests(suites)
     print ""
     print "### [:Analytics] Running tests ###"
     print "-" * 70
     unittest.TextTestRunner(verbosity=2).run(suites)
+    num = len([x for x in _RUN_TESTS.values() if not x])
+    print "%s Number of test blocks skipped: %d" %("OK" if num==0 else "WARN", num)
+    print ""

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import random
 from types import ListType
@@ -15,7 +17,7 @@ class hQueue(object):
     """
 
     def __init__(self, array=[]):
-        misc.checkTypeAgainst(type(array), ListType)
+        misc.checkTypeAgainst(type(array), ListType, __file__)
         self._queue = list(array)
 
     # [Public]

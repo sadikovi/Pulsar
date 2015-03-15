@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+
 # import libs
 import json
 from types import StringType, ListType
 import os
 # import classes
+import analytics.exceptions.exceptions as ex
 import analytics.utils.misc as misc
 from analytics.loading.loader import Loader
 from analytics.loading.jsonloader import JsonLoader
@@ -13,7 +16,9 @@ import analytics.analyser.analyser as al
 import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.propertiesmap as pm
+import analytics.algorithms.algorithmsmap as am
 from analytics.algorithms.algorithm import Algorithm
+import analytics.datamanager.datamanager as datamanager
 
 # project directory
 ANALYTICS_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
@@ -24,19 +29,11 @@ _EMAIL_LIST = [
     "test@example.com"
 ]
 
-# datasets available
-# [Private]
-_DATASETS = [
-    {
-        "id": "test",
-        "name": "Test set",
-        "desc": "Test set",
-        "path": "/datasets/test",
-        "type": "json",
-        "discover": False
-    }
-]
-
+# datamanager
+_datamanager = datamanager.DataManager()
+_datamanager.setSearchPath(os.path.join(ANALYTICS_DIRECTORY, "datasets"))
+# load all datasets
+_datamanager.loadDatasets()
 
 # [Public]
 def isUserInEmaillist(email):
@@ -64,14 +61,15 @@ def getAllDatasets():
     """
     jsonstr = "[]"
     try:
-        jsonstr = json.dumps(_DATASETS)
+        obj = [x.getJSON() for x in _datamanager.getDatasets()]
+        jsonstr = json.dumps(obj)
     except:
         jsonstr = "[]"
     return jsonstr
 
 
 # [Public]
-def requestData(datasetId, query="", datasets=_DATASETS):
+def requestData(datasetId, query):
     """
         Public method to request data, has error handling. Returns data json,
         if everything is okay, otherwise returns error json.
@@ -79,67 +77,60 @@ def requestData(datasetId, query="", datasets=_DATASETS):
         Args:
             datasetId (str): id of a particular dataset
             query (str): select query for data
-            datasets (list<dict>): list of datasets
 
         Returns:
             str: json string of results
     """
     jsonstring = ""
     try:
-        jsonstring = _requestData(datasetId, query, datasets)
-    except BaseException as e:
-        jsonstring = generateErrorMessage(str(e))
+        # check arguments
+        misc.checkTypeAgainst(type(datasetId), StringType, __file__)
+        misc.checkTypeAgainst(type(query), StringType, __file__)
+        # trim arguments
+        datasetId = datasetId.strip(); query = query.strip();
+        # find that ther is actual dataset stored
+        dataset = _datamanager.getDataset(datasetId)
+        # check dataset
+        if dataset is None:
+            # no datasets - error
+            misc.raiseStandardError("No such dataset", __file__)
+        # everything is okay
+        # extract dataset and get path
+        jsonobj = _requestData(dataset, query)
+        jsonstring = _generateSuccessMessage(jsonobj)
+    except ex.AnalyticsBaseException as e:
+        jsonstring = _generateErrorMessage(e._errmsg)
     return jsonstring
 
 
 # [Private]
 # requesting data for dataset
-def _requestData(datasetId, query="", datasets=_DATASETS):
+def _requestData(dataset, query):
     """
         Collects data from dataset and applies query to select a particular
         results. Empty query means default selection.
 
         Args:
-            datasetId (str): id of a particular dataset
+            dataset (Dataset): Dataset instance
             query (str): select query for data
-            datasets (list<dict>): list of datasets
 
         Returns:
             str: json string of results
     """
-    # map dataset parameters
-    ID = "id"; NAME = "name"; PATH = "path"; TYPE = "type";
-    DISCOVER = "discover"
-    # check arguments
-    misc.checkTypeAgainst(type(datasetId), StringType)
-    misc.checkTypeAgainst(type(query), StringType)
-    misc.checkTypeAgainst(type(datasets), ListType)
-    # trim arguments
-    datasetId = datasetId.strip(); query = query.strip();
-    # find that ther is actual dataset stored
-    list = [x for x in datasets if x[ID] == datasetId]
-    listlen = len(list)
-    # check dataset
-    if listlen > 1:
-        # more than 1 dataset - ambiguity error
-        raise StandardError("Datasets ambiguity (more than 1 dataset with id)")
-    elif listlen == 0:
-        # no datasets - error
-        raise StandardError("No such dataset")
-    # everything is okay
-    # extract dataset and get path
-    dataset = list[0]
-    path = dataset[PATH]; isDiscover = dataset[DISCOVER]
-    # datatype to load a particular loader
-    datatype = dataset[TYPE]
+    # check parameters
+    misc.checkTypeAgainst(type(dataset), datamanager.Dataset, __file__)
+    misc.checkTypeAgainst(type(query), StringType, __file__)
+    # prepare json objects
     groups = None; results = None; properties = None
-    # create loader, if something is wrong it will raise an exception
-    loader = _loaderForDatatype(datatype, "")
-    # extract data: groups, results, properties
-    groups = loader.processData(_pathFor(path, "groups", datatype))
-    results = loader.processData(_pathFor(path, "results", datatype))
-    if not isDiscover:
-        _props = loader.processData(_pathFor(path, "properties", datatype))
+    # create groups loader and extract data
+    groupsLoader =  _loaderForDatatype(dataset._groups["type"])
+    groups = groupsLoader.processData(dataset._groups["path"])
+    # create results loader and extract data
+    resultsLoader =  _loaderForDatatype(dataset._results["type"])
+    results = resultsLoader.processData(dataset._results["path"])
+    if not dataset._discover:
+        propsLoader =  _loaderForDatatype(dataset._properties["type"])
+        _props = propsLoader.processData(dataset._properties["path"])
     else:
         _props = []
     properties = _props
@@ -160,15 +151,16 @@ def _requestData(datasetId, query="", datasets=_DATASETS):
     selector.loadQueriesFromQueryset(query)
     selector.setSkipFiltering(True if query=="" else False)
     # check flag whether selector has performed filtering or not
-    flag = selector.startFiltering(groupsmap, resmap, propsmap, algsmap)
+    flag = selector.startFiltering(resmap, groupsmap, propsmap, algsmap)
     # analyse using algorithms map
     resmap = analyser.analyseUsingMap(algsmap, resmap, propsmap)
     # get last selected algorithm that has been used by this instance
     selectedAlg = analyser.getSelectedAlgorithm()
     # now we have everything filtered and ranked
     # prepare json object to send data back
-    jsonstring = generateData(groupsmap, resmap, propsmap, selectedAlg)
-    return jsonstring
+    jsonobj = _generateDataJSON(groupsmap, resmap, propsmap,
+                                    selectedAlg, al.ALGORITMS)
+    return jsonobj
 
 
 # [Private]
@@ -189,48 +181,10 @@ def _loaderForDatatype(datatype=None, filepath=""):
         return XmlLoader.prepareDataFrom(filepath)
     else:
         msg = "Unknown datatype %s" % (str(datatype))
-        raise StandardError(msg)
-
-# [Private]
-def _pathFor(path, file, fileformat):
-    """
-        Returns full path from path, file and fileformat.
-
-        Args:
-            path (str): path to the folder
-            file (str): file in the folder
-            fileformat (str): file format
-
-        Returns:
-            str: full path to the file
-    """
-    misc.checkTypeAgainst(type(path), StringType)
-    misc.checkTypeAgainst(type(file), StringType)
-    misc.checkTypeAgainst(type(fileformat), StringType)
-    # remove slashes
-    path = path.strip("/")
-    file = file.strip("/")
-    return "%s/%s/%s.%s" %(ANALYTICS_DIRECTORY, path, file, fileformat)
+        misc.raiseStandardError(msg, __file__)
 
 
-# [Private]
-def generateErrorMessage(msg=""):
-    """
-        Generates json with error message provided.
-
-        Args:
-            msg (str): error message
-
-        Returns:
-            str: json string with error message
-    """
-    # build global error object
-    obj = { "status": "error", "data": None, "message": msg }
-    return json.dumps(obj)
-
-
-# [Private]
-def generateData(groupsmap, resultsmap, propertiesmap, algorithm):
+def _generateDataJSON(groupsmap, resultsmap, propertiesmap, algorithm, algsmap):
     """
         Generates json data from maps and algorithm, combines them together to
         return back.
@@ -240,30 +194,79 @@ def generateData(groupsmap, resultsmap, propertiesmap, algorithm):
             resultsmap (ResultsMap): map of the results
             propsmap (PropertiesMap): map of the properties
             algorithm (Algorithm): selected algorithm
+            algsmap (AlgorithmsMap): map of all algorithms available
 
         Returns:
-            str: json string with data
+            dict<str, obj>: data object
     """
     # check data types before json conversion
-    try:
-        misc.checkTypeAgainst(type(groupsmap), gm.GroupsMap)
-        misc.checkTypeAgainst(type(resultsmap), rm.ResultsMap)
-        misc.checkTypeAgainst(type(propertiesmap), pm.PropertiesMap)
-        misc.checkInstanceAgainst(algorithm, Algorithm)
-    except BaseException as e:
-        return generateErrorMessage(str(e))
+    misc.checkTypeAgainst(type(groupsmap), gm.GroupsMap, __file__)
+    misc.checkTypeAgainst(type(resultsmap), rm.ResultsMap, __file__)
+    misc.checkTypeAgainst(type(propertiesmap), pm.PropertiesMap, __file__)
+    misc.checkInstanceAgainst(algorithm, Algorithm, __file__)
+    misc.checkTypeAgainst(type(algsmap), am.AlgorithmsMap, __file__)
     # get json objects
     groupsobj = groupsmap.getJSON()
     resultsobj = resultsmap.getJSON()
     propertiesobj = propertiesmap.getJSON()
     algorithmobj = algorithm.getJSON()
+    algorithmsobj = algsmap.getJSON()
     # build data object
     dataobj = {
         "groups": groupsobj,
         "results": resultsobj,
         "properties": propertiesobj,
-        "algorithm": algorithmobj
+        "algorithms": {
+            "selected": algorithmobj,
+            "all": algorithmsobj
+        }
     }
+    return dataobj
+
+
+# [Private]
+def _generateSuccessMessage(dataobj, messages=[]):
+    """
+        Generates success message that includes status, code, data object
+        and messages list.
+
+        Args:
+            dataobj (dict<str, obj>): data object
+            messages (list<str>): list of messages
+
+        Returns:
+            str: json representation of success message
+    """
+    # just make sure that messages is a list, if not - reset it to default
+    if type(messages) is not ListType:
+        messages = []
     # build global object
-    obj = { "status": "success", "data": dataobj, "message": None }
+    obj = {
+        "status": "success",
+        "code": 200,
+        "data": dataobj,
+        "messages": messages
+    }
+    return json.dumps(obj)
+
+
+# [Private]
+def _generateErrorMessage(message, code=400):
+    """
+        Generates json with error message provided.
+
+        Args:
+            code (int): error message code
+            message (str): error message
+
+        Returns:
+            str: json string with error message
+    """
+    # build global error object
+    obj = {
+        "code": int(code),
+        "status": "error",
+        "data": None,
+        "messages": [message]
+    }
     return json.dumps(obj)

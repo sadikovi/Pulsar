@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import json
 from types import StringType, UnicodeType
@@ -37,7 +39,7 @@ class JsonLoader(l.Loader):
             Args:
                 filepath (str): json file path
         """
-        misc.checkTypeAgainst(type(filepath), StringType)
+        misc.checkTypeAgainst(type(filepath), StringType, __file__)
         return cls(filepath)
 
     # [Public]
@@ -71,6 +73,11 @@ class JsonLoader(l.Loader):
                 dict<str, obj>: updated data item with StringType
         """
         for key in data.keys():
-            if type(data[key]) is UnicodeType:
-                data[key] = str(data[key])
+            key_upd = key; data_upd = data[key]
+            if type(key_upd) is UnicodeType:
+                key_upd = str(key_upd)
+            if type(data_upd) is UnicodeType:
+                data_upd = str(data_upd)
+            del data[key]
+            data[key_upd] = data_upd
         return data

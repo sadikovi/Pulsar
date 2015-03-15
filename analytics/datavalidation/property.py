@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import StringType, IntType, FloatType, DictType
 # import classes
@@ -34,8 +36,8 @@ class Property(object):
     """
     def __init__(self, name, sample, dynamic=False, order=Const.PRIORITY_INC):
         if name is None or sample is None:
-            raise ValueError("Property name and sample cannot be None")
-        misc.checkTypeAgainst(type(name), StringType)
+            misc.raiseValueError("Property name/sample are undefined", __file__)
+        misc.checkTypeAgainst(type(name), StringType, __file__)
         # set id to be equal to name, that is true only for the property
         self._id = self._name = name
         # check type to identify whether sample is a number or string
@@ -46,7 +48,7 @@ class Property(object):
         elif type(sample) is StringType:
             self._type = Const.PROPERTY_STRING
         else:
-            raise TypeError("The Property type is not supported")
+            misc.raiseTypeError("The Property type is not supported", __file__)
         # set dynamic
         self._dynamic = False
         self.setDynamic(dynamic)
@@ -71,10 +73,10 @@ class Property(object):
             Returns:
                 Property: instance of the Property class
         """
-        misc.checkTypeAgainst(type(obj), DictType)
+        misc.checkTypeAgainst(type(obj), DictType, __file__)
         # check name
         if Const.PROPERTY_NAME not in obj:
-            raise ValueError("Property object does not have a name")
+            misc.raiseValueError("Property object does not have name", __file__)
         name = obj[Const.PROPERTY_NAME]
         # assign to temp variables
         _prop_sample = Const.PROPERTY_SAMPLE
@@ -104,7 +106,7 @@ class Property(object):
         elif self._type == Const.PROPERTY_STRING and type(obj) is StringType:
             self._values.add(obj)
         else:
-            raise TypeError("Object type does not match specified type")
+            misc.raiseTypeError("Unsupported Property object type", __file__)
 
     # [Public]
     def getId(self):
@@ -177,7 +179,7 @@ class Property(object):
         elif self._type == Const.PROPERTY_STRING:
             value = str(value)
         else:
-            raise TypeError("The Property type is not supported")
+            misc.raiseTypeError("The Property type is not supported", __file__)
         self._default = value
 
     # [Public]

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import warnings
 # import classes
@@ -7,6 +9,12 @@ import analytics.algorithms.relativecomp as rc
 import analytics.utils.misc as misc
 import analytics.datavalidation.propertiesmap as prmap
 import analytics.datavalidation.resultsmap as rsmap
+
+# static algorithms map
+ALGORITMS = AlgorithmsMap()
+DEFAULT_ALGORITHM = rc.RelativeComparison()
+# add algorithms to the map
+ALGORITMS.assign(DEFAULT_ALGORITHM)
 
 
 class Analyser(object):
@@ -35,14 +43,12 @@ class Analyser(object):
                 AlgorithmsMap: algorithms map with available instances
         """
         # initialise map to keep algorithms
-        almap = AlgorithmsMap()
+        self._algorithmsmap = AlgorithmsMap()
         # collect algorithms
-        relcomp1 = rc.RelativeComparison()
-        # and put them into map
-        almap.assign(relcomp1)
-        self._algorithmsmap = almap
-        # set relcomp1 to be default algorithm
-        self._setDefaultAlgorithm(relcomp1)
+        for algorithm in ALGORITMS.values():
+            self._algorithmsmap.assign(algorithm)
+        # set relative comparison to be default algorithm
+        self._setDefaultAlgorithm(DEFAULT_ALGORITHM)
 
     # [Private]
     def _setDefaultAlgorithm(self, algorithm):
@@ -53,7 +59,7 @@ class Analyser(object):
             Args:
                 algorithm (Algorithm): algorithm to set as default
         """
-        misc.checkInstanceAgainst(algorithm, Algorithm)
+        misc.checkInstanceAgainst(algorithm, Algorithm, __file__)
         self._defaultAlgorithm = algorithm
 
     # [Private]
@@ -64,7 +70,7 @@ class Analyser(object):
             Returns:
                 bool: bool value to indicate that everything is set
         """
-        misc.checkTypeAgainst(type(self._algorithmsmap), AlgorithmsMap)
+        misc.checkTypeAgainst(type(self._algorithmsmap), AlgorithmsMap, __file__)
         return True
 
     # [Public]
@@ -136,9 +142,9 @@ class Analyser(object):
                 ResultsMap: updated results map
         """
         # check arguments
-        misc.checkInstanceAgainst(algorithm, Algorithm)
-        misc.checkTypeAgainst(type(resultsMap), rsmap.ResultsMap)
-        misc.checkTypeAgainst(type(propertiesMap), prmap.PropertiesMap)
+        misc.checkInstanceAgainst(algorithm, Algorithm, __file__)
+        misc.checkTypeAgainst(type(resultsMap), rsmap.ResultsMap, __file__)
+        misc.checkTypeAgainst(type(propertiesMap), prmap.PropertiesMap, __file__)
         # set selected algorithm
         self._setSelectedAlgorithm(algorithm)
         # rank results using algorithm
@@ -160,11 +166,11 @@ class Analyser(object):
             Returns:
                 ResultsMap: updated results map
         """
-        misc.checkTypeAgainst(type(algMap), AlgorithmsMap)
+        misc.checkTypeAgainst(type(algMap), AlgorithmsMap, __file__)
         # assign algorithm
         algorithm = None
         if algMap.isEmpty() and not withDefault:
-            raise StandardError("No algorithm is specified")
+            misc.raiseStandardError("No algorithm is specified", __file__)
         else:
             key = None if algMap.isEmpty() else algMap.keys()[0]
             algorithm = self.getAlgorithm(key)

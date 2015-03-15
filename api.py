@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+# import libs
 import setpath
 from google.appengine.api import users
 import analytics.analyticsws as ws
@@ -19,7 +22,7 @@ class API_Datasets(webapp2.RequestHandler):
             if user and ws.isUserInEmaillist(user.email()):
                 res = ws.getAllDatasets()
             else:
-                res = ws.generateErrorMessage(Message.NotAuthenticated)
+                res = ws._generateErrorMessage(Message.NotAuthenticated, 401)
                 self.response.set_status(401)
             self.response.write(res)
         except:
@@ -33,15 +36,15 @@ class API_Query(webapp2.RequestHandler):
         try:
             user = users.get_current_user()
             if user and ws.isUserInEmaillist(user.email()):
-                query = self.request.get('q') or ""
-                datasetId = str(self.request.get('d') or "")
+                query = str(self.request.get('q'))
+                datasetId = str(self.request.get('d'))
                 res = ws.requestData(datasetId, query)
             else:
-                res = ws.generateErrorMessage(Message.NotAuthenticated)
+                res = ws._generateErrorMessage(Message.NotAuthenticated, 401)
                 self.response.set_status(401)
             self.response.write(res)
-        except:
-            error = ws.generateErrorMessage(Message.UnexpectedError)
+        except BaseException as e:
+            error = ws._generateErrorMessage(str(e))
             self.response.set_status(400)
             self.response.write(error)
 

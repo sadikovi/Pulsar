@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import StringType
 import time
@@ -21,10 +23,10 @@ class ErrorBlock(object):
             _isLogged (bool): flag to indicate if error is logged
     """
     def __init__(self, message, description=""):
-        misc.checkTypeAgainst(type(message), StringType)
-        misc.checkTypeAgainst(type(description), StringType)
+        misc.checkTypeAgainst(type(message), StringType, __file__)
+        misc.checkTypeAgainst(type(description), StringType, __file__)
         if message == "":
-            raise ValueError("Error message cannot be empty")
+            misc.raiseValueError("Error message cannot be empty", __file__)
         # fill the attributes
         self._message = message
         self._description = description

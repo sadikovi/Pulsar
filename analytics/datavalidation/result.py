@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import DictType, StringType, ListType
 # import classes
@@ -38,9 +40,9 @@ class Result(object):
     # properties dict has to be a dict<str, Property> instance
     # group is a group id that result relates to
     def __init__(self, obj, group="", properties=pm.PropertiesMap()):
-        misc.checkTypeAgainst(type(obj), DictType)
-        misc.checkTypeAgainst(type(group), StringType)
-        misc.checkTypeAgainst(type(properties), pm.PropertiesMap)
+        misc.checkTypeAgainst(type(obj), DictType, __file__)
+        misc.checkTypeAgainst(type(group), StringType, __file__)
+        misc.checkTypeAgainst(type(properties), pm.PropertiesMap, __file__)
         # use parse for getting parameters
         parse = p.Parse(obj)
         self._id = p.Parse.guidBasedId()
@@ -179,7 +181,7 @@ class Result(object):
             Args:
                 rank (Rank): rank for current Result instance
         """
-        misc.checkTypeAgainst(type(rank), Rank)
+        misc.checkTypeAgainst(type(rank), Rank, __file__)
         self._rank = rank
 
     # [Public]

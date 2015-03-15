@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 # import classes
@@ -63,7 +65,7 @@ class Selector_TestsSequence(unittest.TestCase):
     # not testing loadQueriesFromBlocks, because we are calling it with a
     # little overhead
     def test_selector_loadQueriesFromQueryset(self):
-        with self.assertRaises(ex.SyntaxError):
+        with self.assertRaises(ex.AnalyticsSyntaxError):
             self._sel.loadQueriesFromQueryset(self._bad_queryset)
         self._sel.loadQueriesFromQueryset(self._queryset)
         self.assertEqual(len(self._sel._blocks), 1)
@@ -174,7 +176,7 @@ class Selector_TestsSequence(unittest.TestCase):
         self.assertEquals(len(results.values()), 3)
         self.assertEquals(len(props.values()), 2)
 
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             self._sel.startFiltering(results, groups, props, None)
         set = "select from ${results} where @b=90 and @b|is|dynamic;"+\
                 "select from ${groups} where @id=["+gid+"];"+\

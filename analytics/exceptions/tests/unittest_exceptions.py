@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 # import classes
@@ -9,41 +11,45 @@ class Exceptions_TestsSequence(unittest.TestCase):
         self.isStarted = True
 
 # CheckError tests
-class CheckError_TestsSequence(Exceptions_TestsSequence):
+class AnalyticsCheckError_TestsSequence(Exceptions_TestsSequence):
 
     def test_checkerror_raise(self):
-        with self.assertRaises(c.CheckError):
-            raise c.CheckError(type(1), type(2.1))
+        with self.assertRaises(c.AnalyticsCheckError):
+            raise c.AnalyticsCheckError(type(1), type(2.1))
 
     def test_checkerror_tryCatch(self):
         msg = ""
         try:
-            raise c.CheckError(type(1), type(1.2))
-        except c.CheckError as arg:
-            msg = arg.errmsg
-        self.assertEqual(msg, str(arg))
+            raise c.AnalyticsCheckError(type(1), type(1.2), "file", 12)
+        except c.AnalyticsCheckError as arg:
+            msg = "[!] Expected <type 'int'>, received <type 'float'>"
+        self.assertEqual(msg, arg._errmsg)
+        self.assertEqual("file", arg._source)
+        self.assertEqual("12", arg._line)
 
 # SyntaxError tests
-class SyntaxError_TestsSequence(Exceptions_TestsSequence):
+class AnalyticsSyntaxError_TestsSequence(Exceptions_TestsSequence):
 
     def test_syntaxerror_raise(self):
-        with self.assertRaises(c.SyntaxError):
-            raise c.SyntaxError(1, "; and 1=0")
+        with self.assertRaises(c.AnalyticsSyntaxError):
+            raise c.AnalyticsSyntaxError(1, "; and 1=0")
 
     def test_syntaxerror_tryCatch(self):
         msg = ""
         try:
-            raise c.SyntaxError(1, "; and 1=0")
-        except c.SyntaxError as arg:
-            msg = arg.errmsg
-        self.assertEqual(msg, "Wrong syntax at position 1 near ; and 1=0")
+            raise c.AnalyticsSyntaxError(1, "; and 1=0", "syntaxfile", "23")
+        except c.AnalyticsSyntaxError as arg:
+            msg = "Wrong syntax at position 1 near ; and 1=0"
+        self.assertEqual(msg, arg._errmsg)
+        self.assertEqual("syntaxfile", arg._source)
+        self.assertEqual("23", arg._line)
 
 
 # Load test suites
 def _suites():
     return [
-        CheckError_TestsSequence,
-        SyntaxError_TestsSequence
+        AnalyticsCheckError_TestsSequence,
+        AnalyticsSyntaxError_TestsSequence
     ]
 
 # Load tests

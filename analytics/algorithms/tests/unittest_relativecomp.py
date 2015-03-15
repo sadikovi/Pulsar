@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 import random
@@ -18,7 +20,7 @@ class Algorithms_TestsSequence(unittest.TestCase):
 class RelComp_TestsSequence(Algorithms_TestsSequence):
 
     def test_relcomp_init(self):
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             a = rc._RelComp()
 
     def test_relcomp_alpha(self):
@@ -27,10 +29,10 @@ class RelComp_TestsSequence(Algorithms_TestsSequence):
     def test_relcomp_beta(self):
         alpha = rc._RelComp.alpha()
         delta = 0.8
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             k = -1
             rc._RelComp.beta(alpha, k, delta)
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             k = 1.1
             rc._RelComp.beta(alpha, k, delta)
         k = 1
@@ -61,10 +63,10 @@ class RelComp_TestsSequence(Algorithms_TestsSequence):
 
     def test_relcomp_da(self):
         a = []
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             rc._RelComp.da(a)
         a = [random.randrange(0, 100)]
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             rc._RelComp.da(a)
         for _i in range(10):
             a = [random.randrange(0, 100) for i in range(10)]
@@ -97,9 +99,14 @@ class RelativeComparison_TestsSequence(Algorithms_TestsSequence):
 
     def test_relativecomp_relcomp(self):
         self.assertEqual(self._rel._relcomp([], 1, 1), {})
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             median = random.randrange(1000, 2000)
-            self._rel._relcomp(a, order, median)
+            order = (-1)**random.randrange(0, 2)
+            self._rel._relcomp(None, order, median)
+        with self.assertRaises(ex.AnalyticsStandardError):
+            median = random.randrange(1000, 2000)
+            order = (-1)**random.randrange(0, 2)
+            self._rel._relcomp([1, 2, 3], order, median)
         for i in range(10):
             a = [random.randrange(0, 100)*((-1)**random.randrange(0, 2)) for i in range(10)]
             order = (-1)**random.randrange(0, 2)
@@ -134,9 +141,9 @@ class RelativeComparison_TestsSequence(Algorithms_TestsSequence):
                 self.assertTrue(hashRank[key] is not rank.RSYS.UND_RANK)
 
     def test_relativecomp_computeRank(self):
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             self._rel._computeRanks([], [], [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             self._rel._computeRanks({}, {}, [])
         for _kl in range(10):
             n = random.randrange(1, 3)
@@ -211,7 +218,7 @@ class RelativeComparison_TestsSequence(Algorithms_TestsSequence):
             r = Result(bi, "", props)
             res.assign(r)
 
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             self._rel.rankResults({}, {})
 
         res = self._rel.rankResults(res, props)

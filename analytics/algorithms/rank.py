@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import StringType, IntType, ListType
 # import classes
@@ -50,9 +52,9 @@ class Rank(object):
     """
     def __init__(self, name, pclass, value=0):
         # check parameters
-        misc.checkTypeAgainst(type(name), StringType)
-        misc.checkTypeAgainst(type(pclass), Class)
-        misc.checkTypeAgainst(type(value), IntType)
+        misc.checkTypeAgainst(type(name), StringType, __file__)
+        misc.checkTypeAgainst(type(pclass), Class, __file__)
+        misc.checkTypeAgainst(type(value), IntType, __file__)
         # initialise parameters
         self._name = name
         self._value = value
@@ -84,9 +86,9 @@ class Class(object):
     """
     def __init__(self, name, value=0, ranks=[]):
         # check parameters
-        misc.checkTypeAgainst(type(name), StringType)
-        misc.checkTypeAgainst(type(value), IntType)
-        misc.checkTypeAgainst(type(ranks), ListType)
+        misc.checkTypeAgainst(type(name), StringType, __file__)
+        misc.checkTypeAgainst(type(value), IntType, __file__)
+        misc.checkTypeAgainst(type(ranks), ListType, __file__)
         # initialise attributes
         self._name = name
         self._value = value
@@ -102,7 +104,7 @@ class Class(object):
             Args:
                 rank (Rank): Rank instance to add to the _ranks dicionary
         """
-        misc.checkTypeAgainst(type(rank), Rank)
+        misc.checkTypeAgainst(type(rank), Rank, __file__)
         self._ranks[rank._name] = rank
 
     # [Public]

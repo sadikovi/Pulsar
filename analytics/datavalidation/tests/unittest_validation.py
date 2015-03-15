@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 import json
@@ -32,7 +34,7 @@ class Parse_TestsSequence(DataValidation_TestsSequence):
                             'desc': 'desc', 'parent': '123'}
 
     def test_parse_init(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             parse = p.Parse("str")
             parse.updateInstance(123)
 
@@ -110,9 +112,9 @@ class Group_TestsSequence(DataValidation_TestsSequence):
                             'desc': 'desc', 'parent': '123'}
 
     def test_group_createFromObject(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             group = g.Group.createFromObject([])
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             group = g.Group.createFromObject("123")
         group = g.Group.createFromObject(self._testGroup)
 
@@ -146,7 +148,7 @@ class Group_TestsSequence(DataValidation_TestsSequence):
         group = g.Group.createFromObject(self._testGroup)
         subgroup = g.Group.createFromObject(self._testGroup)
         # raise an exception
-        self.assertRaises(c.CheckError, group.addChild, "123")
+        self.assertRaises(c.AnalyticsCheckError, group.addChild, "123")
         # should not raise any exception
         group.addChild(None)
         self.assertEqual(len(group.getChildren()), 0)
@@ -180,7 +182,7 @@ class Group_TestsSequence(DataValidation_TestsSequence):
     def test_group_addChildren(self):
         group = g.Group.createFromObject(self._testGroup)
         children = {}
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             group.addChildren(children)
         children = [g.Group.createFromObject(self._testGroup), g.Group.createFromObject(self._testGroup)]
         group.addChildren(children)
@@ -201,11 +203,11 @@ class Result_TestsSequence(DataValidation_TestsSequence):
                             'desc': 'desc', 'parent': '123'}
 
     def test_result_init(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             result = r.Result("str")
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             result = r.Result(1)
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             result = r.Result(self._testResult, None)
 
     def test_result_isInitialised(self):
@@ -243,7 +245,7 @@ class Result_TestsSequence(DataValidation_TestsSequence):
 
     def test_result_setRank(self):
         result = r.Result(self._testResult)
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             result.setRank([])
         self.assertEqual(result._rank, rank.RSYS.UND_RANK)
         result.setRank(rank.RSYS.O)
@@ -261,9 +263,9 @@ class Result_TestsSequence(DataValidation_TestsSequence):
 class Property_TestsSequence(DataValidation_TestsSequence):
 
     def test_property_init(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             property = pr.Property({}, [])
-        with self.assertRaises(ValueError):
+        with self.assertRaises(c.AnalyticsValueError):
             property = pr.Property(None, None)
 
         property = pr.Property('value', 123)
@@ -273,9 +275,9 @@ class Property_TestsSequence(DataValidation_TestsSequence):
 
     def test_property_add(self):
         property = pr.Property("property", 122)
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.AnalyticsTypeError):
             property.add("self")
-        with self.assertRaises(TypeError):
+        with self.assertRaises(c.AnalyticsTypeError):
             property.add(123.23)
         property.add(123)
         self.assertEqual(len(property._values), 1)
@@ -315,7 +317,7 @@ class Property_TestsSequence(DataValidation_TestsSequence):
         self.assertEqual(dynamic.getDefault(), 3)
 
     def test_property_createFromObject(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(c.AnalyticsValueError):
             prop = pr.Property.createFromObject({"dynamic": True})
 
         testProp = {"name": "test", "sample": 1, "dynamic": True, "priority": -1}
@@ -486,7 +488,7 @@ class ResultsMap_TestsSequence(DataValidation_TestsSequence):
 
     def test_resultmap_assign(self):
         map = rm.ResultsMap()
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             map.assign("123")
         map.assign(self._result)
         self.assertEqual(map._map[self._result.getId()], self._result)
@@ -528,7 +530,7 @@ class PropertiesMap_TestsSequence(DataValidation_TestsSequence):
 
     def test_propertiesmap_assign(self):
         map = pm.PropertiesMap()
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             map.assign(123)
         map.assign(self._property)
         self.assertEqual(len(map.keys()), 1)
@@ -628,21 +630,21 @@ class Validator_TestsSequence(DataValidation_TestsSequence):
 
     def test_validator_loadGroups(self):
         dv = v.Validator()
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             dv._loadGroups("test")
         dv._loadGroups(self._testGroups)
         self.assertEquals(len(dv.getGroups().keys()), 2)
 
     def test_validator_loadResults(self):
         dv = v.Validator()
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             dv._loadResults("test")
         dv._loadResults(self._testResults)
         self.assertEquals(len(dv.getResults().keys()), 2)
 
     def test_validator_loadProperties(self):
         dv = v.Validator()
-        with  self.assertRaises(c.CheckError):
+        with  self.assertRaises(c.AnalyticsCheckError):
             dv._loadProperties({})
         dv._loadProperties(self._testProperties)
         self.assertEquals(len(dv.getProperties().keys()), 2)

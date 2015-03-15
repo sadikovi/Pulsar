@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import DictType, ListType, StringType
 # import classes
@@ -33,7 +35,7 @@ class Group(object):
     """
 
     def __init__(self, pguid, pid, pname, pdesc, pparent):
-        misc.checkTypeAgainst(type(pguid), StringType)
+        misc.checkTypeAgainst(type(pguid), StringType, __file__)
         self._id = pguid
         self._externalId = pid
         self._name = pname
@@ -43,7 +45,7 @@ class Group(object):
 
     @classmethod
     def createFromObject(cls, object):
-        misc.checkTypeAgainst(type(object), DictType)
+        misc.checkTypeAgainst(type(object), DictType, __file__)
         prs = p.Parse(object)
         return cls(p.Parse.guidBasedId(), prs.getExternalId(), \
                     prs.getName(), prs.getDesc(), prs.getParent())
@@ -153,9 +155,9 @@ class Group(object):
         """
         if child is None:
             return None
-        misc.checkTypeAgainst(type(child), Group)
+        misc.checkTypeAgainst(type(child), Group, __file__)
         if child == self:
-            raise ValueError("Group instance cannot add itself as child")
+            misc.raiseValueError("Recursive parent-child addition", __file__)
         if self.hasChild(child) is False:
             self._children.append(child)
 
@@ -168,7 +170,7 @@ class Group(object):
             Args:
                 children (list<Group>): children list to be added
         """
-        misc.checkTypeAgainst(type(children), ListType)
+        misc.checkTypeAgainst(type(children), ListType, __file__)
         for child in children:
             self.addChild(child)
 
@@ -184,7 +186,7 @@ class Group(object):
             Args:
                 children (list<Group>): children list to be assigned
         """
-        misc.checkTypeAgainst(type(children), ListType)
+        misc.checkTypeAgainst(type(children), ListType, __file__)
         self._children = children
 
     # [Public]

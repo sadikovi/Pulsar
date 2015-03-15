@@ -1,10 +1,11 @@
+#!/usr/bin/env python
+
 # import libs
 from types import StringType, ListType, DictType, TupleType
 import re
 from urllib import quote, unquote
 # import classes
 import analytics.utils.misc as misc
-from analytics.exceptions.exceptions import SyntaxError
 
 ###########################################################
 """
@@ -162,9 +163,9 @@ class QueryEngine(object):
                 list<QueryBlock>: list of QueryBlock instances that
                                     represent each query
         """
-        misc.checkTypeAgainst(type(queryset), StringType)
+        misc.checkTypeAgainst(type(queryset), StringType, __file__)
         if len(queryset) == 0:
-            raise ValueError("Query set is empty")
+            misc.raiseValueError("Query set is empty", __file__)
 
         # initialise list of query blocks
         queryBlocks = []
@@ -185,7 +186,7 @@ class QueryEngine(object):
             # check syntax
             group = re.match(_QUERY_PATTERN, query, re.I)
             if group is None or group.group() != query:
-                raise SyntaxError(1, query)
+                misc.raiseSyntaxError(1, query, __file__)
             # start creating query block
             queryStatement = None
             for table in self._tablesMap.values():
@@ -221,10 +222,10 @@ class QueryEngine(object):
             Returns:
                 str: modified string containing keys on match places
         """
-        misc.checkTypeAgainst(type(pattern), StringType)
-        misc.checkTypeAgainst(type(querySet), StringType)
-        misc.checkTypeAgainst(type(key), StringType)
-        misc.checkTypeAgainst(type(pmap), DictType)
+        misc.checkTypeAgainst(type(pattern), StringType, __file__)
+        misc.checkTypeAgainst(type(querySet), StringType, __file__)
+        misc.checkTypeAgainst(type(key), StringType, __file__)
+        misc.checkTypeAgainst(type(pmap), DictType, __file__)
         i = 0
         while True:
             group = re.search(pattern, querySet, re.I)
@@ -251,10 +252,10 @@ class QueryEngine(object):
             Returns:
                 str: string representation of query blocks
         """
-        misc.checkTypeAgainst(type(blocks), ListType)
+        misc.checkTypeAgainst(type(blocks), ListType, __file__)
         query = []
         for block in blocks:
-            misc.checkTypeAgainst(type(block), QueryBlock)
+            misc.checkTypeAgainst(type(block), QueryBlock, __file__)
             query.append(block.queryToString())
         return _QUERY_DELIMITER.join(query)
 
@@ -269,8 +270,8 @@ class QueryBlock(object):
             _predicates (list<QueryPredicate>): list of query predicates
     """
     def __init__(self, queryStatement, queryPredicates=[]):
-        misc.checkTypeAgainst(type(queryStatement), QueryStatement)
-        misc.checkTypeAgainst(type(queryPredicates), ListType)
+        misc.checkTypeAgainst(type(queryStatement), QueryStatement, __file__)
+        misc.checkTypeAgainst(type(queryPredicates), ListType, __file__)
         self._statement = queryStatement
         self._predicates = queryPredicates
 
@@ -282,7 +283,7 @@ class QueryBlock(object):
             Args:
                 queryPredicate (QueryPredicate): predicate to add
         """
-        misc.checkTypeAgainst(type(queryPredicate), QueryPredicate)
+        misc.checkTypeAgainst(type(queryPredicate), QueryPredicate, __file__)
         self._predicates.append(queryPredicate)
 
     # [Public]
@@ -343,16 +344,16 @@ class QueryStatement(object):
             Returns:
                 QueryStatement: statement instance
         """
-        misc.checkTypeAgainst(type(statement), StringType)
+        misc.checkTypeAgainst(type(statement), StringType, __file__)
         statement = statement.strip()
         group = re.search(_TABLE_PATTERN, statement, re.I)
         if group is None:
-            raise SyntaxError(1, statement)
+            misc.raiseSyntaxError(1, statement, __file__)
         return cls.createWithTable(group.group())
 
     def __init__(self, table, arguments=[]):
-        misc.checkTypeAgainst(type(table), StringType)
-        misc.checkTypeAgainst(type(arguments), ListType)
+        misc.checkTypeAgainst(type(table), StringType, __file__)
+        misc.checkTypeAgainst(type(arguments), ListType, __file__)
         self._table = table
         self._arguments = arguments
 
@@ -407,7 +408,7 @@ class QueryPredicate(object):
             Returns:
                 QueryPredicate: query predicate with all the information
         """
-        misc.checkTypeAgainst(type(predicate), StringType)
+        misc.checkTypeAgainst(type(predicate), StringType, __file__)
         # prepare predicate
         predicate = predicate \
                 .replace(_PREDICATE_KW_IS.lower(),_PREDICATE_KW_IS) \
@@ -456,7 +457,7 @@ class QueryPredicate(object):
             Returns:
                 QueryPredicate: query predicate with all the information
         """
-        misc.checkTypeAgainst(type(predicate), StringType)
+        misc.checkTypeAgainst(type(predicate), StringType, __file__)
         predicate = predicate.strip()
         # loop through the list of patterns
         for pattern in _PREDICATE_IND_PATTERNS.keys():
@@ -465,11 +466,11 @@ class QueryPredicate(object):
                 vtype = _PREDICATE_IND_PATTERNS[pattern]["vtype"]
                 return cls.createFromTypeAndPredicate(ptype, vtype, predicate)
         # if no match at all raise an error
-        raise ValueError("Invalid predicate, or non-supported format")
+        misc.raiseValueError("Invalid predicate / unsupported format", __file__)
 
     def __init__(self, ptype, valueType, key, values):
-        misc.checkTypeAgainst(type(key), StringType)
-        misc.checkTypeAgainst(type(values), TupleType)
+        misc.checkTypeAgainst(type(key), StringType, __file__)
+        misc.checkTypeAgainst(type(values), TupleType, __file__)
         # type
         self._type = ptype
         # value type

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import classes
 import analytics.datavalidation.result as r
 import analytics.utils.misc as misc
@@ -53,7 +55,7 @@ class ResultsMap(object):
             Args:
                 result (Result): new Result instance
         """
-        misc.checkTypeAgainst(type(result), r.Result)
+        misc.checkTypeAgainst(type(result), r.Result, __file__)
         if not self.has(result.getId()):
             self._map[result.getId()] = result
 

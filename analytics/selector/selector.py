@@ -1,9 +1,10 @@
+#!/usr/bin/env python
+
 # import libs
 from types import StringType, ListType
 # import classes
 import analytics.utils.queryengine as q
 import analytics.utils.misc as misc
-import analytics.exceptions.exceptions as c
 import analytics.datavalidation.resultsmap as rm
 import analytics.datavalidation.groupsmap as gm
 import analytics.datavalidation.propertiesmap as pm
@@ -47,7 +48,7 @@ class Selector(object):
             Args:
                 queryset (str): string contains queries set
         """
-        misc.checkTypeAgainst(type(queryset), StringType)
+        misc.checkTypeAgainst(type(queryset), StringType, __file__)
         # if queryset is empty then skip loading
         if queryset == "":
             return False
@@ -65,7 +66,7 @@ class Selector(object):
             Args:
                 queryblocks (list<QueryBlock>): list of query blocks
         """
-        misc.checkTypeAgainst(type(queryblocks), ListType)
+        misc.checkTypeAgainst(type(queryblocks), ListType, __file__)
         # fill properties
         self._blocks = queryblocks
         self._readyToFilter = True
@@ -102,7 +103,7 @@ class Selector(object):
             return False
         # check if selector is ready to filter
         if self._readyToFilter is False:
-            raise StandardError('Selector is not ready to filter')
+            misc.raiseStandardError('Selector is not ready to filter', __file__)
         # find tables in blocks
         _results = None; _groups = None; _props = None; _algorithms = None
         for block in self._blocks:
@@ -148,9 +149,9 @@ class Selector(object):
                 propertiesMap (PropertiesMap): map of Property instances
                 queryBlock (QueryBlock): query block
         """
-        misc.checkTypeAgainst(type(resultsMap), rm.ResultsMap)
-        misc.checkTypeAgainst(type(propertiesMap), pm.PropertiesMap)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock)
+        misc.checkTypeAgainst(type(resultsMap), rm.ResultsMap, __file__)
+        misc.checkTypeAgainst(type(propertiesMap), pm.PropertiesMap, __file__)
+        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
 
         # update properties with assignment predicates
         dynamicIds = []
@@ -198,8 +199,8 @@ class Selector(object):
                 groupsMap (GroupsMap): map of Group instances
                 queryBlock (QueryBlock): query block
         """
-        misc.checkTypeAgainst(type(groupsMap), gm.GroupsMap)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock)
+        misc.checkTypeAgainst(type(groupsMap), gm.GroupsMap, __file__)
+        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
         # init group
         group = None
         # search through predicates
@@ -227,8 +228,8 @@ class Selector(object):
                 propertiesMap (PropertiesMap): map of Property instances
                 queryBlock (QueryBlock): query block
         """
-        misc.checkTypeAgainst(type(propertiesMap), pm.PropertiesMap)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock)
+        misc.checkTypeAgainst(type(propertiesMap), pm.PropertiesMap, __file__)
+        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
         # list to store matching ids
         names = []
         # search for matching properties
@@ -259,8 +260,8 @@ class Selector(object):
                 algorithmsMap (AlgorithmsMap): map of algorithms
                 queryBlock (QueryBlock): query block
         """
-        misc.checkTypeAgainst(type(algorithmsMap), am.AlgorithmsMap)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock)
+        misc.checkTypeAgainst(type(algorithmsMap), am.AlgorithmsMap, __file__)
+        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
         # list to store matching ids
         ids = []
         # search for matching algorithms
@@ -291,8 +292,8 @@ class Selector(object):
                 groupsMap (GroupsMap): map of Group instances
                 resultsMap( ResultsMap): map of Results instances
         """
-        misc.checkTypeAgainst(type(groupsMap), gm.GroupsMap)
-        misc.checkTypeAgainst(type(resultsMap), rm.ResultsMap)
+        misc.checkTypeAgainst(type(groupsMap), gm.GroupsMap, __file__)
+        misc.checkTypeAgainst(type(resultsMap), rm.ResultsMap, __file__)
         ids = []
         # search for results that do not match any group
         for result in resultsMap.values():

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from datetime import date
 import os
@@ -13,7 +15,7 @@ class Logger(object):
         and must be used with class methods only.
     """
     def __init__(self):
-        raise StandardError('Logger class cannot be instantiated')
+        misc.raiseStandardError('Logger class cannot be instantiated', __file__)
 
     # [Public]
     @classmethod
@@ -27,7 +29,7 @@ class Logger(object):
             Returns:
                 bool: flag indicating that logging was successful
         """
-        misc.checkTypeAgainst(type(error), ErrorBlock)
+        misc.checkTypeAgainst(type(error), ErrorBlock, __file__)
         # check file size
         pattern = Const.ERR_LOG_PREFIX + Const.LOG_PIECE_SEPARATOR + \
                     cls._currentDateString() + Const.LOG_PIECE_SEPARATOR + \

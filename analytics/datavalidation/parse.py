@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import uuid
 from types import DictType, StringType
@@ -44,7 +46,7 @@ class Parse(object):
             Returns:
                 object: value for a key found in a set of possible keys
         """
-        misc.checkTypeAgainst(type(self._object), DictType)
+        misc.checkTypeAgainst(type(self._object), DictType, __file__)
         for key in array:
             if key in self._object:
                 self._primaryKeys.append(key)
@@ -60,7 +62,7 @@ class Parse(object):
             Args:
                 object (dict<str, object>): object to update reference to
         """
-        misc.checkTypeAgainst(type(object), DictType)
+        misc.checkTypeAgainst(type(object), DictType, __file__)
         self._resetParse()
         self._object = object
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import classes
 import analytics.utils.misc as misc
 from analytics.errorhandler.errorblock import ErrorBlock
@@ -16,7 +18,7 @@ class ErrorHandler(object):
     _errorList = []
 
     def __init__(self):
-        raise StandardError("ErrorHandler cannot be instantiated")
+        misc.raiseStandardError("ErrorHandler cannot be instantiated", __file__)
 
     # [Public]
     @classmethod
@@ -51,7 +53,7 @@ class ErrorHandler(object):
             Args:
                 error ErrorBlock: error to process
         """
-        misc.checkTypeAgainst(type(error), ErrorBlock)
+        misc.checkTypeAgainst(type(error), ErrorBlock, __file__)
         # process error
         res = cls._processError(error)
         # append error
@@ -66,7 +68,7 @@ class ErrorHandler(object):
             Args:
                 error (ErrorBlock): error to be added
         """
-        misc.checkTypeAgainst(type(error), ErrorBlock)
+        misc.checkTypeAgainst(type(error), ErrorBlock, __file__)
         # register error
         error.makeRegistered()
         # append error to the list
@@ -82,7 +84,7 @@ class ErrorHandler(object):
             Args:
                 error (ErrorBlock): error to be processed
         """
-        misc.checkTypeAgainst(type(error), ErrorBlock)
+        misc.checkTypeAgainst(type(error), ErrorBlock, __file__)
         # log error
         flag = Logger.logError(error, True)
         # mark error as logged

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import classes
 import analytics.utils.misc as misc
 import analytics.algorithms.algorithm as a
@@ -49,7 +51,7 @@ class AlgorithmsMap(object):
             Args:
                 algorithm (Algorithm): Algorithm instance to be added to _map
         """
-        misc.checkInstanceAgainst(algorithm, a.Algorithm)
+        misc.checkInstanceAgainst(algorithm, a.Algorithm, __file__)
         key = algorithm.getId()
         if not self.has(key):
             self._map[key] = algorithm

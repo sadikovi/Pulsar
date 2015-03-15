@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 # import classes
@@ -34,7 +36,7 @@ class AlgorithmsMap_TestsSequence(Algorithms_TestsSequence):
         self.assertEqual(self._almap.has("123"), True)
 
     def test_algorithmsmap_assign(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ex.AnalyticsTypeError):
             self._almap.assign([])
 
         test = TestAlgorithm("id", "name", "short")
@@ -67,11 +69,11 @@ class AlgorithmsMap_TestsSequence(Algorithms_TestsSequence):
 class Rank_TestsSequence(Algorithms_TestsSequence):
 
     def test_rank_init(self):
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rnk = rank.Rank([], [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rnk = rank.Rank("name", [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rnk = rank.Rank("rank", rank.Class("name"), "str")
         rClass = rank.Class("name")
         rnk = rank.Rank("rank", rClass, 10)
@@ -83,11 +85,11 @@ class Rank_TestsSequence(Algorithms_TestsSequence):
 class Class_TestsSequence(Algorithms_TestsSequence):
 
     def test_class_init(self):
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rClass = rank.Class([], [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rClass = rank.Class("class", [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rClass = rank.Class("class", 10, {})
         rClass = rank.Class("class", 10)
         self.assertEqual(rClass._name, "class")
@@ -97,7 +99,7 @@ class Class_TestsSequence(Algorithms_TestsSequence):
     def test_class_addRank(self):
         rClass = rank.Class("class", 10)
         rnk = rank.Rank("rank", rClass, 10)
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             rClass.addRank([])
         rClass.addRank(rnk)
         self.assertEqual(rnk._class, rClass)

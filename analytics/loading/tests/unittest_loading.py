@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 from types import ListType
@@ -22,7 +24,7 @@ class JsonLoader_TestsSequence(Loading_TestsSequence):
         self.assertEqual(js._filepath, self.jsonfile)
 
     def test_jsonloader_prepareDataFrom(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             js = jsl.JsonLoader.prepareDataFrom({})
         js = jsl.JsonLoader.prepareDataFrom(self.jsonfile)
         self.assertEqual(js._filepath, self.jsonfile)
@@ -45,7 +47,7 @@ class XmlLoader_TestsSequence(Loading_TestsSequence):
         self.assertEqual(xml._filepath, self.xmlfile)
 
     def test_xmlloader_prepareDataFrom(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             xml = xmll.XmlLoader.prepareDataFrom({})
         xml = xmll.XmlLoader.prepareDataFrom(self.xmlfile)
         self.assertEqual(xml._filepath, self.xmlfile)
@@ -65,11 +67,11 @@ class XmlLoader_TestsSequence(Loading_TestsSequence):
         xml = xmll.XmlLoader.prepareDataFrom(self.xmlfile)
         result = {}
 
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             xml._processNode(12, "str", "elementName", result)
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             xml._processNode("name", [], "elementName", result)
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             xml._processNode("name", "str", "elementName", [])
 
         xml._processNode("", "str", "elementName", result)

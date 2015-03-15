@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 class Const(object):
     """
         Const class is an aggregator of all global constants in the

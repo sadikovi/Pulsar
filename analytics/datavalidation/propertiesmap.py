@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import ListType
 # import classes
@@ -54,7 +56,7 @@ class PropertiesMap(object):
             Args:
                 property (Property): Property instance to be added to _map
         """
-        misc.checkTypeAgainst(type(property), p.Property)
+        misc.checkTypeAgainst(type(property), p.Property, __file__)
         if not self.has(property.getName()):
             self._map[property.getName()] = property
 
@@ -126,7 +128,7 @@ class PropertiesMap(object):
             Args:
                 ids (list<str>): property ids list
         """
-        misc.checkTypeAgainst(type(ids), ListType)
+        misc.checkTypeAgainst(type(ids), ListType, __file__)
         # list with dynamic properties ids
         dynamic = ids[0:Const.DYNAMIC_PROP_NUMBER]
         for key in self.keys():

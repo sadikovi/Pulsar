@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # [Abstract]
 class Loader(object):
     """

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from xml.dom import minidom
 from types import StringType, DictType
@@ -39,7 +41,7 @@ class XmlLoader(l.Loader):
             Args:
                 filepath (str): json file path
         """
-        misc.checkTypeAgainst(type(filepath), StringType)
+        misc.checkTypeAgainst(type(filepath), StringType, __file__)
         return cls(filepath)
 
     # [Public]
@@ -86,12 +88,12 @@ class XmlLoader(l.Loader):
                 pstore (dict<str, str>): dictionary for pair {name, value}
         """
         # check that properties store
-        misc.checkTypeAgainst(type(pstore), DictType)
+        misc.checkTypeAgainst(type(pstore), DictType, __file__)
         # check name
-        misc.checkTypeAgainst(type(pname), StringType)
+        misc.checkTypeAgainst(type(pname), StringType, __file__)
         pname = str(pname)
         # check type
-        misc.checkTypeAgainst(type(ptype), StringType)
+        misc.checkTypeAgainst(type(ptype), StringType, __file__)
         ptype = str(ptype)
 
         if len(pname) == 0: return False

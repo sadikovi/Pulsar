@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import ListType, DictType
 import math
@@ -30,7 +32,8 @@ class _RelComp(object):
         All methods are static, class must not be instantiated.
     """
     def __init__(self):
-        raise StandardError(str(self.__class__) + " cannot be instantiated")
+        msg = "%s cannot be instantiated" % (str(self.__class__.__name__))
+        misc.raiseStandardError(msg, __file__)
 
     @staticmethod
     def alpha():
@@ -39,7 +42,7 @@ class _RelComp(object):
     @staticmethod
     def beta(alpha, k, delta):
         if k < 0 or k > 1:
-            raise StandardError("k must be in range [0, 1]")
+            misc.raiseStandardError("k must be in range [0, 1]", __file__)
         elif k == 0:
             return 1.0 / (1 + delta*math.exp(1-alpha))
         elif k == 1:
@@ -76,7 +79,8 @@ class _RelComp(object):
     @staticmethod
     def da(array):
         if len(array) < 2:
-            raise StandardError("Array must have at least 2 elements")
+            msg = "Array must have at least 2 elements"
+            misc.raiseStandardError(msg, __file__)
         dai = 0; _i = 0
         for _i in range(1, len(array)):
             dai += math.fabs(array[_i] - array[_i-1])
@@ -114,8 +118,8 @@ class RelativeComparison(Algorithm):
                 ResultsMap: the same map but with updated ranks
         """
         # check that maps have the right types
-        misc.checkTypeAgainst(type(resultsMap), ResultsMap)
-        misc.checkTypeAgainst(type(propertiesMap), PropertiesMap)
+        misc.checkTypeAgainst(type(resultsMap), ResultsMap, __file__)
+        misc.checkTypeAgainst(type(propertiesMap), PropertiesMap, __file__)
         # retrieve only dynamic properties
         dyns = [p for p in propertiesMap.values() if p.getDynamic() is True]
         # call private method to select appropriate ranking scheme
@@ -134,7 +138,7 @@ class RelativeComparison(Algorithm):
             Returns:
                 ResultsMap: updated with ranks results map
         """
-        misc.checkTypeAgainst(type(resultsMap), ResultsMap)
+        misc.checkTypeAgainst(type(resultsMap), ResultsMap, __file__)
         # check how many results are in the map
         n = resultsMap.isEmpty(); m = len(dynamics)
         # if length of either arguments equals 0 return resultsMap
@@ -142,7 +146,7 @@ class RelativeComparison(Algorithm):
             return resultsMap
         # if length of dyns more than constant then we raise an error
         elif m > MAX_DYNAMIC_PROPS:
-            raise StandardError("Too many dynamic properties")
+            misc.raiseStandardError("Too many dynamic properties", __file__)
         # we are clear, start ranking results
         # compute hash and store values into a, store id and hash into b
         a = {}; b = {}; _medians = []; _orders = []
@@ -150,7 +154,7 @@ class RelativeComparison(Algorithm):
         for _i in range(0, m):
             default = dynamics[_i].getDefault()
             if default is None:
-                raise StandardError("Default value is None")
+                misc.raiseStandardError("Default value is None", __file__)
             _medians.append(default)
             # append priority order
             _orders.append(dynamics[_i].getPriorityOrder())
@@ -206,18 +210,20 @@ class RelativeComparison(Algorithm):
                 dict<str, Rank>: map with hashkey and Rank object for that key
         """
         # check of the arguments
-        misc.checkTypeAgainst(type(a), DictType)
-        misc.checkTypeAgainst(type(orders), ListType)
-        misc.checkTypeAgainst(type(medians), ListType)
+        misc.checkTypeAgainst(type(a), DictType, __file__)
+        misc.checkTypeAgainst(type(orders), ListType, __file__)
+        misc.checkTypeAgainst(type(medians), ListType, __file__)
         if len(orders) != len(medians):
-            raise StandardError("Orders and medians have different length")
+            msg = "Orders and medians have different length"
+            misc.raiseStandardError(msg, __file__)
         # start separating threads of values
         for _i in range(len(orders)):
             # ranking set of values
             rankList = set()
             for ls in a.values():
                 # check that values length equals orders length
-                assert len(ls) == len(orders)
+                # assert len(ls) == len(orders)
+                misc.evaluateAssertion(len(ls)==len(orders), "", __file__)
                 if ls[_i] is not None:
                     rankList.add(ls[_i])
             # convert set into list and pass to calculate rank value
@@ -247,12 +253,13 @@ class RelativeComparison(Algorithm):
             Returns:
                 dict<value, int>: map with pairs "value : rank-value"
         """
+        misc.checkTypeAgainst(type(rankedList), ListType, __file__)
         # map to store pairs "value - rank", negative flag, median index
         relmap = {}; negative = None; _median_i = -1; rln = len(rankedList)
         if rln > 0:
             # check that median is in the list
             if median not in rankedList:
-                raise StandardError("Median is not in the list")
+                misc.raiseStandardError("Median is not in the list", __file__)
             # sort ranked list according to priority order
             # in the end we always get sorted array in increasing order
             if order == Const.PRIORITY_DEC:
@@ -338,7 +345,8 @@ class RelativeComparison(Algorithm):
                     continue
                 # calculate average for passing threshold
                 value = map[key]
-                assert len(value) > 0, "frontier value is empty"
+                # assert len(value) > 0, ""
+                misc.evaluateAssertion(len(value) > 0, "empty value", __file__)
                 average = sum(value)*1.0 / len(value)
                 # if average passes threshold we add value to classList
                 if average <= threads[_i-1] and average >= threads[_i]:
@@ -351,7 +359,8 @@ class RelativeComparison(Algorithm):
             # (not Pareto frontier): |__20%__|___30%___|_____50%_____|
             for key in classMap.keys():
                 value = classMap[key]
-                assert len(value) > 0, "frontier value is empty"
+                # assert len(value) > 0, "frontier value is empty"
+                misc.evaluateAssertion(len(value) > 0, "empty value", __file__)
                 average = sum(value)*1.0 / len(value)
                 # if clause for sub-thresholds
                 if average >= threads[_i-1]-(threads[_i-1]-threads[_i])*SUB_R_I:

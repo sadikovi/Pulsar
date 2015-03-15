@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import ListType
 # import classes
@@ -118,7 +120,7 @@ class GroupsMap(object):
             Args:
                 group (Group): to be added to the groupsmap
         """
-        misc.checkTypeAgainst(type(group), g.Group)
+        misc.checkTypeAgainst(type(group), g.Group, __file__)
         if self.isHierarchy():
             return None
         if not self.has(group.getId()):
@@ -347,8 +349,8 @@ class GroupsMap(object):
                 array (list<Group>): list to collect scanned elements
                 root (Group): element to scan and retrieve children
         """
-        misc.checkTypeAgainst(type(array), ListType)
-        misc.checkTypeAgainst(type(root), g.Group)
+        misc.checkTypeAgainst(type(array), ListType, __file__)
+        misc.checkTypeAgainst(type(root), g.Group, __file__)
 
         if root is None or len(root.getChildren()) == 0:
             return False
@@ -375,8 +377,8 @@ class GroupsMap(object):
                 vlist (dict<str, bool>): dictionary to collect already
                                             traversed elements
         """
-        misc.checkTypeAgainst(type(collector), ListType)
-        misc.checkTypeAgainst(type(element), g.Group)
+        misc.checkTypeAgainst(type(collector), ListType, __file__)
+        misc.checkTypeAgainst(type(element), g.Group, __file__)
 
         if element is None or len(element.getChildren()) == 0: return False
         # check whether element is in vlist / is a cycle element
@@ -402,7 +404,7 @@ class GroupsMap(object):
             Args:
                 group (Group): new group instance as a root
         """
-        misc.checkTypeAgainst(type(group), g.Group)
+        misc.checkTypeAgainst(type(group), g.Group, __file__)
         if self._isHierarchy:
             # check unknown group
             unknown = None

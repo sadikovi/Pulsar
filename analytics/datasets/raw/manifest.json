@@ -1,0 +1,11 @@
+{
+    "id": "raw",
+    "name": "Raw dataset",
+    "desc": "Raw dataset",
+    "data": {
+        "groups": { "file": "groups", "type": "json" },
+        "results": { "file": "results", "type": "json" },
+        "properties": { "file": "properties", "type": "json" }
+    },
+    "discover": true
+}

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 from types import ListType
@@ -25,9 +27,9 @@ class Analyser_TestsSequence(unittest.TestCase):
         self.assertEqual(a._defaultAlgorithm, a._algorithmsmap.values()[0])
 
     def test_analyser_setDefaultAlgorithm(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ex.AnalyticsTypeError):
             self._analyser._setDefaultAlgorithm(None)
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ex.AnalyticsTypeError):
             self._analyser._setDefaultAlgorithm({})
         t = rc.RelativeComparison()
         self._analyser._setDefaultAlgorithm(t)
@@ -52,11 +54,11 @@ class Analyser_TestsSequence(unittest.TestCase):
         t = rc.RelativeComparison()
         rmap = rsmap.ResultsMap()
         pmap = prmap.PropertiesMap()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ex.AnalyticsTypeError):
             self._analyser.analyseUsingAlgorithm(None, [], [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             self._analyser.analyseUsingAlgorithm(t, [], [])
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             self._analyser.analyseUsingAlgorithm(t, rmap, {})
         res = self._analyser.analyseUsingAlgorithm(t, rmap, pmap)
         self.assertEqual(res, rmap)
@@ -65,9 +67,9 @@ class Analyser_TestsSequence(unittest.TestCase):
         t = rc.RelativeComparison()
         rmap = rsmap.ResultsMap()
         pmap = prmap.PropertiesMap()
-        with self.assertRaises(ex.CheckError):
+        with self.assertRaises(ex.AnalyticsCheckError):
             self._analyser.analyseUsingMap(None, rmap, prmap)
-        with self.assertRaises(StandardError):
+        with self.assertRaises(ex.AnalyticsStandardError):
             self._analyser.analyseUsingMap(a.AlgorithmsMap(), rmap, pmap, False)
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")

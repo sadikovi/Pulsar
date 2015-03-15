@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
 import time
@@ -19,9 +21,9 @@ class ErrorHandling_TestsSequence(unittest.TestCase):
 class ErrorBlock_TestsSequence(ErrorHandling_TestsSequence):
 
     def test_errorblock_init(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             error = ErrorBlock(123)
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             error = ErrorBlock("123", 123)
         # without details
         error = ErrorBlock("ValueError")
@@ -71,7 +73,7 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
         ErrorHandler.reset()
 
     def test_errorhandler_init(self):
-        with self.assertRaises(StandardError):
+        with self.assertRaises(c.AnalyticsStandardError):
             handler = ErrorHandler()
 
     def test_errorhandler_reset(self):
@@ -84,7 +86,7 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
     def test_errorhandler_errorList_push(self):
         error = ErrorBlock("ValueError", "")
         self.assertEqual(ErrorHandler._errorList, [])
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             ErrorHandler._errorList_push("")
         ErrorHandler._errorList_push(error)
         self.assertEqual(error._isRegistered, True)
@@ -93,7 +95,7 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
 
     def test_errorhandler_processError(self):
         error = ErrorBlock("ValueError", "")
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             ErrorHandler._processError("")
         flag = ErrorHandler._processError(error)
         self.assertEqual(error._isLogged, True)
@@ -101,7 +103,7 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
 
     def test_errorhandler_handleError(self):
         error = ErrorBlock("ValueError", "")
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             ErrorHandler.handleError("")
         flag = ErrorHandler.handleError(error)
         self.assertEqual(error._isRegistered, True)
@@ -109,7 +111,7 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
         self.assertEqual(flag, True)
 
     def test_errorhandler_handleErrorDetails(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             ErrorHandler.handleErrorDetails(None)
         flag = ErrorHandler.handleErrorDetails("ValueError", "Test")
         self.assertEqual(flag, True)
@@ -130,7 +132,7 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
                 os.unlink(os.path.join(root, f))
 
     def test_logger_init(self):
-        with self.assertRaises(StandardError):
+        with self.assertRaises(c.AnalyticsStandardError):
             logger = Logger()
 
     def test_logger_log(self):
@@ -148,7 +150,7 @@ class Logger_TestsSequence(ErrorHandling_TestsSequence):
 
     def test_logger_logError(self):
         error = ErrorBlock("Log Error")
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             flag = Logger.logError(None)
         flag = Logger.logError(error)
         self.assertEqual(flag, True)

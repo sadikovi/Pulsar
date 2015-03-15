@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # import libs
 from types import DictType, ListType
 # import classes
@@ -39,7 +41,7 @@ class Validator(object):
             Args:
                 groups (dict<str, object>): groups raw data as dictionary
         """
-        misc.checkTypeAgainst(type(groups), ListType)
+        misc.checkTypeAgainst(type(groups), ListType, __file__)
         for obj in groups:
             group = g.Group.createFromObject(obj)
             self._groups.assign(group)
@@ -54,7 +56,7 @@ class Validator(object):
             Args:
                 results (dict<str, object>): results raw data as dictionary
         """
-        misc.checkTypeAgainst(type(results), ListType)
+        misc.checkTypeAgainst(type(results), ListType, __file__)
         for obj in results:
             result = r.Result(obj)
             result.updateGroup(self._groups.guid(result.getGroup()))
@@ -70,7 +72,7 @@ class Validator(object):
             Args:
                 properties (dict<str, object>): properties raw data
         """
-        misc.checkTypeAgainst(type(properties), ListType)
+        misc.checkTypeAgainst(type(properties), ListType, __file__)
         for obj in properties:
             prop = p.Property.createFromObject(obj)
             self._properties.assign(prop)

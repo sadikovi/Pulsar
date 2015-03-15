@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+
 # import libs
 import unittest
+import inspect
 from types import DictType, ListType
 # import classes
 import analytics.exceptions.exceptions as c
@@ -18,7 +21,7 @@ class hQueue_TestsSequence(Utils_TestsSequence):
         self._array = [1, 2, 3, 4, 5]
 
     def test_hqueue_init(self):
-        with self.assertRaises(c.CheckError):
+        with self.assertRaises(c.AnalyticsCheckError):
             queue = hq.hQueue({})
         queue = hq.hQueue(self._array)
         self.assertEqual(queue._queue, self._array)
@@ -64,9 +67,13 @@ class misc_TestsSequence(Utils_TestsSequence):
 
     def test_misc_checkTypeAgainst(self):
         a = {"id":"1"}
-        with self.assertRaises(c.CheckError):
-            misc.checkTypeAgainst(type(a), ListType)
-        t = misc.checkTypeAgainst(type(a), DictType)
+        with self.assertRaises(c.AnalyticsCheckError):
+            misc.checkTypeAgainst(type(a), ListType, __file__)
+        try:
+            misc.checkTypeAgainst(type(a), ListType, __file__)
+        except c.AnalyticsCheckError as e:
+            self.assertEqual(e._line, str(inspect.currentframe().f_lineno-2))
+        t = misc.checkTypeAgainst(type(a), DictType, __file__)
         self.assertEqual(t, True)
 
     def test_misc_checkInstanceAgainst(self):
@@ -76,14 +83,14 @@ class misc_TestsSequence(Utils_TestsSequence):
             pass
         class C(B):
             pass
-        a = A(); b = B(); c = C()
-        self.assertTrue(misc.checkInstanceAgainst(a, A))
-        self.assertTrue(misc.checkInstanceAgainst(b, B))
-        self.assertTrue(misc.checkInstanceAgainst(c, C))
-        self.assertTrue(misc.checkInstanceAgainst(b, A))
-        self.assertTrue(misc.checkInstanceAgainst(c, A))
-        with self.assertRaises(TypeError):
-            self.assertTrue(misc.checkInstanceAgainst(a, B))
+        aobj = A(); bobj = B(); cobj = C()
+        self.assertTrue(misc.checkInstanceAgainst(aobj, A, __file__))
+        self.assertTrue(misc.checkInstanceAgainst(bobj, B, __file__))
+        self.assertTrue(misc.checkInstanceAgainst(cobj, C, __file__))
+        self.assertTrue(misc.checkInstanceAgainst(bobj, A, __file__))
+        self.assertTrue(misc.checkInstanceAgainst(cobj, A, __file__))
+        with self.assertRaises(c.AnalyticsTypeError):
+            self.assertTrue(misc.checkInstanceAgainst(aobj, B, __file__))
 
 # Load test suites
 def _suites():
