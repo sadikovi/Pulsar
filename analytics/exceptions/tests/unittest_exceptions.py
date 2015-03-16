@@ -44,12 +44,66 @@ class AnalyticsSyntaxError_TestsSequence(Exceptions_TestsSequence):
         self.assertEqual("syntaxfile", arg._source)
         self.assertEqual("23", arg._line)
 
+# TypeError tests
+class AnalyticsTypeError_TestsSequence(Exceptions_TestsSequence):
+
+    def test_typeerror_raise(self):
+        with self.assertRaises(c.AnalyticsTypeError):
+            raise c.AnalyticsTypeError("Test message")
+
+    def test_typeerror_tryCatch(self):
+        msg = ""
+        try:
+            raise c.AnalyticsTypeError("typeerror", "typefile", "11")
+        except c.AnalyticsTypeError as arg:
+            msg = "typeerror"
+        self.assertEqual(msg, arg._errmsg)
+        self.assertEqual("typefile", arg._source)
+        self.assertEqual("11", arg._line)
+
+# ValueError tests
+class AnalyticsValueError_TestsSequence(Exceptions_TestsSequence):
+
+    def test_valueerror_raise(self):
+        with self.assertRaises(c.AnalyticsValueError):
+            raise c.AnalyticsValueError("Test message")
+
+    def test_valueerror_tryCatch(self):
+        msg = ""
+        try:
+            raise c.AnalyticsValueError("valueerror", "valuefile", "12")
+        except c.AnalyticsValueError as arg:
+            msg = "valueerror"
+        self.assertEqual(msg, arg._errmsg)
+        self.assertEqual("valuefile", arg._source)
+        self.assertEqual("12", arg._line)
+
+# StandardError tests
+class AnalyticsStandardError_TestsSequence(Exceptions_TestsSequence):
+
+    def test_standarderror_raise(self):
+        with self.assertRaises(c.AnalyticsStandardError):
+            raise c.AnalyticsStandardError("Test message")
+
+    def test_standarderror_tryCatch(self):
+        msg = ""
+        try:
+            raise c.AnalyticsStandardError("standarderror", "standardfile", "15")
+        except c.AnalyticsStandardError as arg:
+            msg = "standarderror"
+        self.assertEqual(msg, arg._errmsg)
+        self.assertEqual("standardfile", arg._source)
+        self.assertEqual("15", arg._line)
+
 
 # Load test suites
 def _suites():
     return [
         AnalyticsCheckError_TestsSequence,
-        AnalyticsSyntaxError_TestsSequence
+        AnalyticsSyntaxError_TestsSequence,
+        AnalyticsTypeError_TestsSequence,
+        AnalyticsValueError_TestsSequence,
+        AnalyticsStandardError_TestsSequence
     ]
 
 # Load tests

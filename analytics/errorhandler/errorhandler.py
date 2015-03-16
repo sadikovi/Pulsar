@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+# import libs
+import os
 # import classes
+import paths
 import analytics.utils.misc as misc
 from analytics.errorhandler.errorblock import ErrorBlock
 from analytics.errorhandler.logger import Logger

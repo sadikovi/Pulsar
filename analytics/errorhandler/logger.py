@@ -5,9 +5,14 @@ from datetime import date
 import os
 import fnmatch
 # import classes
+import paths
 from analytics.errorhandler.errorblock import ErrorBlock
 import analytics.utils.misc as misc
 from analytics.utils.constants import Const
+
+# override log directory
+Const.LOG_DIRECTORY = os.path.join(paths.ANALYTICS_PATH, "logs")
+
 
 class Logger(object):
     """
@@ -35,17 +40,17 @@ class Logger(object):
                     cls._currentDateString() + Const.LOG_PIECE_SEPARATOR + \
                     "*" + Const.FILE_EXTENSION
         index = cls._getLastFileIndex(Const.LOG_DIRECTORY, pattern)
-        filepath = Const.LOG_DIRECTORY+Const.ERR_LOG_PREFIX + \
+        filepath = os.path.join(Const.LOG_DIRECTORY, Const.ERR_LOG_PREFIX + \
                     Const.LOG_PIECE_SEPARATOR+cls._currentDateString() + \
-                    Const.LOG_PIECE_SEPARATOR+str(index)+Const.FILE_EXTENSION
+                    Const.LOG_PIECE_SEPARATOR+str(index)+Const.FILE_EXTENSION)
         # check if flag is True and we have to check file size
         if checkFileSize:
             # override index the next index
             newIndex = index + 1 if cls._sizeExceedsMax(filepath) else index
             # update filepath with new index
-            filepath = Const.LOG_DIRECTORY+Const.ERR_LOG_PREFIX + \
+            filepath = os.path.join(Const.LOG_DIRECTORY, Const.ERR_LOG_PREFIX + \
                     Const.LOG_PIECE_SEPARATOR+cls._currentDateString() + \
-                    Const.LOG_PIECE_SEPARATOR+str(newIndex)+Const.FILE_EXTENSION
+                    Const.LOG_PIECE_SEPARATOR+str(newIndex)+Const.FILE_EXTENSION)
         return cls.log(filepath, error.toString())
 
     # [Private]

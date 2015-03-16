@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-# import libs
-import os
-import sys
-
+import paths
+# set system path to the root directory
+sys.path.append(paths.ROOT_PATH)
 # set system path to the analytics
-sys.path.append(os.path.join(os.path.dirname(__file__), 'analytics'))
+sys.path.append(paths.ANALYTICS_PATH)

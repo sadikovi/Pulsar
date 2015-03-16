@@ -50,7 +50,7 @@ Const.PRIORITY_DEC = -1
 Const.ERRORBLOCK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 # logger constants
-Const.LOG_DIRECTORY = "/Users/sadikovi/Developer/Pulsar/analytics/logs/"
+Const.LOG_DIRECTORY = ""
 Const.ERR_LOG_PREFIX = "log_error"
 Const.LOG_PIECE_SEPARATOR = "_"
 Const.FILE_EXTENSION = ".log"

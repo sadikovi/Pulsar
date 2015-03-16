@@ -34,23 +34,28 @@ class Dataset(object):
         self._name = obj["name"]
         self._desc = obj["desc"]
         self._discover = bool(obj["discover"])
+        # groups file name and type
+        _groups_filename = obj["data"]["groups"]["file"].replace("/", "_")
+        _groups_filetype = obj["data"]["groups"]["type"]
         self._groups = {
-            "path": dr+"/"+obj["data"]["groups"]["file"].replace("/", "_")+ \
-                    "."+obj["data"]["groups"]["type"],
-            "type": obj["data"]["groups"]["type"]
+            "path": os.path.join(dr, _groups_filename+"."+_groups_filetype),
+            "type": _groups_filetype
         }
+        # results file name and type
+        _results_filename = obj["data"]["results"]["file"].replace("/", "_")
+        _results_filetype = obj["data"]["results"]["type"]
         self._results = {
-            "path": dr+"/"+obj["data"]["results"]["file"].replace("/", "_")+ \
-                    "."+obj["data"]["results"]["type"],
-            "type": obj["data"]["results"]["type"]
+            "path": os.path.join(dr, _results_filename+"."+_results_filetype),
+            "type": _results_filetype
         }
         self._properties = None
         # if discover is False, specify properties
         if not self._discover:
+            _prop_filename = obj["data"]["properties"]["file"].replace("/", "_")
+            _prop_filetype = obj["data"]["properties"]["type"]
             self._properties = {
-                "path": dr+"/"+obj["data"]["properties"]["file"].replace("/", "_")+ \
-                        "."+obj["data"]["properties"]["type"],
-                "type": obj["data"]["properties"]["type"]
+                "path": os.path.join(dr, _prop_filename+"."+_prop_filetype),
+                "type": _prop_filetype
             }
 
     # [Public]
