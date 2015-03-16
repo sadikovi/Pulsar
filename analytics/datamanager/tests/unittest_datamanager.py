@@ -15,23 +15,23 @@ class DataManager_TestsSequence(unittest.TestCase):
     def test_datamanager_init(self):
         t = dm.DataManager()
         self.assertEqual(t._directory, dm._DIRECTORY)
-        self.assertEqual(t._manifests, [])
+        self.assertEqual(t._manifests, {})
         self.assertEqual(t._datasets, {})
 
     def test_datamanager_reset(self):
         t = dm.DataManager()
         self.assertEqual(t._directory, dm._DIRECTORY)
-        self.assertEqual(t._manifests, [])
+        self.assertEqual(t._manifests, {})
         self.assertEqual(t._datasets, {})
         t.setSearchPath("test")
-        t._manifests.append(1)
+        t._manifests["root"] = "root/manifest.json"
         t._datasets["1"] = 1
         self.assertEqual(t._directory, "test")
-        self.assertEqual(t._manifests, [1])
+        self.assertEqual(t._manifests, {"root":"root/manifest.json"})
         self.assertEqual(t._datasets, {"1":1})
         t.resetToDefault()
         self.assertEqual(t._directory, dm._DIRECTORY)
-        self.assertEqual(t._manifests, [])
+        self.assertEqual(t._manifests, {})
         self.assertEqual(t._datasets, {})
 
     def test_datamanager_parseManifest(self):
@@ -60,15 +60,16 @@ class DataManager_TestsSequence(unittest.TestCase):
         directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datasets")
         t.setSearchPath(directory)
         t._findManifests(t._directory)
-        self.assertEqual(len(t._manifests), 2)
-        self.assertEqual(t._manifests[0], os.path.join(directory, "test", "manifest.json"))
+        self.assertEqual(len(t._manifests.keys()), 2)
+        tempdir = os.path.join(directory, "test")
+        self.assertEqual(t._manifests[tempdir], os.path.join(tempdir, "manifest.json"))
 
     def test_datamanager_loadDatasets(self):
         directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datasets")
         t = dm.DataManager()
         t.setSearchPath(directory)
         t.loadDatasets()
-        self.assertEqual(len(t._manifests), 2)
+        self.assertEqual(len(t._manifests.keys()), 2)
         self.assertEqual(len(t._datasets.values()), 1)
 
 

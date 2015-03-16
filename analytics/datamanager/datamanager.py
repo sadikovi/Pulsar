@@ -13,6 +13,25 @@ _MANIFEST_JSON = "manifest.json"
 _DIRECTORY = os.path.join(os.path.dirname(__file__), "datasets")
 
 
+class DKeys(object):
+    """
+        Class DKeys is a set of constant parameter names for attributes
+        of the parsing object.
+    """
+    pass
+# Dataset parameters that are used for an parsing object
+DKeys.ID = "id"
+DKeys.NAME = "name"
+DKeys.DESC = "desc"
+DKeys.DISCOVER = "discover"
+DKeys.DATA = "data"
+DKeys.DATA_Groups = "groups"
+DKeys.DATA_Results = "results"
+DKeys.DATA_Properties = "properties"
+DKeys.FILE = "file"
+DKeys.TYPE = "type"
+
+
 class Dataset(object):
     """
         Simple dataset class to hold all the parameters. Converts filenames
@@ -30,32 +49,36 @@ class Dataset(object):
     def __init__(self, obj, dr):
         misc.checkTypeAgainst(type(obj), DictType, __file__)
         misc.checkTypeAgainst(type(dr), StringType, __file__)
-        self._id = obj["id"]
-        self._name = obj["name"]
-        self._desc = obj["desc"]
-        self._discover = bool(obj["discover"])
+        self._id = obj[DKeys.ID]
+        self._name = obj[DKeys.NAME]
+        self._desc = obj[DKeys.DESC]
+        self._discover = bool(obj[DKeys.DISCOVER])
+        # files data
+        _data = obj[DKeys.DATA]
+        # path and type constants
+        c_path = "path"; c_type = "type"
         # groups file name and type
-        _groups_filename = obj["data"]["groups"]["file"].replace("/", "_")
-        _groups_filetype = obj["data"]["groups"]["type"]
+        _groups_filename = _data[DKeys.DATA_Groups][DKeys.FILE]
+        _groups_filetype = _data[DKeys.DATA_Groups][DKeys.TYPE]
         self._groups = {
-            "path": os.path.join(dr, _groups_filename+"."+_groups_filetype),
-            "type": _groups_filetype
+            c_path: self._filepath(dr, _groups_filename, _groups_filetype),
+            c_type: _groups_filetype
         }
         # results file name and type
-        _results_filename = obj["data"]["results"]["file"].replace("/", "_")
-        _results_filetype = obj["data"]["results"]["type"]
+        _results_filename = _data[DKeys.DATA_Results][DKeys.FILE]
+        _results_filetype = _data[DKeys.DATA_Results][DKeys.TYPE]
         self._results = {
-            "path": os.path.join(dr, _results_filename+"."+_results_filetype),
-            "type": _results_filetype
+            c_path: self._filepath(dr, _results_filename, _results_filetype),
+            c_type: _results_filetype
         }
         self._properties = None
         # if discover is False, specify properties
         if not self._discover:
-            _prop_filename = obj["data"]["properties"]["file"].replace("/", "_")
-            _prop_filetype = obj["data"]["properties"]["type"]
+            _prop_filename = _data[DKeys.DATA_Properties][DKeys.FILE]
+            _prop_filetype = _data[DKeys.DATA_Properties][DKeys.TYPE]
             self._properties = {
-                "path": os.path.join(dr, _prop_filename+"."+_prop_filetype),
-                "type": _prop_filetype
+                c_path: self._filepath(dr, _prop_filename, _prop_filetype),
+                c_type: _prop_filetype
             }
 
     # [Public]
@@ -72,6 +95,24 @@ class Dataset(object):
             "desc": self._desc
         }
 
+    # [Private]
+    def _filepath(self, directory, filename, filetype):
+        """
+            Returns full file path for specified directory, file name and file
+            type.
+
+            Args:
+                directory (str): directory
+                filename (str): file name
+                filetype (str): file type
+
+            Returns:
+                str: full file path
+        """
+        # replace any "/" on "_"
+        filename = filename.replace("/", "_")
+        return os.path.join(directory, "%s.%s"%(filename, filetype))
+
 
 class DataManager(object):
     """
@@ -80,19 +121,19 @@ class DataManager(object):
         Dataset objects.
 
         Attributes:
-            _manifests (list<str>): list of paths to manifests files
+            _manifests (dir<str, str>): map of dirs and manifest file paths
             _datasets (dir<str, Dataset>): map of datasets
             _directory (str): search directory
     """
     def __init__(self):
-        self._manifests = []
-        self._datasets = {}
-        self._directory = _DIRECTORY
+        # declare attributes
+        self._manifests = {}; self._datasets = {}; self._directory = ""
+        self.resetToDefault()
 
     # [Private]
     def _findManifests(self, directory):
         """
-            Scans directory and collects manifests paths in _manifests
+            Scans directory and collects manifests paths into _manifests
             attribute.
 
             Args:
@@ -102,7 +143,7 @@ class DataManager(object):
         for root, dirs, files in os.walk(directory):
             for file in files:
                 if file == _MANIFEST_JSON:
-                    self._manifests.append(os.path.join(root, file))
+                    self._manifests[root] = os.path.join(root, file)
 
     # [Private]
     def _parseManifest(self, path):
@@ -135,14 +176,22 @@ class DataManager(object):
         return True
 
     # [Public]
-    def loadDatasets(self):
+    def loadDatasets(self, searchpath=None):
         """
             Loads datasets from _directory path.
+
+            Args:
+                searchpath (str): search path for datasets
         """
-        self._manifests = []
-        self._datasets = {}
+        # assign search path or use it to save previous path
+        searchpath = searchpath or self._directory
+        # clean previous datasets and manifests info
+        self.resetToDefault()
+        # assign back search path
+        self.setSearchPath(searchpath)
+        # look for manifests and parse them
         self._findManifests(self._directory)
-        for manifestpath in self._manifests:
+        for manifestpath in self._manifests.values():
             self._parseManifest(manifestpath)
 
     # [Public]
@@ -185,5 +234,5 @@ class DataManager(object):
             Resets instance to default parameters.
         """
         self._directory = _DIRECTORY
-        self._manifests = []
+        self._manifests = {}
         self._datasets = {}
