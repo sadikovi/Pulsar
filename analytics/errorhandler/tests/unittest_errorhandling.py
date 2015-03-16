@@ -5,7 +5,9 @@ import unittest
 import time
 from datetime import datetime
 import os
+import sys
 # import classes
+import paths
 from analytics.errorhandler.errorblock import ErrorBlock
 from analytics.errorhandler.errorhandler import ErrorHandler
 from analytics.errorhandler.logger import Logger
@@ -122,9 +124,12 @@ class ErrorHandler_TestsSequence(ErrorHandling_TestsSequence):
 class Logger_TestsSequence(ErrorHandling_TestsSequence):
 
     def setUp(self):
-        self._file = "/Users/sadikovi/Developer/Pulsar/analytics/logs/test.txt"
-        self._dir = "/Users/sadikovi/Developer/Pulsar/analytics/logs/"
-        with open(self._file, 'w') as f: f.write('')
+        self._dir = os.path.join(paths.ANALYTICS_PATH, "logs")
+        self._file = os.path.join(self._dir, "test.txt")
+        if not os.path.exists(self._dir):
+            os.makedirs(self._dir)
+        with open(self._file, 'w') as f:
+            f.write('')
 
     def tearDown(self):
         for root, dirs, files in os.walk(self._dir):

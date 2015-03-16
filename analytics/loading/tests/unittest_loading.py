@@ -2,8 +2,10 @@
 
 # import libs
 import unittest
+import os
 from types import ListType
 # import classes
+import paths
 import analytics.loading.loader as l
 import analytics.loading.jsonloader as jsl
 import analytics.loading.xmlloader as xmll
@@ -13,8 +15,8 @@ import analytics.exceptions.exceptions as c
 class Loading_TestsSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
-        self.jsonfile = './analytics/rawdata/groups.json'
-        self.xmlfile = './analytics/rawdata/groups.xml'
+        self.jsonfile = os.path.join(paths.ANALYTICS_PATH, 'rawdata', 'groups.json')
+        self.xmlfile = os.path.join(paths.ANALYTICS_PATH, 'rawdata', 'groups.xml')
 
 # JsonLoader tests
 class JsonLoader_TestsSequence(Loading_TestsSequence):

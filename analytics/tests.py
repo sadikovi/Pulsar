@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-# import sys and update path
+# import os, sys and update path
+import os
 import sys
 
-DIR_PATH = "/Users/sadikovi/Developer/Pulsar"
+# set default path as an external directory of the module
+DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(DIR_PATH)
 
 # import libs

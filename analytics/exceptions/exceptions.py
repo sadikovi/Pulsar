@@ -13,7 +13,7 @@ class AnalyticsBaseException(BaseException):
     def __init__(self, message, source="Global", line=1):
         self._errmsg = message
         self._source = str(source) or "Global"
-        self._line = str(line) or str(1)
+        self._line = str(line or 1)
         msg = "%s: %s - %s" %(self._source, self._line, self._errmsg)
         super(AnalyticsBaseException, self).__init__(msg)
 

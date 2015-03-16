@@ -36,9 +36,9 @@ class DataManager_TestsSequence(unittest.TestCase):
 
     def test_datamanager_parseManifest(self):
         directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datasets")
-        right_dir = os.path.join(directory, "test/manifest.json")
-        wrong_dir = "wrong_dir/manifest.json"
-        wrong_manifest = os.path.join(directory, "wrongtest/manifest.json")
+        right_dir = os.path.join(directory, "test", "manifest.json")
+        wrong_dir = os.path.join("wrong_dir", "manifest.json")
+        wrong_manifest = os.path.join(directory, "wrongtest", "manifest.json")
         t = dm.DataManager()
         self.assertEqual(t._parseManifest(wrong_dir), False)
         self.assertEqual(t._parseManifest(wrong_manifest), False)
@@ -49,9 +49,9 @@ class DataManager_TestsSequence(unittest.TestCase):
         self.assertEqual(dataset._name, "Test dataset")
         self.assertEqual(dataset._desc, "Test dataset")
         self.assertEqual(dataset._discover, False)
-        self.assertEqual(dataset._groups, { "path": os.path.join(directory, "test/groups.json"), "type": "json" })
-        self.assertEqual(dataset._results, { "path": os.path.join(directory, "test/results.json"), "type": "json" })
-        self.assertEqual(dataset._properties, { "path": os.path.join(directory, "test/properties.json"), "type": "json" })
+        self.assertEqual(dataset._groups, { "path": os.path.join(directory, "test", "groups.json"), "type": "json" })
+        self.assertEqual(dataset._results, { "path": os.path.join(directory, "test", "results.json"), "type": "json" })
+        self.assertEqual(dataset._properties, { "path": os.path.join(directory, "test", "properties.json"), "type": "json" })
 
     def test_datamanager_findManifests(self):
         t = dm.DataManager()
@@ -61,7 +61,7 @@ class DataManager_TestsSequence(unittest.TestCase):
         t.setSearchPath(directory)
         t._findManifests(t._directory)
         self.assertEqual(len(t._manifests), 2)
-        self.assertEqual(t._manifests[0], os.path.join(directory, "test/manifest.json"))
+        self.assertEqual(t._manifests[0], os.path.join(directory, "test", "manifest.json"))
 
     def test_datamanager_loadDatasets(self):
         directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datasets")
