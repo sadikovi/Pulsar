@@ -46,6 +46,7 @@ DKeys.DATA_Groups = "groups"
 DKeys.DATA_Results = "results"
 DKeys.DATA_Properties = "properties"
 DKeys.FILE = "file"
+DKeys.PATH = "path"
 DKeys.TYPE = "type"
 
 
@@ -73,20 +74,19 @@ class Dataset(object):
         # files data
         _data = obj[DKeys.DATA]
         # path and type constants
-        c_path = "path"; c_type = "type"
         # groups file name and type
         _groups_filename = _data[DKeys.DATA_Groups][DKeys.FILE]
         _groups_filetype = _data[DKeys.DATA_Groups][DKeys.TYPE]
         self._groups = {
-            c_path: self._filepath(dr, _groups_filename, _groups_filetype),
-            c_type: _groups_filetype
+            DKeys.PATH: self._filepath(dr, _groups_filename, _groups_filetype),
+            DKeys.TYPE: _groups_filetype
         }
         # results file name and type
         _results_filename = _data[DKeys.DATA_Results][DKeys.FILE]
         _results_filetype = _data[DKeys.DATA_Results][DKeys.TYPE]
         self._results = {
-            c_path: self._filepath(dr, _results_filename, _results_filetype),
-            c_type: _results_filetype
+            DKeys.PATH: self._filepath(dr, _results_filename, _results_filetype),
+            DKeys.TYPE: _results_filetype
         }
         self._properties = None
         # if discover is False, specify properties
@@ -94,8 +94,8 @@ class Dataset(object):
             _prop_filename = _data[DKeys.DATA_Properties][DKeys.FILE]
             _prop_filetype = _data[DKeys.DATA_Properties][DKeys.TYPE]
             self._properties = {
-                c_path: self._filepath(dr, _prop_filename, _prop_filetype),
-                c_type: _prop_filetype
+                DKeys.PATH: self._filepath(dr, _prop_filename, _prop_filetype),
+                DKeys.TYPE: _prop_filetype
             }
 
     # [Public]
@@ -253,3 +253,76 @@ class DataManager(object):
         self._directory = _DIRECTORY
         self._manifests = {}
         self._datasets = {}
+
+    # [Public]
+    def util_testDatasets(self, searchpath=None):
+        """
+            Collects and tests datasets that are in the folder. Keeps results
+            in list for a particular manifest found.
+
+            Args:
+                searchpath (str): search path
+
+            Returns:
+                dict<str, obj>: result of the testing
+        """
+        searchpath = searchpath or self._directory
+        self.resetToDefault()
+        # assign back search path
+        self.setSearchPath(searchpath)
+        # look for manifests and parse them
+        self._findManifests(self._directory)
+        # statistics for manifests
+        manifest_stats = {}
+        for manifestpath in self._manifests.values():
+            manifest_stats[manifestpath] = {}
+            _exists = os.path.isfile(manifestpath)
+            manifest_stats[manifestpath]["manifest"] = _exists
+            if _exists:
+                try:
+                    self._parseManifest(manifestpath)
+                    manifest_stats[manifestpath]["dataset"] = True
+                except:
+                    manifest_stats[manifestpath]["dataset"] = False
+        # statistics for datasets
+        ds_stats = {}
+        for ds in self._datasets.values():
+            ds_stats[ds._id] = {}
+            ds_stats[ds._id]["groups"] = os.path.isfile(ds._groups[DKeys.PATH])
+            ds_stats[ds._id]["results"] = os.path.isfile(ds._results[DKeys.PATH])
+            if ds._discover:
+                continue
+            ds_stats[ds._id]["properties"] = os.path.isfile(ds._properties[DKeys.PATH])
+
+        # stats finished, report statistics
+        return {"manifests": manifest_stats, "datasets": ds_stats}
+
+    # [Public]
+    def util_checkDatasetsResult(self, obj):
+        """
+            Checks overall result of the object received from
+            "util_testDatasets" and returns bool value that indicates whether
+            test is passed or not.
+
+            Args:
+                obj (dict<str, obj>): result of the testing
+
+            Returns:
+                bool: flag to show whether test is passed or failed
+        """
+        manfs = obj["manifests"]
+        ds = obj["datasets"]
+        flag = True
+        # test types
+        flag = flag and type(manfs) is DictType and type(ds) is DictType
+        # test lengths of keys
+        flag = flag and len(manfs.keys()) == len(ds.keys())
+        # check result of common assertions
+        if not flag:
+            return flag
+        # continue testing of each manifest and dataset
+        # check manifests
+        mn = [m for manf in manfs.values() for m in manf.values() if not m]
+        # check datasets
+        dt = [p for dsf in ds.values() for p in dsf.values() if not p]
+        return flag and len(mn)==0 and len(dt)==0

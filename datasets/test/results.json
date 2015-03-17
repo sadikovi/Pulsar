@@ -1,5 +1,0 @@
-[
-    {"id": "A", "name": "Result A", "desc": "A", "group": "2", "value": 1, "order": "up"},
-    {"id": "B", "name": "Result B", "desc": "B", "group": "2", "value": 2, "order": "up"},
-    {"id": "C", "name": "Result C", "desc": "C", "group": "3", "value": 5, "order": "up"}
-]
