@@ -20,7 +20,9 @@ limitations under the License.
 # import libs
 import unittest
 import os
+from types import DictType
 # import classes
+import paths
 import analytics.exceptions.exceptions as ex
 import analytics.datamanager.datamanager as dm
 
@@ -88,6 +90,33 @@ class DataManager_TestsSequence(unittest.TestCase):
         t.loadDatasets()
         self.assertEqual(len(t._manifests.keys()), 2)
         self.assertEqual(len(t._datasets.values()), 1)
+
+    def test_datamanager_testDatasets(self):
+        directory = os.path.join(paths.ANALYTICS_PATH, "datasets")
+        t = dm.DataManager()
+        res = t.util_testDatasets(directory)
+        # select manifest and dataset results
+        manfs = res["manifests"]
+        ds = res["datasets"]
+        self.assertEqual(type(manfs), DictType)
+        self.assertEqual(type(ds), DictType)
+        self.assertEqual(len(manfs.keys()), len(ds.keys()))
+        # check manifests
+        for manf in manfs.values():
+            self.assertEqual(manf["manifest"], True)
+            self.assertEqual(manf["dataset"], True)
+        # check datasets
+        for dsf in ds.values():
+            self.assertEqual(dsf["groups"], True)
+            self.assertEqual(dsf["results"], True)
+            if "properties" in dsf:
+                self.assertEqual(dsf["properties"], True)
+
+    def test_datamanager_checkDatasetTest(self):
+        directory = os.path.join(paths.ANALYTICS_PATH, "datasets")
+        t = dm.DataManager()
+        res = t.util_testDatasets(directory)
+        self.assertEqual(t.util_checkDatasetsResult(res), True)
 
 
 # Load test suites
