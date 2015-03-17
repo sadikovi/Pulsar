@@ -321,16 +321,8 @@ class DataManager(object):
         if not flag:
             return flag
         # continue testing of each manifest and dataset
-        ###
         # check manifests
-        for manf in manfs.values():
-            flag = flag and manf["manifest"] and manf["dataset"]
-        if not flag:
-            return flag
-        ###
+        mn = [m for manf in manfs.values() for m in manf.values() if not m]
         # check datasets
-        for dsf in ds.values():
-            flag = flag and dsf["groups"] and dsf["results"]
-            if "properties" in dsf:
-                flag = flag and dsf["properties"]
-        return flag
+        dt = [p for dsf in ds.values() for p in dsf.values() if not p]
+        return flag and len(mn)==0 and len(dt)==0
