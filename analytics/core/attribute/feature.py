@@ -7,7 +7,8 @@ from analytics.core.dataitem import DataItem
 class Feature(DataItem):
     """
         Feature class keeps information of a particular property of the
-        element.
+        element. Type is a simple type, e.g. all primitive types and
+        StringType that are hashable.
 
         Attributes:
             _value (obj): value of the feature

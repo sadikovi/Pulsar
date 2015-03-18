@@ -2,12 +2,15 @@
 
 # import classes
 from analytics.core.dataitem import DataItem
+from analytics.core.attribute.dynamic import Dynamic
 
 
 class Pulse(DataItem):
     """
         Pulse class core filtering element in analytics, keeps values of
-        features and type. It allows static or dynamic filtering.
+        features and type. It allows static or dynamic filtering. Type is a
+        simple type, not a data structure, e.g. StringType, IntType or
+        FloatType that are hashable.
 
         Attributes:
             _type (Type): feature type (data type)
@@ -51,6 +54,18 @@ class Pulse(DataItem):
         """
         return self._default
 
+    # [Public]
+    def addValueToStore(self, value):
+        """
+            Adds value to store of the static pulse.
+
+            Args:
+                value (obj): value for the pulse
+        """
+        if type(value) is self._type:
+            self._store.add(value)
+
+    # [Public]
     def getJSON(self):
         """
             Returns json representation of the instance.
@@ -65,8 +80,53 @@ class Pulse(DataItem):
 
 
 class StaticPulse(Pulse):
-    pass
+    """
+        StaticPulse is class for static properties that do not change over time.
+        Standard filtering option. Cannot mimic behaviour of dynamic pulse.
+    """
+    def __init__(self, name, desc, sample):
+        super(StaticPulse, self).__init__(name, desc, sample)
+
+    # [Public]
+    def setDefaultValue(self, default):
+        """
+            Sets default value for StaticPulse instance. Checks that default
+            value is in store, and assigns new value, otherwise action is
+            skipped.
+
+            Args:
+                default (obj): default value
+        """
+        if type(default) is self._type and default in self._store:
+            self._default = default
 
 
 class DynamicPulse(Pulse):
-    pass
+    """
+        DynamicPulse is class for dynamic properties that do change over time.
+        Can mimic StandardPulse. Usual filtering does not apply for dynamic
+        pulse.
+
+        Attributes:
+            _static (bool): shows currently selected mode
+            _dynamic (Dynamic): dynamic attribute
+    """
+    def __init__(self, name, desc, sample, priority, static=False):
+        super(DynamicPulse, self).__init__(name, desc, sample)
+        self._static = static
+        self._dynamic = Dynamic(priority)
+
+    # [Public]
+    def setDefaultValue(self, default):
+        """
+            Sets default value for DynamicPulse instance.
+
+            Args:
+                default (obj): default value
+        """
+        if type(default) is self._type:
+            if static:
+                self._default = default
+            # if dynamic property is mimicking static pulse, check store
+            elif default in self._store:
+                self._default = default
