@@ -56,6 +56,25 @@ class Cluster(DataItem):
         return len(self._children) == 0
 
     # [Public]
+    def setParent(self, parent):
+        """
+            Sets parent for a cluster.
+
+            Args:
+                parent (Cluster): parent cluster
+        """
+        if parent is not None:
+            misc.checkTypeAgainst(type(parent), Cluster, __file__)
+        self._parent = parent
+
+    # [Public]
+    def makeLeaf(self):
+        """
+            Resets cluster _children map to be a leaf.
+        """
+        self._children = {}
+
+    # [Public]
     def addChild(self, cluster):
         """
             Adds child cluster to the list.
@@ -70,16 +89,15 @@ class Cluster(DataItem):
         self._children[cluster._id] = cluster
 
     # [Public]
-    def addChildren(self, clusters):
+    def removeChild(self, cluster):
         """
-            Adds clusters sequentially as children to the instance.
+            Removes child cluster from the list.
 
             Args:
-                clusters (list<Cluster>): list of child clusters
+                cluster (Cluster): child cluster
         """
-        misc.checkTypeAgainst(type(clusters), ListType, __file__)
-        for cluster in clusters:
-            self.addChild(cluster)
+        if cluster is not None and cluster.id() in self._children:
+            del self._children[cluster.id()]
 
     # [Public]
     def getJSON(self):

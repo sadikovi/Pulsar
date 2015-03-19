@@ -29,25 +29,18 @@ import analytics.loading.jsonloader as jsl
 _MANIFEST_JSON = "manifest.json"
 _DIRECTORY = os.path.join(os.path.dirname(__file__), "datasets")
 
-
-class DKeys(object):
-    """
-        Class DKeys is a set of constant parameter names for attributes
-        of the parsing object.
-    """
-    pass
 # Dataset parameters that are used for an parsing object
-DKeys.ID = "id"
-DKeys.NAME = "name"
-DKeys.DESC = "desc"
-DKeys.DISCOVER = "discover"
-DKeys.DATA = "data"
-DKeys.DATA_Groups = "groups"
-DKeys.DATA_Results = "results"
-DKeys.DATA_Properties = "properties"
-DKeys.FILE = "file"
-DKeys.PATH = "path"
-DKeys.TYPE = "type"
+ID = "id"
+NAME = "name"
+DESC = "desc"
+DISCOVER = "discover"
+DATA = "data"
+DATA_Groups = "groups"
+DATA_Results = "results"
+DATA_Properties = "properties"
+FILE = "file"
+PATH = "path"
+TYPE = "type"
 
 
 class Dataset(object):
@@ -67,35 +60,35 @@ class Dataset(object):
     def __init__(self, obj, dr):
         misc.checkTypeAgainst(type(obj), DictType, __file__)
         misc.checkTypeAgainst(type(dr), StringType, __file__)
-        self._id = obj[DKeys.ID]
-        self._name = obj[DKeys.NAME]
-        self._desc = obj[DKeys.DESC]
-        self._discover = bool(obj[DKeys.DISCOVER])
+        self._id = obj[ID]
+        self._name = obj[NAME]
+        self._desc = obj[DESC]
+        self._discover = bool(obj[DISCOVER])
         # files data
-        _data = obj[DKeys.DATA]
+        _data = obj[DATA]
         # path and type constants
         # groups file name and type
-        _groups_filename = _data[DKeys.DATA_Groups][DKeys.FILE]
-        _groups_filetype = _data[DKeys.DATA_Groups][DKeys.TYPE]
+        _groups_filename = _data[DATA_Groups][FILE]
+        _groups_filetype = _data[DATA_Groups][TYPE]
         self._groups = {
-            DKeys.PATH: self._filepath(dr, _groups_filename, _groups_filetype),
-            DKeys.TYPE: _groups_filetype
+            PATH: self._filepath(dr, _groups_filename, _groups_filetype),
+            TYPE: _groups_filetype
         }
         # results file name and type
-        _results_filename = _data[DKeys.DATA_Results][DKeys.FILE]
-        _results_filetype = _data[DKeys.DATA_Results][DKeys.TYPE]
+        _results_filename = _data[DATA_Results][FILE]
+        _results_filetype = _data[DATA_Results][TYPE]
         self._results = {
-            DKeys.PATH: self._filepath(dr, _results_filename, _results_filetype),
-            DKeys.TYPE: _results_filetype
+            PATH: self._filepath(dr, _results_filename, _results_filetype),
+            TYPE: _results_filetype
         }
         self._properties = None
         # if discover is False, specify properties
         if not self._discover:
-            _prop_filename = _data[DKeys.DATA_Properties][DKeys.FILE]
-            _prop_filetype = _data[DKeys.DATA_Properties][DKeys.TYPE]
+            _prop_filename = _data[DATA_Properties][FILE]
+            _prop_filetype = _data[DATA_Properties][TYPE]
             self._properties = {
-                DKeys.PATH: self._filepath(dr, _prop_filename, _prop_filetype),
-                DKeys.TYPE: _prop_filetype
+                PATH: self._filepath(dr, _prop_filename, _prop_filetype),
+                TYPE: _prop_filetype
             }
 
     # [Public]
@@ -288,11 +281,11 @@ class DataManager(object):
         ds_stats = {}
         for ds in self._datasets.values():
             ds_stats[ds._id] = {}
-            ds_stats[ds._id]["groups"] = os.path.isfile(ds._groups[DKeys.PATH])
-            ds_stats[ds._id]["results"] = os.path.isfile(ds._results[DKeys.PATH])
+            ds_stats[ds._id]["groups"] = os.path.isfile(ds._groups[PATH])
+            ds_stats[ds._id]["results"] = os.path.isfile(ds._results[PATH])
             if ds._discover:
                 continue
-            ds_stats[ds._id]["properties"] = os.path.isfile(ds._properties[DKeys.PATH])
+            ds_stats[ds._id]["properties"] = os.path.isfile(ds._properties[PATH])
 
         # stats finished, report statistics
         return {"manifests": manifest_stats, "datasets": ds_stats}
