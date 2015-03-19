@@ -17,7 +17,7 @@ class Dynamic(object):
     ForwardPriority = 1
     ReversedPriority = -1
 
-    def __init_(self, priority):
+    def __init__(self, priority):
         self._priority = ForwardPriority
         # if priority is reversed, update attribute
         if priority == ReversedPriority:
