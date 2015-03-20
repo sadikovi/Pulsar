@@ -97,7 +97,9 @@ class StaticPulse(Pulse):
             Args:
                 default (obj): default value
         """
-        if type(default) is self._type and default in self._store:
+        if default is None:
+            self._default = default
+        elif type(default) is self._type and default in self._store:
             self._default = default
 
 
@@ -124,8 +126,12 @@ class DynamicPulse(Pulse):
             Args:
                 default (obj): default value
         """
-        if type(default) is self._type:
-            if static:
+        # check default value as None
+        if default is None:
+            self._default = default
+        # check typed default value
+        elif type(default) is self._type:
+            if not static:
                 self._default = default
             # if dynamic property is mimicking static pulse, check store
             elif default in self._store:

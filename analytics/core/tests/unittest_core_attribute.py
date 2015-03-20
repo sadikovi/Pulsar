@@ -13,14 +13,22 @@ from analytics.core.attribute.feature import Feature
 class Dynamic_TestSequence(unittest.TestCase):
     def setUp(self):
         self._input = [
-            "test string",
-            " test string ",
-            1,
-            1.23,
-            {"1": True},
-            False,
-            [1, 2, 3],
             None,
+            True,
+            False,
+            sys.maxint,
+            -sys.maxint-1,
+            {},
+            [],
+            "test string",
+            0,
+            1,
+            -1,
+            1.23,
+            -3.34,
+            " test string ",
+            " ",
+            "1",
             Dynamic.ForwardPriority,
             Dynamic.ReversedPriority
         ]
