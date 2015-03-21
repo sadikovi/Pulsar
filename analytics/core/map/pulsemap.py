@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # import classes
+import analytics.utils.misc as misc
 from analytics.core.pulse import Pulse
 from analytics.core.map.dataitemmap import DataItemMap
 
@@ -20,5 +21,5 @@ class PulseMap(DataItemMap):
             Args:
                 element (Element): data item
         """
-        misc.checkInstanceAgainst(type(element), Pulse, __file__)
+        misc.checkInstanceAgainst(element, Pulse, __file__)
         super(PulseMap, self).add(element)

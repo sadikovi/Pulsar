@@ -18,10 +18,10 @@ class Dynamic(object):
     ReversedPriority = -1
 
     def __init__(self, priority):
-        self._priority = ForwardPriority
+        self._priority = Dynamic.ForwardPriority
         # if priority is reversed, update attribute
-        if priority == ReversedPriority:
-            self._priority = ReversedPriority
+        if priority == Dynamic.ReversedPriority:
+            self._priority = Dynamic.ReversedPriority
 
     # [Public]
     def priority(self):

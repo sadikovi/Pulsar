@@ -24,7 +24,7 @@ class DataItemMap(object):
             Args:
                 dataitem (DataItem): data item
         """
-        misc.checkInstanceAgainst(type(dataitem), DataItem, __file__)
+        misc.checkInstanceAgainst(dataitem, DataItem, __file__)
         self._map[dataitem.id()] = dataitem
 
     # [Public]
@@ -47,6 +47,8 @@ class DataItemMap(object):
                 id (str): data item id
                 default (obj): default value if nothing is found
         """
+        # id is always string
+        id = str(id)
         return self._map[id] if id in self._map else default
 
     # [Public]
@@ -57,4 +59,6 @@ class DataItemMap(object):
             Args:
                 id (str): data item id
         """
+        # id is always string
+        id = str(id)
         return id in self._map

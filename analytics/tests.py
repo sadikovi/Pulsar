@@ -30,17 +30,20 @@ import unittest
 
 # select what tests to run
 _RUN_TESTS = {
-    "exceptions":       True,
-    "datavalidation":   True,
-    "loading":          True,
-    "utils":            True,
-    "algorithms":       True,
-    "relcomp_alg":      True,
-    "query_engine":     True,
-    "selector":         True,
-    "error_handler":    True,
-    "analyser":         True,
-    "datamanager":      True
+    "exceptions":       False,
+    "datavalidation":   False,
+    "loading":          False,
+    "utils":            False,
+    "algorithms":       False,
+    "relcomp_alg":      False,
+    "query_engine":     False,
+    "selector":         False,
+    "error_handler":    False,
+    "analyser":         False,
+    "datamanager":      False,
+    "core_attribute":   True,
+    "core":             True,
+    "core_map":         True
 }
 
 def _checkTest(key):
@@ -124,6 +127,26 @@ def _collectSystemTests(suites):
     else:
         print "@skip: data manager tests"
 
+    # core attributes
+    if _checkTest("core_attribute"):
+        import analytics.core.tests.unittest_core_attribute as unittest_core_attribute
+        suites.addTest(unittest_core_attribute.loadSuites())
+    else:
+        print "@skip: core attribute tests"
+
+    # core
+    if _checkTest("core"):
+        import analytics.core.tests.unittest_core as unittest_core
+        suites.addTest(unittest_core.loadSuites())
+    else:
+        print "@skip: core tests"
+
+    # core maps
+    if _checkTest("core_map"):
+        import analytics.core.tests.unittest_core_map as unittest_core_map
+        suites.addTest(unittest_core_map.loadSuites())
+    else:
+        print "@skip: core map tests"
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()

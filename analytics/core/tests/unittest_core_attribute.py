@@ -4,81 +4,49 @@
 import unittest
 from types import IntType, DictType
 import random
+import sys
 # import classes
-import analytics.utils.mics as misc
+import analytics.utils.misc as misc
 from analytics.core.attribute.dynamic import Dynamic
 from analytics.core.attribute.feature import Feature
 
 
-class Dynamic_TestSequence(unittest.TestCase):
-    def setUp(self):
-        self._input = [
-            None,
-            True,
-            False,
-            sys.maxint,
-            -sys.maxint-1,
-            {},
-            [],
-            "test string",
-            0,
-            1,
-            -1,
-            1.23,
-            -3.34,
-            " test string ",
-            " ",
-            "1",
-            Dynamic.ForwardPriority,
-            Dynamic.ReversedPriority
-        ]
+# some general input to test
+general_input = [
+    None, True, False, sys.maxint, -sys.maxint-1, {}, [],
+    {"1": 1, "2": 2}, [1, 2, 3, 4, 5], "abc", 0, 1, -1, 1.23,
+    -3.34, " string ", " test test test ", "1"
+]
 
+class Dynamic_TestSequence(unittest.TestCase):
     def test_dynamic_init(self):
-        for el in self._input:
+        for el in general_input:
             obj = Dynamic(el)
             if type(el) is IntType:
-                if el == Dynamic.ForwardPriority:
-                    self.assertEqual(obj._priority, Dynamic.ForwardPriority)
-                else:
+                if el == Dynamic.ReversedPriority:
                     self.assertEqual(obj._priority, Dynamic.ReversedPriority)
+                else:
+                    self.assertEqual(obj._priority, Dynamic.ForwardPriority)
             else:
                 self.assertEqual(obj._priority, Dynamic.ForwardPriority)
 
     def test_dynamic_priority(self):
-        for el in self._input:
+        for el in general_input:
             obj = Dynamic(el)
             self.assertEqual(obj.priority(), obj._priority)
 
 
 class Feature_TestSequence(unittest.TestCase):
     def setUp(self):
-        import sys
-        self._input = [
-            None,
-            True,
-            False,
-            sys.maxint,
-            -sys.maxint-1,
-            {},
-            [],
-            "test string",
-            0,
-            1,
-            -1,
-            1.23,
-            -3.34,
-            " test string ",
-            " ",
-            "1"
-        ]
         self._iterations = 20
+        self._teststr = "test feature"
 
     def test_feature_init(self):
-        for it in self._iterations:
+        for it in range(self._iterations):
             # generate attributes
-            name = random.choice(self._input)
-            desc = random.choice(self._input)
-            value = random.choice(self._input)
+            name = random.choice(general_input)
+            desc = random.choice(general_input)
+            value = random.choice(general_input)
             # create Feature and test it
             f = Feature(name, desc, value)
             seed = str(name).strip() + type(value).__name__
@@ -90,27 +58,27 @@ class Feature_TestSequence(unittest.TestCase):
             self.assertEqual(f._type, type(value))
 
     def test_feature_value(self):
-        for it in self._iterations:
+        for it in range(self._iterations):
             # generate attribute value
-            value = random.choice(self._input)
+            value = random.choice(general_input)
             # create feature and test parameter
-            f = Feature("test feature", "test feature", value)
+            f = Feature(self._teststr, self._teststr, value)
             self.assertEqual(f.value(), value)
 
     def test_feature_type(self):
-        for it in self._iterations:
+        for it in range(self._iterations):
             # generate attribute value
-            value = random.choice(self._input)
+            value = random.choice(general_input)
             # create feature and test parameter
-            f = Feature("test feature", "test feature", value)
+            f = Feature(self._teststr, self._teststr, value)
             self.assertEqual(f.type(), type(value))
 
     def test_feature_getJSON(self):
-        for it in self._iterations:
+        for it in range(self._iterations):
             # generate attributes
-            name = random.choice(self._input)
-            desc = random.choice(self._input)
-            value = random.choice(self._input)
+            name = random.choice(general_input)
+            desc = random.choice(general_input)
+            value = random.choice(general_input)
             # create feature and test parameter
             f = Feature(name, desc, value)
             json = f.getJSON()

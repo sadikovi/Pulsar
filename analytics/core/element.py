@@ -90,7 +90,7 @@ class Element(DataItem):
             Returns:
                 dict<str, obj>: json representation of the instance
         """
-        obj = super(Cluster, self).getJSON()
+        obj = super(Element, self).getJSON()
         obj["cluster"] = None if self._cluster is None else self._cluster._id
         obj["rank"] = None if self._rank is None else self._rank.getJSON()
         obj["features"] = [f.getJSON() for f in self._features.values()]

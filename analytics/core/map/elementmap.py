@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # import classes
+import analytics.utils.misc as misc
 from analytics.core.element import Element
 from analytics.core.map.dataitemmap import DataItemMap
 
@@ -20,5 +21,5 @@ class ElementMap(DataItemMap):
             Args:
                 element (Element): data item
         """
-        misc.checkInstanceAgainst(type(element), Element, __file__)
+        misc.checkInstanceAgainst(element, Element, __file__)
         super(ElementMap, self).add(element)

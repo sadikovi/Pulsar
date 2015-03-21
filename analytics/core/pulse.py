@@ -131,7 +131,7 @@ class DynamicPulse(Pulse):
             self._default = default
         # check typed default value
         elif type(default) is self._type:
-            if not static:
+            if not self._static:
                 self._default = default
             # if dynamic property is mimicking static pulse, check store
             elif default in self._store:

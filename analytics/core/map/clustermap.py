@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 # import classes
-from analytics.core.map.dataitem import DataItemMap
+import analytics.utils.misc as misc
+from analytics.core.cluster import Cluster
+from analytics.core.map.dataitemmap import DataItemMap
 
 
 class ClusterMap(DataItemMap):
@@ -31,6 +33,7 @@ class ClusterMap(DataItemMap):
                 cluster (Cluster): cluster to add
                 parentId (str): parent id
         """
+        misc.checkInstanceAgainst(cluster, Cluster, __file__)
         # check if cluster is leaf
         if not cluster.isLeaf():
             for child in cluster.children():
@@ -77,15 +80,15 @@ class ClusterMap(DataItemMap):
         if id not in self._map:
             return
         cluster = self._map[id]
-        if cluster.isLeaf():
-            parent = cluster.parent()
-            if parent is not None:
-                parent.removeChild(cluster)
-            else:
-                del self._root[cluster.id()]
-            del self._map[id]
+        # find parent
+        parent = cluster.parent()
+        # delete from parent
+        if parent is not None:
+            parent.removeChild(cluster)
         else:
-            parent = cluster.parent()
+            del self._root[cluster.id()]
+        # if cluster is not leaf, reassign children to cluster's parent
+        if not cluster.isLeaf():
             list = cluster.children()
             for child in list:
                 child.setParent(parent)
@@ -94,7 +97,8 @@ class ClusterMap(DataItemMap):
                 else:
                     parent.addChild(child)
             cluster.makeLeaf()
-            del self._map[id]
+        # delete from global map
+        del self._map[id]
 
     # [Public]
     def get(self, id, default=None):

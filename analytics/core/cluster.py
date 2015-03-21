@@ -3,6 +3,7 @@
 # import libs
 from types import ListType
 # import classes
+import analytics.utils.misc as misc
 from analytics.core.dataitem import DataItem
 
 
