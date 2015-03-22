@@ -43,7 +43,8 @@ _RUN_TESTS = {
     "datamanager":      False,
     "core_attribute":   True,
     "core":             True,
-    "core_map":         True
+    "core_map":         True,
+    "core_processor":   True
 }
 
 def _checkTest(key):
@@ -147,6 +148,13 @@ def _collectSystemTests(suites):
         suites.addTest(unittest_core_map.loadSuites())
     else:
         print "@skip: core map tests"
+
+    # core processor
+    if _checkTest("core_processor"):
+        import analytics.core.tests.unittest_core_processor as unittest_core_processor
+        suites.addTest(unittest_core_processor.loadSuites())
+    else:
+        print "@skip: core processor tests"
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()

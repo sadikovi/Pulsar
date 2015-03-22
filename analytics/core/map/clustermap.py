@@ -63,9 +63,20 @@ class ClusterMap(DataItemMap):
             if key in self._map:
                 parent = self._map[key]
                 for cl in list:
-                    parent.addChild(cl)
-                    cl.setParent(parent)
-                    del self._root[cl.id()]
+                    # check that chain will not create cycles
+                    def recurCycle(clr, cid):
+                        if clr is None: return False
+                        if clr.id() == cid: return True
+                        flag = False
+                        for child in clr.children():
+                            flag = flag or recurCycle(child, cid)
+                        return flag
+                    if recurCycle(cl, parent.id()):
+                        cl.setParent(None)
+                    else:
+                        parent.addChild(cl)
+                        cl.setParent(parent)
+                        del self._root[cl.id()]
                 del self._waitlist[key]
 
     # [Public]

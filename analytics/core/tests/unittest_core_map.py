@@ -126,6 +126,15 @@ class ClusterMap_TestSequence(unittest.TestCase):
         parent(0)
         return ls
 
+    def _clusters_chain_cycled(self, num):
+        ls = self._clusters_chain_reversed(num)
+        lslen = len(ls)
+        if lslen > 1:
+            last = ls[lslen-1]
+            first = ls[0]
+            last.setParent(first)
+        return ls
+
     def _idmap(self, ls):
         map = {}
         for it in ls:
@@ -227,6 +236,21 @@ class ClusterMap_TestSequence(unittest.TestCase):
         self.assertEqual(len(treemap.keys()), len(idmap.keys()))
         for key in treemap.keys():
             self.assertEqual(sorted(treemap[key]), sorted(idmap[key]))
+
+    def test_clustermap_add_chain_cycled(self):
+        # 7. cycles inside the list
+        ls = self._clusters_chain_cycled(self.num)
+        for el in ls:
+            self.map.add(el)
+        self.assertEqual(len(self.map._root.keys()), 1)
+        self.assertEqual(len(self.map._map.keys()), len(ls))
+        self.assertEqual(self.map._waitlist, {})
+        treemap = {}; idmap = self._idmap(ls)
+        self._recurCheck(self.map._root.values(), treemap)
+        self.assertEqual(len(treemap.keys()), len(idmap.keys()))
+        for key in treemap.keys():
+            self.assertEqual(sorted(treemap[key]), sorted(idmap[key]))
+
 
     def test_clustermap_remove(self):
         ls = self._clusters_tree_normal(self.num)
