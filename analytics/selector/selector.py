@@ -1,321 +1,256 @@
 #!/usr/bin/env python
 
-'''
-Copyright 2015 Ivan Sadikov
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-'''
-
-
 # import libs
 from types import StringType, ListType
+import warnings
 # import classes
 import analytics.utils.queryengine as q
 import analytics.utils.misc as misc
-import analytics.datavalidation.resultsmap as rm
-import analytics.datavalidation.groupsmap as gm
-import analytics.datavalidation.propertiesmap as pm
-import analytics.algorithms.algorithmsmap as am
-from analytics.utils.constants import Const
+from analytics.algorithms.algorithmsmap import AlgorithmsMap
+from analytics.core.map.clustermap import ClusterMap
+from analytics.core.map.elementmap import ElementMap
+from analytics.core.map.pulsemap import PulseMap
 
 
-class Selector(object):
+# some of the tables to use for filtering
+CLUSTERS = "CLUSTERS"
+ELEMENTS = "ELEMENTS"
+PULSES = "PULSES"
+ALGORITHMS = "ALGORITHMS"
+
+class FilterBlock(object):
     """
-        Selector class performs filtering of the coming data. For example, if
-        there are @GroupsMap, @ResultsMap, and @PropertiesMap coming into the
-        class, then on the other end those maps will be modified + algorithm is
-        added. Thus, there are four instances to manage.
-
-
-        GroupsMap--------|                    |----> GroupsMap'
-        ResultsMap-------|  --> Selector -->  |----> ResultsMap'
-        PropertiesMap----|                    |----> PropertiesMap'
-                                              |----> Algorithm
-
-        To do this, selector receives DML queries to perform on those maps. It
-        uses queryengine to parse queries and extract all the properties.
+        Simple class to update maps in batch.
 
         Attributes:
-            _initialised (bool): simple property to show that instance is on
-            _blocks (list<QueryBlock>): list of blocks of the queries
-            _readyToFilter (bool): flag to show if selector has loaded blocks
+            _alg (AlgorithmsMap): map of algorithms
+            _pul (PulseMap): map of pulses
+            _clu (ClusterMap): map of clusters
+            _ele (ElementMap): map of elements
+            _isFiltered (bool): flag to show that filter block is filtered
     """
-    def __init__(self):
-        self._initialised = True
-        self._blocks = []
-        self._readyToFilter = False
-        self._skipFiltering = False
+    def __init__(self, algorithmsmap, pulsemap, clustermap, elementmap):
+        self._alg = algorithmsmap
+        self._pul = pulsemap
+        self._clu = clustermap
+        self._ele = elementmap
+        self._isFiltered = False
 
-    # [Public]
-    def loadQueriesFromQueryset(self, queryset=""):
-        """
-            Loads queries set and parses them using QueryEngine. Assigns them
-            to _blocks property for later filtering.
+# [Public]
+def filterWithBlock(queryset, flrblock):
+    """
+        Recommended method for filtering maps with queryset. Takes care of
+        filtering order and overall process.
 
-            Args:
-                queryset (str): string contains queries set
-        """
-        misc.checkTypeAgainst(type(queryset), StringType, __file__)
-        # if queryset is empty then skip loading
-        if queryset == "":
+        Args:
+            queryset (str): query set
+            flrblock (FilterBlock): filter block with maps
+    """
+    # check if filter block has already been filtered
+    if flrblock._isFiltered:
+        return flrblock
+    # extract query blocks
+    blocks = parseQueryset(queryset, q.QueryEngine())
+    if not blocks:
+        return flrblock
+    # filter blocks to match maps
+    ablock = None; pblock = None; cblock = None
+    for block in blocks:
+        if block._statement._table.upper() == ALGORITHMS:
+            ablock = block
+        elif block._statement._table.upper() == PULSES:
+            pblock = block
+        elif block._statement._table.upper() == CLUSTERS:
+            cblock = block
+    # use each block to parse map
+    flrblock._alg = filterAlgorithms(ablock, flrblock._alg)
+    flrblock._pul = filterPulses(pblock, flrblock._pul)
+    flrblock._clu = filterClusters(cblock, flrblock._clu)
+    flrblock._ele = filterElements(flrblock._ele, flrblock._clu, flrblock._pul)
+    # finished filtering
+    flrblock._isFiltered = True
+    return flrblock
+
+# [Public]
+def parseQueryset(queryset=None, engine=None):
+    """
+        Parsing query set. If query set is None or not a string, query set is
+        reset to empty string. If query set is invalid, exception is thrown.
+
+        Args:
+            queryset (str): query set
+            engine (QueryEngine): query engine to parse queryset
+
+        Returns:
+            list<QueryBlock>: list of query blocks
+    """
+    if queryset is None:
+        queryset = ""
+    elif type(queryset) is not StringType:
+        msg = "Queryset is not a string and will be reset to empty"
+        warnings.warn(msg, UserWarning)
+        queryset = ""
+    else:
+        queryset = queryset.strip()
+    # query blocks
+    blocks = []
+    # check if queryset is empty, and in this case return empty list
+    if queryset == "":
+        blocks = []
+    else:
+        # return query blocks
+        engine = engine if type(engine) is q.QueryEngine else q.QueryEngine()
+        blocks = engine.parse(queryset)
+    return blocks
+
+# [Public]
+def filterAlgorithms(queryblock, algorithmsmap):
+    """
+        Filters algorithms.
+
+        Args:
+            queryblock (QueryBlock): query block for algorithms
+            algorithmsmap (AlgorithmsMap): map of algorithms
+
+        Returns:
+            AlgorithmsMap: reference to updated algorithms map
+    """
+    # if queryblock is None then do not filter at all
+    if queryblock is None:
+        return algorithmsmap
+    misc.checkTypeAgainst(type(queryblock), q.QueryBlock, __file__)
+    misc.checkTypeAgainst(type(algorithmsmap), AlgorithmsMap, __file__)
+    # get predicates
+    predicates = queryblock._predicates
+    # algorithm keys
+    akeys = []
+    for predicate in predicates:
+        ptype = predicate._type
+        parameter = predicate._parameter
+        values = predicate._values
+        # check only equal predicates with parameter "id"
+        if ptype == q._PREDICATE_TYPES.EQUAL and parameter.upper() == "ID":
+            keys.append(values[0])
+    # remove keys that are not selected
+    for key in algorithmsmap.keys():
+        if key not in akeys:
+            algorithmsmap.remove(key)
+    return algorithmsmap
+
+# [Public]
+def filterPulses(queryblock, pulsemap):
+    """
+        Filters pulses.
+
+        Args:
+            queryblock (QueryBlock): query block for pulses
+            pulsemap (PulseMap): map of pulses
+
+        Returns:
+            PulseMap: reference to updated pulses map
+    """
+    # if queryblock is None then do not filter at all
+    if queryblock is None:
+        return pulsemap
+    misc.checkTypeAgainst(type(queryblock), q.QueryBlock, __file__)
+    misc.checkTypeAgainst(type(pulsemap), PulseMap, __file__)
+    # get predicates
+    predicates = queryblock._predicates
+    # check assign predicates first
+    for predicate in predicates:
+        ptype = predicate._type
+        if ptype == _PREDICATE_TYPES.ASSIGN:
+            values = predicate._values
+            pulse = pulsemap.get(predicate._parameter)
+            if pulse is not None and type(pulse) is DynamicPulse:
+                pulse.setStatic(not values[0].upper()=="DYNAMIC")
+    # check equal predicate
+    for predicate in predicates:
+        ptype = predicate._type
+        # check equal predicate
+        if ptype == q._PREDICATE_TYPES.EQUAL:
+            pulse = pulsemap.get(predicate._parameter)
+            if pulse is not None:
+                values = predicate._values
+                pulse.setDefault(values[0])
+    # return updated pulsemap
+    return pulsemap
+
+# [Public]
+def filterClusters(queryblock, clustermap):
+    """
+        Filters clusters.
+
+        Args:
+            queryblock (QueryBlock): query block for clusters
+            clustermap (ClusterMap): map of clusters
+
+        Returns:
+            ClusterMap: reference to updated clusters map
+    """
+    # if queryblock is None then do not filter at all
+    if queryblock is None:
+        return clustermap
+    misc.checkTypeAgainst(type(queryblock), q.QueryBlock, __file__)
+    misc.checkTypeAgainst(type(clustermap), ClusterMap, __file__)
+    # storing clusters
+    clusters = []
+    # get predicates
+    predicates = queryblock._predicates
+    for predicate in predicates:
+        ptype = predicate._type
+        parameter = predicate._parameter
+        if ptype == q._PREDICATE_TYPES.EQUAL and parameter.upper() == "ID":
+            if clustermap.has(values[0]):
+                clusters.append(values[0])
+    # filter clusters
+    updatedmap = ClusterMap()
+    for key in clusters:
+        updatedmap.add(clustermap.get(key))
+    # return updated cluster map
+    return updatedmap
+
+# [Public]
+def filterElements(elementmap, clustermap, pulsemap):
+    """
+        Filters elements using cluster map and pulse map.
+
+        Args:
+            elementmap (ElementMap): map of elements
+            clustermap (ClusterMap): filtered map of clusters
+            pulsemap (PulseMap): filtered map of pulses
+
+        Returns:
+            ElementMap: reference to updated element map
+    """
+    misc.checkTypeAgainst(type(elementmap), ElementMap, __file__)
+    misc.checkTypeAgainst(type(clustermap), ClusterMap, __file__)
+    misc.checkTypeAgainst(type(pulsemap), PulseMap, __file__)
+    # filter by clusters
+    elements = elementmap._map.values()
+    for element in elements:
+        parent = element.parent()
+        if parent is None or not clustermap.has(parent.id()):
+            elementmap.remove(element.id())
+    # filter by pulses
+    elements = elementmap._map.values()
+    # pulses
+    # "is selectable" closure
+    def isselectable(x):
+        if type(x) is DynamicPulse and x.static() is True:
+            return True if x.default() is not None else False
+        elif type(x) is StaticPulse:
+            return True if x.default() is not None else False
+        else:
             return False
-        # initialise engine
-        engine = q.QueryEngine()
-        # load queries from query blocks
-        self.loadQueriesFromBlocks(engine.parse(queryset))
-        return True
-
-    # [Public]
-    def loadQueriesFromBlocks(self, queryblocks):
-        """
-            Loads queries blocks directly to the _blocks property.
-
-            Args:
-                queryblocks (list<QueryBlock>): list of query blocks
-        """
-        misc.checkTypeAgainst(type(queryblocks), ListType, __file__)
-        # fill properties
-        self._blocks = queryblocks
-        self._readyToFilter = True
-        return True
-
-    # [Public]
-    def setSkipFiltering(self, flag):
-        """
-            Sets skip filtering property as True or False. If property is True
-            then the whole filtering is skipped and no modifications are made
-            to the existing maps.
-
-            Args:
-                flag (bool): flag to set the property
-        """
-        self._skipFiltering = not not flag
-
-    # [Public]
-    def startFiltering(self, resultsMap, groupsMap, propsMap, algorithmsMap):
-        """
-            Starts filtering of the specified maps. If map is None, then the
-            step is skipped and map is returned as it is. Selector changes
-            those maps in place.
-
-            Args:
-                resultsMap (ResultsMap)      : map of results
-                groupsMap (GroupsMap)        : map of groups
-                propsMap (PropertiesMap)     : map of properties
-                algorithmsMap (AlgorithmsMap): map of algorithms
-        """
-        # check if selector was told to skip filtering
-        if self._skipFiltering:
-            # skip filtering and notify about it
-            return False
-        # check if selector is ready to filter
-        if self._readyToFilter is False:
-            misc.raiseStandardError('Selector is not ready to filter', __file__)
-        # find tables in blocks
-        _results = None; _groups = None; _props = None; _algorithms = None
-        for block in self._blocks:
-            statement = block._statement or q.QueryStatement(_TABLE_NONE)
-            if statement._table == Const._TABLE_RESULTS:
-                _results = block
-            elif statement._table == Const._TABLE_GROUPS:
-                _groups = block
-            elif statement._table == Const._TABLE_PROPERTIES:
-                _props = block
-            elif statement._table == Const._TABLE_ALGORITHM:
-                _algorithms = block
-        # filter maps
-        # 1. filter results
-        if resultsMap is not None and _results is not None:
-            self._filterResults(resultsMap, propsMap, _results)
-        # 2. filter groups (returns new reference)
-        if groupsMap is not None and _groups is not None:
-            self._filterGroups(groupsMap, _groups)
-        # 3. filter properties
-        if propsMap is not None and _props is not None:
-            self._filterProperties(propsMap, _props)
-        # 4. filter algorithms
-        if algorithmsMap is not None and _algorithms is not None:
-            self._filterAlgorithms(algorithmsMap, _algorithms)
-        # match groups and results after filtering
-        self._matchGroupsAndResults(groupsMap, resultsMap)
-        # ... and that is it
-        return True
-
-    # [Private]
-    def _filterResults(self, resultsMap, propertiesMap, queryBlock):
-        """
-            Method to filter results using properties map and query block.
-            First and foremost, updates properties by setting default values to
-            compare against later. Also sets dynamic property.
-
-            Ignores predicates that are not EQUAL or ASSIGN types, or are not
-            in properties map.
-
-            Args:
-                resultsMap (ResultsMap): map of Result instances
-                propertiesMap (PropertiesMap): map of Property instances
-                queryBlock (QueryBlock): query block
-        """
-        misc.checkTypeAgainst(type(resultsMap), rm.ResultsMap, __file__)
-        misc.checkTypeAgainst(type(propertiesMap), pm.PropertiesMap, __file__)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
-
-        # update properties with assignment predicates
-        dynamicIds = []
-        for predicate in queryBlock._predicates:
-            # if property does not exist - ignore it
-            key = predicate._parameter; values = predicate._values
-            if propertiesMap.has(key):
-                if predicate._type == q._PREDICATE_TYPES.ASSIGN:
-                    # add id to dynamic list
-                    dynamicIds.append(key)
-                if predicate._type == q._PREDICATE_TYPES.EQUAL:
-                    propertiesMap.get(key).setDefault(values[0])
-        # update dynamic properties
-        propertiesMap.setDynamic(dynamicIds)
-
-        # list to keep selected ids
-        ids = []
-        # ignore properties that have default values as None
-        for result in resultsMap.values():
-            _matches = True
-            for prop in propertiesMap.values():
-                # property has no default value or dynamic - skip
-                if prop._default is None or prop._dynamic:
-                    continue
-                value = result.getProperties()[prop.getName()]
-                # filter only if property has default value
-                _matches = _matches and value == prop._default
-            if _matches:
-                ids.append(result.getId())
-        # remove results that are not selected
-        for key in resultsMap.keys():
-            if key not in ids:
-                resultsMap.remove(key)
-
-    # [Private]
-    def _filterGroups(self, groupsMap, queryBlock):
-        """
-            Method to filter groups.
-            Uses predicate with type EQUAL and searches for the property "id".
-            If property exists, searches groups map for the first match.
-            If group exists - updates groups map to contain only this group and
-            all the children. Otherwise, does not filter at all.
-
-            Args:
-                groupsMap (GroupsMap): map of Group instances
-                queryBlock (QueryBlock): query block
-        """
-        misc.checkTypeAgainst(type(groupsMap), gm.GroupsMap, __file__)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
-        # init group
-        group = None
-        # search through predicates
-        for predicate in queryBlock._predicates:
-            if predicate._type is not q._PREDICATE_TYPES.EQUAL:
-                continue
-            if predicate._parameter == Const._QUERY_ID:
-                group = groupsMap.get(predicate._values[0])
-                if group is not None:
-                    break
-        # if group is found, update map to contain only the group and children
-        if group is not None:
-            groupsMap.makeRoot(group)
-
-    # [Private]
-    def _filterProperties(self, propertiesMap, queryBlock):
-        """
-            Method to filter properties. Similar to filtering groups, it uses
-            only EQUAL predicates. Searches for parameters "id" or "name".
-            It is recommended to filter properties after filtering results, as
-            some properties may have gone otherwise, and filtering would be
-            inconsistent.
-
-            Args:
-                propertiesMap (PropertiesMap): map of Property instances
-                queryBlock (QueryBlock): query block
-        """
-        misc.checkTypeAgainst(type(propertiesMap), pm.PropertiesMap, __file__)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
-        # list to store matching ids
-        names = []
-        # search for matching properties
-        for predicate in queryBlock._predicates:
-            # skip predicate that does not have equality type
-            if predicate._type is not q._PREDICATE_TYPES.EQUAL:
-                continue
-            for prop in propertiesMap.values():
-                if predicate._parameter == Const._QUERY_ID:
-                    if prop.getId() == predicate._values[0]:
-                        names.append(prop.getName())
-                elif predicate._parameter == Const._QUERY_NAME:
-                    if prop.getName() == predicate._values[0]:
-                        names.append(prop.getName())
-        # remove not matching algorithms
-        for key in propertiesMap.keys():
-            if key not in names:
-                propertiesMap.remove(key)
-
-    # [Private]
-    def _filterAlgorithms(self, algorithmsMap, queryBlock):
-        """
-            Method to filter algorithms. Similar to filtering properties, it
-            uses only predicates with type EQUAL, and searches for "id" and
-            "name" parameters.
-
-            Args:
-                algorithmsMap (AlgorithmsMap): map of algorithms
-                queryBlock (QueryBlock): query block
-        """
-        misc.checkTypeAgainst(type(algorithmsMap), am.AlgorithmsMap, __file__)
-        misc.checkTypeAgainst(type(queryBlock), q.QueryBlock, __file__)
-        # list to store matching ids
-        ids = []
-        # search for matching algorithms
-        for predicate in queryBlock._predicates:
-            # skip predicate that does not have equality type
-            if predicate._type is not q._PREDICATE_TYPES.EQUAL:
-                continue
-            for algorithm in algorithmsMap.values():
-                if predicate._parameter == Const._QUERY_ID:
-                    if algorithm.getId() == predicate._values[0]:
-                        ids.append(algorithm.getId())
-                elif predicate._parameter == Const._QUERY_NAME:
-                    if algorithm.getName() == predicate._values[0]:
-                        ids.append(algorithm.getId())
-        # remove not matching algorithms
-        for key in algorithmsMap.keys():
-            if key not in ids:
-                algorithmsMap.remove(key)
-
-    # [Private]
-    def _matchGroupsAndResults(self, groupsMap, resultsMap):
-        """
-            Matches groups and results after filtering, to have consistent
-            data across two different maps. Thus, every result has to belong to
-            a group, otherwise it is deleted.
-
-            Args:
-                groupsMap (GroupsMap): map of Group instances
-                resultsMap( ResultsMap): map of Results instances
-        """
-        misc.checkTypeAgainst(type(groupsMap), gm.GroupsMap, __file__)
-        misc.checkTypeAgainst(type(resultsMap), rm.ResultsMap, __file__)
-        ids = []
-        # search for results that do not match any group
-        for result in resultsMap.values():
-            if not groupsMap.has(result.getGroup()):
-                ids.append(result.getId())
-        # remove results that do not match any group
-        for id in ids:
-            resultsMap.remove(id)
+    pulses = [x for x in pulsemap._map.values() if isselectable(x)]
+    for element in elements:
+        remove = False
+        for pulse in pulses:
+            feature = element._features[pulse.id()]
+            if feature is None or feature.value() != pulse.default():
+                removed = True
+        if remove:
+            elementmap.remove(element.id())
+    # return element map
+    return elementmap

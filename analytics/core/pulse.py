@@ -66,6 +66,16 @@ class Pulse(DataItem):
             self._store.add(value)
 
     # [Public]
+    def static(self):
+        """
+            Returns static parameter of Pulse.
+
+            Returns:
+                bool: flag showing if instance is static
+        """
+        return True
+
+    # [Public]
     def getJSON(self):
         """
             Returns json representation of the instance.
@@ -102,6 +112,16 @@ class StaticPulse(Pulse):
         elif type(default) is self._type and default in self._store:
             self._default = default
 
+    # [Public]
+    def static(self):
+        """
+            StaticPulse instance is always static.
+
+            Returns:
+                bool: flag showing if instance is static
+        """
+        return True
+
 
 class DynamicPulse(Pulse):
     """
@@ -115,7 +135,7 @@ class DynamicPulse(Pulse):
     """
     def __init__(self, name, desc, sample, priority, static=False):
         super(DynamicPulse, self).__init__(name, desc, sample)
-        self._static = static
+        self._static = bool(static)
         self._dynamic = Dynamic(priority)
 
     # [Public]
@@ -136,3 +156,23 @@ class DynamicPulse(Pulse):
             # if dynamic property is mimicking static pulse, check store
             elif default in self._store:
                 self._default = default
+
+    # [Public]
+    def static(self):
+        """
+            Returns static parameter of the DynamicPulse instance.
+
+            Returns:
+                bool: flag showing if instance is static
+        """
+        return self._static
+
+    # [Public]
+    def setStatic(self, isstatic=False):
+        """
+            Set static attribute of the instance.
+
+            Args:
+                isstatic (bool): parameter to set static attribute
+        """
+        self._static = bool(isstatic)

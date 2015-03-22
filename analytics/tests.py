@@ -37,7 +37,7 @@ _RUN_TESTS = {
     "algorithms":       False,
     "relcomp_alg":      False,
     "query_engine":     False,
-    "selector":         False,
+    "selector":         True,
     "error_handler":    False,
     "analyser":         False,
     "datamanager":      False,

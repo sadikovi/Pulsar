@@ -119,5 +119,20 @@ class ClusterMap(DataItemMap):
             Args:
                 id (str): cluster id
                 default (obj): default object to return if nothing is found
+
+            Returns:
+                Cluster: element in map
         """
         return self._map[id] if id in self._map else default
+
+    def has(self, id):
+        """
+            Returns True if element with id exists, otherwise False.
+
+            Args:
+                id (str): cluster id
+
+            Returns:
+                bool: indicator whether element is in map
+        """
+        return id in self._map

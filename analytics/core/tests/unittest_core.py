@@ -392,6 +392,12 @@ class Pulse_TestSequence(unittest.TestCase):
             self.assertEqual(obj["type"], pulse.type())
             self.assertEqual(obj["default"], pulse.default())
 
+    def test_pulse_static(self):
+        for sample in general_input:
+            pulse = Pulse(self._teststr, self._teststr, sample)
+            # pulse static property is always static
+            self.assertEqual(pulse.static(), True)
+
 
 class StaticPulse_TestSequence(unittest.TestCase):
     def setUp(self):
@@ -411,6 +417,10 @@ class StaticPulse_TestSequence(unittest.TestCase):
                 test_default = default
                 pulse.setDefaultValue(default)
             self.assertEqual(pulse.default(), test_default)
+
+    def test_staticpulse_static(self):
+        pulse = StaticPulse(self._teststr, self._teststr, self._sample)
+        self.assertEqual(pulse.static(), True)
 
 
 class DynamicPulse_TestSequence(unittest.TestCase):
@@ -456,6 +466,24 @@ class DynamicPulse_TestSequence(unittest.TestCase):
             pulse.setDefaultValue(default)
             self.assertEqual(pulse.default(), test_default)
 
+    def test_dynamicpulse_static(self):
+        pulse = DynamicPulse(self._teststr, self._teststr,
+                                self._sample, self._prior, False)
+        self.assertEqual(pulse.static(), False)
+        pulse = DynamicPulse(self._teststr, self._teststr,
+                                self._sample, self._prior, True)
+        self.assertEqual(pulse.static(), True)
+
+    def test_dynamicpulse_setStatic(self):
+        pulse = DynamicPulse(self._teststr, self._teststr,
+                                self._sample, self._prior, False)
+        self.assertEqual(pulse.static(), False)
+        pulse.setStatic(True)
+        self.assertEqual(pulse.static(), True)
+        pulse.setStatic([])
+        self.assertEqual(pulse.static(), False)
+        pulse.setStatic(1)
+        self.assertEqual(pulse.static(), True)
 
 # Load test suites
 def _suites():
