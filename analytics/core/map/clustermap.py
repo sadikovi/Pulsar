@@ -37,7 +37,7 @@ class ClusterMap(DataItemMap):
         # check if cluster is leaf
         if not cluster.isLeaf():
             for child in cluster.children():
-                self.add(cluster)
+                self.add(child)
             cluster.makeLeaf()
         # check cluster against clusters map
         if cluster.id() in self._map:

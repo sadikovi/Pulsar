@@ -10,6 +10,7 @@ from analytics.algorithms.algorithmsmap import AlgorithmsMap
 from analytics.core.map.clustermap import ClusterMap
 from analytics.core.map.elementmap import ElementMap
 from analytics.core.map.pulsemap import PulseMap
+from analytics.core.pulse import StaticPulse, DynamicPulse
 
 
 # some of the tables to use for filtering
@@ -127,9 +128,9 @@ def filterAlgorithms(queryblock, algorithmsmap):
     for predicate in predicates:
         ptype = predicate._type
         parameter = predicate._parameter
-        values = predicate._values
         # check only equal predicates with parameter "id"
         if ptype == q._PREDICATE_TYPES.EQUAL and parameter.upper() == "ID":
+            values = predicate._values
             keys.append(values[0])
     # remove keys that are not selected
     for key in algorithmsmap.keys():
@@ -159,7 +160,7 @@ def filterPulses(queryblock, pulsemap):
     # check assign predicates first
     for predicate in predicates:
         ptype = predicate._type
-        if ptype == _PREDICATE_TYPES.ASSIGN:
+        if ptype == q._PREDICATE_TYPES.ASSIGN:
             values = predicate._values
             pulse = pulsemap.get(predicate._parameter)
             if pulse is not None and type(pulse) is DynamicPulse:
@@ -172,7 +173,7 @@ def filterPulses(queryblock, pulsemap):
             pulse = pulsemap.get(predicate._parameter)
             if pulse is not None:
                 values = predicate._values
-                pulse.setDefault(values[0])
+                pulse.setDefaultValue(values[0])
     # return updated pulsemap
     return pulsemap
 
@@ -201,6 +202,7 @@ def filterClusters(queryblock, clustermap):
         ptype = predicate._type
         parameter = predicate._parameter
         if ptype == q._PREDICATE_TYPES.EQUAL and parameter.upper() == "ID":
+            values = predicate._values
             if clustermap.has(values[0]):
                 clusters.append(values[0])
     # filter clusters
@@ -229,7 +231,7 @@ def filterElements(elementmap, clustermap, pulsemap):
     # filter by clusters
     elements = elementmap._map.values()
     for element in elements:
-        parent = element.parent()
+        parent = element.cluster()
         if parent is None or not clustermap.has(parent.id()):
             elementmap.remove(element.id())
     # filter by pulses
@@ -245,12 +247,12 @@ def filterElements(elementmap, clustermap, pulsemap):
             return False
     pulses = [x for x in pulsemap._map.values() if isselectable(x)]
     for element in elements:
-        remove = False
+        toRemove = False
         for pulse in pulses:
             feature = element._features[pulse.id()]
             if feature is None or feature.value() != pulse.default():
-                removed = True
-        if remove:
+                toRemove = True
+        if toRemove:
             elementmap.remove(element.id())
     # return element map
     return elementmap

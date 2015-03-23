@@ -30,15 +30,13 @@ import unittest
 
 # select what tests to run
 _RUN_TESTS = {
-    "exceptions":       False,
-    "datavalidation":   False,
-    "loading":          False,
-    "utils":            False,
+    "exceptions":       True,
+    "loading":          True,
+    "utils":            True,
     "algorithms":       False,
     "relcomp_alg":      False,
-    "query_engine":     False,
+    "query_engine":     True,
     "selector":         True,
-    "error_handler":    False,
     "analyser":         False,
     "datamanager":      False,
     "core_attribute":   True,
@@ -57,13 +55,6 @@ def _collectSystemTests(suites):
         suites.addTest(unittest_exceptions.loadSuites())
     else:
         print "@skip: exceptions tests"
-
-    # datavalidation
-    if _checkTest("datavalidation"):
-        import analytics.datavalidation.tests.unittest_validation as unittest_validation
-        suites.addTest(unittest_validation.loadSuites())
-    else:
-        print "@skip: data validation tests"
 
     # loading
     if _checkTest("loading"):
@@ -106,13 +97,6 @@ def _collectSystemTests(suites):
         suites.addTest(unittest_selector.loadSuites())
     else:
         print "@skip: selector tests"
-
-    # error handler
-    if _checkTest("error_handler"):
-        import analytics.errorhandler.tests.unittest_errorhandling as unittest_errorhandling
-        suites.addTest(unittest_errorhandling.loadSuites())
-    else:
-        print "@skip: error handler tests"
 
     # analyser
     if _checkTest("analyser"):

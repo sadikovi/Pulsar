@@ -272,7 +272,20 @@ class ClusterMap_TestSequence(unittest.TestCase):
             self.map.add(el)
         for el in ls:
             self.assertEqual(self.map.get(el.id()), el)
+            # try getting element with doubled id
             self.assertEqual(self.map.get(el.id()*2), None)
+
+    def test_clustermap_addClusterWithChildren(self):
+        # try it on chain, because we assure that there is one element in root
+        ls = self._clusters_chain_normal(self.num)
+        for el in ls:
+            self.map.add(el)
+        anothermap = ClusterMap()
+        anothermap.add(self.map._root.values()[0])
+        # assertion
+        self.assertEqual(len(self.map._map), len(anothermap._map))
+        for el in ls:
+            self.assertEqual(self.map.get(el.id()), anothermap.get(el.id()))
 
 
 class ElementMap_TestSequence(unittest.TestCase):

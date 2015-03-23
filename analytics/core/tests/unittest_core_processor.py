@@ -134,6 +134,29 @@ class Processor_TestSequence(unittest.TestCase):
             self.assertTrue(issubclass(w[0].category, UserWarning))
         self.assertEqual(len(self._pulsemap._map), 1)
 
+    def test_processor_processBlock(self):
+        clusters = {"map": self._clustermap, "data": [self._clrobj]}
+        elements = {"map": self._elementmap, "data": [self._elmobj]}
+        pulses = {"map": self._pulsemap, "data": [self._plsobj]}
+        # fill block
+        block = processor.ProcessBlock(clusters, elements, pulses)
+        self.assertEqual(block._clustermap, self._clustermap)
+        self.assertEqual(block._elementmap, self._elementmap)
+        self.assertEqual(block._pulsemap, self._pulsemap)
+        self.assertEqual(block._isProcessed, False)
+        # process block
+        block = processor.processWithBlock(block)
+        self.assertEqual(block._isProcessed, True)
+        self.assertEqual(
+            len(block._clustermap._map.values()), len(clusters["data"])
+        )
+        self.assertEqual(
+            len(block._elementmap._map.values()), len(elements["data"])
+        )
+        self.assertEqual(
+            len(block._pulsemap._map.values()), len(pulses["data"])
+        )
+
 # Load test suites
 def _suites():
     return [

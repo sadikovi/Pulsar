@@ -16,6 +16,67 @@ from analytics.core.attribute.dynamic import Dynamic
 from analytics.core.attribute.feature import Feature
 
 
+class ProcessBlock(object):
+    """
+        Simple class to process maps in batch.
+
+        Attributes:
+            _clu (ClusterMap): map of clusters
+            _pul (PulseMap): map of pulses
+            _ele (ElementMap): map of elements
+            _isProcessed (bool): flag to show that block is processed
+    """
+    def __init__(self, clusters, elements, pulses):
+        self._clustermap = clusters["map"]
+        self._elementmap = elements["map"]
+        self._pulsemap = pulses["map"]
+        self._data = {
+            "clusters": clusters["data"],
+            "elements": elements["data"],
+            "pulses": pulses["data"]
+        }
+        self._isProcessed = False
+
+# [Public]
+def processWithBlock(block):
+    """
+        Uses ProcessBlock instance to parse lists into maps. Establishes
+        process of parsing by itself making it safer to use.
+
+        Args:
+            block (ProcessBlock): process block
+
+        Returns:
+            ProcessBlock: updated block
+    """
+    if block._isProcessed:
+        return processBlock
+    # util map
+    idmapper = {}
+    # parse object lists
+    ## clusters
+    idmapper = parseClusters(
+        block._data["clusters"],
+        block._clustermap,
+        idmapper
+    )
+    ## elements
+    idmapper = parseElements(
+        block._data["elements"],
+        block._elementmap,
+        idmapper
+    )
+    ## pulses
+    idmapper = parsePulses(
+        block._data["pulses"],
+        block._pulsemap,
+        idmapper
+    )
+    # block is processed
+    block._isProcessed = True
+    # return block
+    return block
+
 ### Parsing clusters
 # [Public]
 def parseClusters(objlist, clustermap, idmapper={}):
@@ -52,7 +113,7 @@ def parseClusters(objlist, clustermap, idmapper={}):
             # make sure that paid exists and is in map
             if paid is not None and paid in idmapper:
                 parent = idmapper[paid]["cluster"]
-                cluster.setParent(None)
+                cluster.setParent(parent)
         except:
             # TODO: do not forget to log it!
             assign_failures += 1
@@ -89,10 +150,18 @@ def parseElements(objlist, elementmap, idmapper={}):
     # failures
     parse_failures = 0
     # parse elements
+    # map for values
+    valmap = {}
     for obj in objlist:
         element = None
         try:
             element = _processElementObject(obj, idmapper)
+            # fill value map
+            for feature in element.features():
+                if feature.id() in valmap:
+                    valmap[feature.id()].append(feature.value())
+                else:
+                    valmap[feature.id()] = [feature.value()]
         except:
             # TODO: do not forget to log it!
             parse_failures += 1
@@ -104,7 +173,7 @@ def parseElements(objlist, elementmap, idmapper={}):
         msg = "%d element entries could not be parsed" %(parse_failures)
         warnings.warn(msg, UserWarning)
     # return idmapper
-    return idmapper
+    return valmap
 
 ### Parsing pulses
 # [Public]
@@ -113,7 +182,7 @@ def parsePulses(objlist, pulsemap, idmapper={}):
         Parses clusters using objects list, pulse map and idmapper.
 
         Args:
-            objlist (list<dict>): list of objects to parse into clusters
+            objlist (list<dict>): list of objects to parse into pulses
             clustermap (PulseMap): map to add clusters
             idmapper (dict<str, obj>):  util dictionary
 
@@ -130,6 +199,10 @@ def parsePulses(objlist, pulsemap, idmapper={}):
         pulse = None
         try:
             pulse = _processPulseObject(obj, idmapper)
+            # add value to store from idmapper
+            if pulse.id() in idmapper:
+                for vl in idmapper[pulse.id()]:
+                    pulse.addValueToStore(vl)
         except:
             # TODO: do not forget to log it!
             parse_failures += 1
