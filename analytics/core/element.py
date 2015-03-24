@@ -6,7 +6,7 @@ from types import ListType
 from analytics.core.dataitem import DataItem
 from analytics.core.cluster import Cluster
 from analytics.core.attribute.feature import Feature
-from analytics.algorithms.rank import Rank
+from analytics.algorithms.rank import Rank, RSYS
 import analytics.utils.misc as misc
 
 
@@ -19,11 +19,11 @@ class Element(DataItem):
             _rank (Rank): rank of the element
             _features (dict<str, Pulse): list of features for element
     """
-    def __init__(self, name, desc, cluster=None, rank=None):
+    def __init__(self, name, desc, cluster=None, rank=RSYS.UND_RANK):
         if cluster is not None:
             misc.checkTypeAgainst(type(cluster), Cluster, __file__)
-        if rank is not None:
-            misc.checkTypeAgainst(type(rank), Rank, __file__)
+        # rank is always Rank instance
+        misc.checkTypeAgainst(type(rank), Rank, __file__)
         super(Element, self).__init__(name, desc)
         self._cluster = cluster
         self._rank = rank
@@ -48,6 +48,17 @@ class Element(DataItem):
                 Rank: rank
         """
         return self._rank
+
+    # [Public]
+    def setRank(self, rank):
+        """
+            Sets element rank.
+
+            Args:
+                rank (Rank): new rank
+        """
+        misc.checkTypeAgainst(type(rank), Rank, __file__)
+        self._rank = rank
 
     # [Public]
     def features(self):

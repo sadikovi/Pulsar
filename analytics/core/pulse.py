@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# import libs
+from types import IntType, FloatType
 # import classes
 from analytics.core.dataitem import DataItem
 from analytics.core.attribute.dynamic import Dynamic
@@ -176,3 +178,26 @@ class DynamicPulse(Pulse):
                 isstatic (bool): parameter to set static attribute
         """
         self._static = bool(isstatic)
+
+    # [Public]
+    def default(self):
+        """
+            Returns default value. Checks, if pulse is not static and None then
+            calculates default value as average.
+
+            Returns:
+                obj: default value
+        """
+        if self._default is None and not self.static():
+            if len(self._store) > 0:
+                n = len(self._store); s = sum(self._store)
+                if self._type is IntType:
+                    self._default = int(s*1.0 / n)
+                elif self._type is FloatType:
+                    self._default = int(s*100)*1.0 / 100*n
+            else:
+                self._default = None
+        elif self.static() and self._default is not None:
+            if self._default not in self._store:
+                self._default = None
+        return self._default

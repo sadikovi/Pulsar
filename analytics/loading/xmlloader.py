@@ -23,8 +23,23 @@ from types import StringType, DictType
 # import classes
 import analytics.loading.loader as l
 import analytics.utils.misc as misc
-from analytics.utils.constants import Const
 
+# constants for xml loader
+class Const(object):
+    pass
+
+# xml root
+Const.XML_ELEMENTS = "elements"
+# xml element
+Const.XML_ELEMENT = "element"
+# xml attribute
+Const.XML_ATTRIBUTE = "attr"
+Const.XML_ATTR_NAME = "name"
+Const.XML_ATTR_TYPE = "type"
+# data types
+Const.XML_TYPE_STRING = "str"
+Const.XML_TYPE_INT = "int"
+Const.XML_TYPE_FLOAT = "float"
 
 class XmlLoader(l.Loader):
     """

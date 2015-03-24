@@ -19,6 +19,7 @@ from analytics.core.element import Element
 from analytics.core.pulse import DynamicPulse, StaticPulse, Pulse
 from analytics.core.attribute.dynamic import Dynamic
 from analytics.core.attribute.feature import Feature
+from analytics.algorithms.rank import RSYS
 
 
 # some general input to test
@@ -77,7 +78,7 @@ class Processor_TestSequence(unittest.TestCase):
         self.assertEqual(elm.name(), self._elmobj["name"])
         self.assertEqual(elm.desc(), self._elmobj["desc"])
         self.assertEqual(elm.cluster(), None)
-        self.assertEqual(elm.rank(), None)
+        self.assertEqual(elm.rank(), RSYS.UND_RANK)
 
     def test_processor_pulseObject(self):
         for it in range(self._iterations):

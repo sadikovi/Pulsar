@@ -256,9 +256,8 @@ def _processElementObject(obj, idmapper={}):
     desc = obj["desc"]
     clid = obj["cluster"]
     cluster = idmapper[clid]["cluster"] if clid in idmapper else None
-    # leave rank as None
-    rank = None
-    element = Element(name, desc, cluster, rank)
+    # leave rank as default
+    element = Element(name, desc, cluster)
     # search features
     reserved = ["name", "desc", "cluster"]
     for key in obj.keys():

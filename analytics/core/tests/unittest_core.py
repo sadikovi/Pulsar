@@ -20,8 +20,8 @@ from analytics.core.pulse import Pulse, StaticPulse, DynamicPulse
 # some general input to test
 general_input = [
     None, True, False, sys.maxint, -sys.maxint-1, {}, [],
-    {"1": 1, "2": 2}, [1, 2, 3, 4, 5], "abc", 0, 1, -1, 1.23,
-    -3.34, " string ", " test test test ", "1"
+    {"1": 1, "2": 2}, [1, 2, 3, 4, 5], "abc", 0, 1, -1, 1.233,
+    -3.343, 0.23435, " string ", " test test test ", "1"
 ]
 
 
@@ -267,7 +267,7 @@ class Element_TestSequence(unittest.TestCase):
             if cluster is not None and type(cluster) is not Cluster:
                 with self.assertRaises(ex.AnalyticsCheckError):
                     el = Element(name, desc, cluster, r)
-            elif r is not None and type(r) is not rank.Rank:
+            elif type(r) is not rank.Rank:
                 with self.assertRaises(ex.AnalyticsCheckError):
                     el = Element(name, desc, cluster, r)
             else:
@@ -289,7 +289,7 @@ class Element_TestSequence(unittest.TestCase):
 
     def test_element_rank(self):
         for r in self._ranks:
-            if r is None or type(r) is rank.Rank:
+            if type(r) is rank.Rank:
                 el = Element(self._teststr, self._teststr, None, r)
                 self.assertEqual(el.rank(), r)
             else:
@@ -332,6 +332,10 @@ class Element_TestSequence(unittest.TestCase):
         for it in range(self._iterations):
             clr = random.choice(clusters)
             rnk = random.choice(ranks)
+            if rnk is None:
+                with self.assertRaises(ex.AnalyticsCheckError):
+                    el = Element(self._teststr, self._teststr, clr, rnk)
+                continue
             el = Element(self._teststr, self._teststr, clr, rnk)
             obj = el.getJSON()
             self.assertEqual(obj["cluster"], None if clr is None else clr.id())
@@ -426,7 +430,7 @@ class StaticPulse_TestSequence(unittest.TestCase):
 class DynamicPulse_TestSequence(unittest.TestCase):
     def setUp(self):
         self._iterations = 20
-        self._sample = 117
+        self._sample = 117.0
         self._prior = Dynamic.ForwardPriority
         self._teststr = "test string"
 
@@ -461,7 +465,18 @@ class DynamicPulse_TestSequence(unittest.TestCase):
         test_default = None
         for default in general_input:
             # must assign value without checking in the store
-            if default is None or type(default) == type(self._sample):
+            if default is None:
+                if pulse._store is not None:
+                    s = sum(pulse._store); n = len(pulse._store)
+                    if pulse._type is IntType:
+                        test_default = int(s*1.0/n)
+                    elif pulse._type is FloatType:
+                        test_default = int(s*100)*1.0/100*n
+                    else:
+                        test_default = None
+                else:
+                    test_default = None
+            elif type(default) == type(self._sample):
                 test_default = default
             pulse.setDefaultValue(default)
             self.assertEqual(pulse.default(), test_default)
@@ -484,6 +499,26 @@ class DynamicPulse_TestSequence(unittest.TestCase):
         self.assertEqual(pulse.static(), False)
         pulse.setStatic(1)
         self.assertEqual(pulse.static(), True)
+
+    def test_dynamicpulse_changeDefault(self):
+        # sample of data and maximum elements in range
+        sample = 1; max_el = 5
+        pulse = DynamicPulse(self._teststr, self._teststr,
+                                sample, self._prior, False)
+        self.assertEqual(pulse.default(), None)
+        for i in range(max_el):
+            pulse.addValueToStore(i)
+        default = int(sum(range(max_el))*1.0 / len(range(max_el)))
+        self.assertEqual(pulse.default(), default)
+        # set default that out of range
+        pulse.setDefaultValue(max_el*2)
+        self.assertEqual(pulse.default(), max_el*2)
+        # change static attribute to True
+        pulse.setStatic(True)
+        self.assertEqual(pulse.default(), None)
+        pulse.setStatic(False)
+        # after reseting to dynamic default value should not be None
+        self.assertEqual(pulse.default(), default)
 
 # Load test suites
 def _suites():
