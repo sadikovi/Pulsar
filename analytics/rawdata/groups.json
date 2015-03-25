@@ -1,6 +1,0 @@
-[
-    {"id": "super", "name": "super group name", "parent": null, "children": []},
-    {"id": "a", "name": "a group name", "parent": "super", "children": []},
-    {"id": "b", "name": "b group name", "parent": "super", "children": []},
-    {"id": "c", "name": "c group name", "parent": "super", "children": []}
-]

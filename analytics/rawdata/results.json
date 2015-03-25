@@ -1,7 +1,0 @@
-[
-    {"id": "A", "name": "A name", "desc": "A description", "group": "a", "value": 123, "price": 320, "bedrooms": 3, "bathrooms": 1},
-    {"id": "B", "name": "B name", "desc": "B description", "group": "b", "value": 122, "price": 350, "bedrooms": 2, "bathrooms": 1},
-    {"id": "C", "name": "C name", "desc": "C description", "group": "b", "value": 100, "price": 290, "bedrooms": 4, "bathrooms": 1},
-    {"id": "D", "name": "D name", "desc": "D description", "group": "c", "value": 200, "price": 400, "bedrooms": 2, "bathrooms": 2},
-    {"id": "E", "name": "E name", "desc": "E description", "group": "c", "value": 340, "price": 420, "bedrooms": 4, "bathrooms": 2}
-]
