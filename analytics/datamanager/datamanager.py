@@ -35,9 +35,9 @@ NAME = "name"
 DESC = "desc"
 DISCOVER = "discover"
 DATA = "data"
-DATA_Groups = "groups"
-DATA_Results = "results"
-DATA_Properties = "properties"
+DATA_CLU = "clusters"
+DATA_ELE = "elements"
+DATA_PUL = "pulses"
 FILE = "file"
 PATH = "path"
 TYPE = "type"
@@ -53,9 +53,9 @@ class Dataset(object):
             _name (str): dataset name
             _desc (str): dataset desc
             _discover (bool): dataset isDiscover property
-            _groups (dict<str, str>): groups information (path and type)
-            _results (dict<str, str>): results information (path and type)
-            _properties (dict<str, str>): properties information (path and type)
+            _clusters (dict<str, str>): clusters information (path and type)
+            _elements (dict<str, str>): elements information (path and type)
+            _pulses (dict<str, str>): pulses information (path and type)
     """
     def __init__(self, obj, dr):
         misc.checkTypeAgainst(type(obj), DictType, __file__)
@@ -67,28 +67,28 @@ class Dataset(object):
         # files data
         _data = obj[DATA]
         # path and type constants
-        # groups file name and type
-        _groups_filename = _data[DATA_Groups][FILE]
-        _groups_filetype = _data[DATA_Groups][TYPE]
-        self._groups = {
-            PATH: self._filepath(dr, _groups_filename, _groups_filetype),
-            TYPE: _groups_filetype
+        # clusters file name and type
+        _clusters_filename = _data[DATA_CLU][FILE]
+        _clusters_filetype = _data[DATA_CLU][TYPE]
+        self._clusters = {
+            PATH: self._filepath(dr, _clusters_filename, _clusters_filetype),
+            TYPE: _clusters_filetype
         }
-        # results file name and type
-        _results_filename = _data[DATA_Results][FILE]
-        _results_filetype = _data[DATA_Results][TYPE]
-        self._results = {
-            PATH: self._filepath(dr, _results_filename, _results_filetype),
-            TYPE: _results_filetype
+        # elements file name and type
+        _elements_filename = _data[DATA_ELE][FILE]
+        _elements_filetype = _data[DATA_ELE][TYPE]
+        self._elements = {
+            PATH: self._filepath(dr, _elements_filename, _elements_filetype),
+            TYPE: _elements_filetype
         }
-        self._properties = None
-        # if discover is False, specify properties
+        self._pulses = None
+        # if discover is False, specify pulses
         if not self._discover:
-            _prop_filename = _data[DATA_Properties][FILE]
-            _prop_filetype = _data[DATA_Properties][TYPE]
-            self._properties = {
-                PATH: self._filepath(dr, _prop_filename, _prop_filetype),
-                TYPE: _prop_filetype
+            _pulses_filename = _data[DATA_PUL][FILE]
+            _pulses_filetype = _data[DATA_PUL][TYPE]
+            self._pulses = {
+                PATH: self._filepath(dr, _pulses_filename, _pulses_filetype),
+                TYPE: _pulses_filetype
             }
 
     # [Public]
@@ -281,11 +281,11 @@ class DataManager(object):
         ds_stats = {}
         for ds in self._datasets.values():
             ds_stats[ds._id] = {}
-            ds_stats[ds._id]["groups"] = os.path.isfile(ds._groups[PATH])
-            ds_stats[ds._id]["results"] = os.path.isfile(ds._results[PATH])
+            ds_stats[ds._id][DATA_CLU] = os.path.isfile(ds._clusters[PATH])
+            ds_stats[ds._id][DATA_ELE] = os.path.isfile(ds._elements[PATH])
             if ds._discover:
                 continue
-            ds_stats[ds._id]["properties"] = os.path.isfile(ds._properties[PATH])
+            ds_stats[ds._id][DATA_PUL] = os.path.isfile(ds._pulses[PATH])
 
         # stats finished, report statistics
         return {"manifests": manifest_stats, "datasets": ds_stats}

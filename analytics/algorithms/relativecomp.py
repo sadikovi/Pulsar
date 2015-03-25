@@ -140,7 +140,7 @@ class RelativeComparison(Algorithm):
         misc.checkTypeAgainst(type(pulsemap), PulseMap, __file__)
         # retrieve only dynamic properties
         dyns = []
-        for p in pulseMap._map.values():
+        for p in pulsemap._map.values():
             if type(p) is DynamicPulse and not p.static() and p.default():
                 dyns.append(p)
         # call private method to select appropriate ranking scheme
@@ -195,7 +195,7 @@ class RelativeComparison(Algorithm):
                     values.append(None)
             hashkey = self._hashkeyForList(values)
             a[hashkey] = values
-            b[res.getId()] = hashkey
+            b[element.id()] = hashkey
         # rank map values by applying generic algorithm
         hashRank = self._computeRanks(a, _orders, _medians)
         # update ranks
@@ -230,7 +230,7 @@ class RelativeComparison(Algorithm):
 
             Args:
                 a (dict<str, list>): generic map with values and hashkeys
-                orders (list<int>): list of priority orders (see Const for more)
+                orders (list<int>): list of priority orders
                 medians (list<value>): list of median values
 
             Returns:
@@ -274,7 +274,7 @@ class RelativeComparison(Algorithm):
 
             Args:
                 rankedList (list<value>): list with values to rank
-                order (int): priority order of the values (see const for more)
+                order (int): priority order of the values
                 median (value): median (default) value
 
             Returns:
@@ -289,7 +289,7 @@ class RelativeComparison(Algorithm):
                 misc.raiseStandardError("Median is not in the list", __file__)
             # sort ranked list according to priority order
             # in the end we always get sorted array in increasing order
-            if order == Const.PRIORITY_DEC:
+            if order == Dynamic.ReversedPriority:
                 rankedList = sorted(rankedList, None, None, True)
                 # find median index
                 _median_i = rankedList.index(median)
@@ -323,7 +323,7 @@ class RelativeComparison(Algorithm):
             if negative is not None:
                 rankedList = [v + negative for v in rankedList]
             # reverse values back according to order
-            if order == Const.PRIORITY_DEC:
+            if order == Dynamic.ReversedPriority:
                 minel = rankedList[0]; maxel = rankedList[rln-1]
                 rankedList = [maxel+minel-v for v in rankedList]
             # map original values and ranks

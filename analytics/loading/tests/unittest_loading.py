@@ -29,14 +29,14 @@ import analytics.loading.xmlloader as xmll
 import analytics.exceptions.exceptions as c
 
 # Superclass for this tests sequence
-class Loading_TestsSequence(unittest.TestCase):
+class Loading_TestSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
-        self.jsonfile = os.path.join(paths.ANALYTICS_PATH, 'rawdata', 'groups.json')
-        self.xmlfile = os.path.join(paths.ANALYTICS_PATH, 'rawdata', 'groups.xml')
+        self.jsonfile = os.path.join(paths.ANALYTICS_PATH, 'rawdata', 'clusters.json')
+        self.xmlfile = os.path.join(paths.ANALYTICS_PATH, 'rawdata', 'clusters.xml')
 
 # JsonLoader tests
-class JsonLoader_TestsSequence(Loading_TestsSequence):
+class JsonLoader_TestSequence(Loading_TestSequence):
 
     def test_jsonloader_init(self):
         js = jsl.JsonLoader(self.jsonfile)
@@ -60,7 +60,7 @@ class JsonLoader_TestsSequence(Loading_TestsSequence):
         self.assertEqual(result[10]["parent"], "12")
 
 # XmlLoader tests
-class XmlLoader_TestsSequence(Loading_TestsSequence):
+class XmlLoader_TestSequence(Loading_TestSequence):
     def test_xmlloader_init(self):
         xml = xmll.XmlLoader(self.xmlfile)
         self.assertEqual(xml._filepath, self.xmlfile)
@@ -103,8 +103,8 @@ class XmlLoader_TestsSequence(Loading_TestsSequence):
 # Load test suites
 def _suites():
     return [
-        JsonLoader_TestsSequence,
-        XmlLoader_TestsSequence
+        JsonLoader_TestSequence,
+        XmlLoader_TestSequence
     ]
 
 # Load tests

@@ -1,9 +1,9 @@
 {
     "id": "123456_test",
     "data": {
-        "groups": { "file": "groups", "type": "json" },
-        "results": { "file": "results", "type": "json" },
-        "properties": { "file": "properties", "type": "json" }
+        "clusters": { "file": "clusters", "type": "json" },
+        "elements": { "file": "elements", "type": "json" },
+        "pulses": { "file": "pulses", "type": "json" }
     },
     "discover": true
 }
