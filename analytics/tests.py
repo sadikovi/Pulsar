@@ -37,12 +37,13 @@ _RUN_TESTS = {
     "relcomp_alg":      True,
     "query_engine":     True,
     "selector":         True,
-    "analyser":         False,
+    "analyser":         True,
     "datamanager":      True,
     "core_attribute":   True,
     "core":             True,
     "core_map":         True,
-    "core_processor":   True
+    "core_processor":   True,
+    "service":          True
 }
 
 def _checkTest(key):
@@ -139,6 +140,13 @@ def _collectSystemTests(suites):
         suites.addTest(unittest_core_processor.loadSuites())
     else:
         print "@skip: core processor tests"
+
+    # service
+    if _checkTest("service"):
+        import analytics.tests.unittest_service as unittest_service
+        suites.addTest(unittest_service.loadSuites())
+    else:
+        print "@skip: service tests"
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()

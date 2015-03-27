@@ -471,7 +471,7 @@ class DynamicPulse_TestSequence(unittest.TestCase):
                     if pulse._type is IntType:
                         test_default = int(s*1.0/n)
                     elif pulse._type is FloatType:
-                        test_default = int(s*100)*1.0/100*n
+                        test_default = int(s*100)*1.0/(100*n)
                     else:
                         test_default = None
                 else:
@@ -519,6 +519,21 @@ class DynamicPulse_TestSequence(unittest.TestCase):
         pulse.setStatic(False)
         # after reseting to dynamic default value should not be None
         self.assertEqual(pulse.default(), default)
+
+    def test_dynamicpulse_floatDefault(self):
+        elems = [320.0, 300.0, 199.0, 234.0, 250.0, 245.0, 230.0]
+        avg = sum(elems)*1.0 / len(elems)
+        # round average
+        avg = int(avg*100)*1.0 / 100
+        pulse = DynamicPulse(
+            self._teststr,
+            self._teststr,
+            elems[0],
+            self._prior
+        )
+        for elem in elems:
+            pulse.addValueToStore(elem)
+        self.assertEqual(pulse.default(), avg)
 
 # Load test suites
 def _suites():

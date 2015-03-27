@@ -21,11 +21,11 @@ limitations under the License.
 import json
 from types import StringType, UnicodeType
 # import classes
-import analytics.loading.loader as l
 import analytics.utils.misc as misc
+from analytics.loading.loader import Loader
 
 
-class JsonLoader(l.Loader):
+class JsonLoader(Loader):
     """
         JsonLoader class is a subclass of Loader that provides actual interface
         to load data from json file. It overrides methods @prepareDataFrom and

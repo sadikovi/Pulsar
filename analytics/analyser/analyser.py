@@ -24,6 +24,7 @@ class AnalyseBlock(object):
         self._data = {"map": algmap}
         self._isAnalysed = False
 
+
 # [Public]
 def analyseWithBlock(analyseBlock):
     """
@@ -74,7 +75,7 @@ def analyseUsingMap(algmap, elements, pulses, withDefault=True):
         if len(algmap.keys()) > 1:
             msg = "Few algorithms were specified, first one will be selected"
             warnings.warn(msg, UserWarning)
-        algorithm = _getAlgorithm(algmap.keys()[0])
+        algorithm = ALGORITMS.get(algmap.keys()[0])
     elif withDefault:
         msg = "Nothing was specified, default algorithm will be used"
         warnings.warn(msg, UserWarning)
@@ -87,7 +88,7 @@ def analyseUsingMap(algmap, elements, pulses, withDefault=True):
 
 
 # [Public]
-def analyseUsingAlgorithm(self, algorithm, elements, pulses):
+def analyseUsingAlgorithm(algorithm, elements, pulses):
     """
         Uses algorithm to rank elements. Calls "rankResults" method that is
         impolemented in abstract class Algorithm.
@@ -104,17 +105,3 @@ def analyseUsingAlgorithm(self, algorithm, elements, pulses):
     misc.checkInstanceAgainst(algorithm, Algorithm, __file__)
     # rank results using algorithm
     return algorithm.rankResults(elements, pulses)
-
-
-# [Private]
-def _getAlgorithm(algorithmId):
-    """
-        Returns algorithm for specified id, or None, if nothing was found.
-
-        Args:
-            algorithmId (str): id of the algorithm
-
-        Returns:
-            Algorithm: algorithm
-    """
-    return ALGORITMS.get(algorithmId)
