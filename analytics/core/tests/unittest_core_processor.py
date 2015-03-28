@@ -44,7 +44,7 @@ class Processor_TestSequence(unittest.TestCase):
             "id": "#1",
             "name": "#1",
             "desc": "#1",
-            "cluster": None,
+            "cluster": "#1",
             "dir": "up"
         }
         self._plsobj = {
@@ -166,6 +166,43 @@ class Processor_TestSequence(unittest.TestCase):
         self.assertEqual(block._isProcessed, True)
         self.assertEqual(
             len(block._clustermap._map.values()), len(clusters["data"])
+        )
+        self.assertEqual(
+            len(block._elementmap._map.values()), len(elements["data"])
+        )
+        self.assertEqual(
+            len(block._pulsemap._map.values()), len(pulses["data"])
+        )
+
+    def test_processor_processBlockUnknownCluster(self):
+        elmobjects = [
+            self._elmobj,
+            {
+                "id": "#2",
+                "name": "#2",
+                "desc": "#2",
+                "cluster": None,
+                "dir": "up"
+            }
+
+        ]
+        clusters = {"map": self._clustermap, "data": [self._clrobj]}
+        elements = {"map": self._elementmap, "data": elmobjects}
+        pulses = {"map": self._pulsemap, "data": [self._plsobj]}
+        # fill block
+        block = processor.ProcessBlock(clusters, elements, pulses)
+        self.assertEqual(block._clustermap, self._clustermap)
+        self.assertEqual(block._elementmap, self._elementmap)
+        self.assertEqual(block._pulsemap, self._pulsemap)
+        self.assertEqual(block._isProcessed, False)
+        # process block
+        block = processor.processWithBlock(block)
+        self.assertEqual(block._isProcessed, True)
+        self.assertEqual(
+            len(block._clustermap._map.values()), len(clusters["data"])+1
+        )
+        self.assertTrue(
+            processor.UNKNOWN_CLUSTER.id() in block._clustermap._map
         )
         self.assertEqual(
             len(block._elementmap._map.values()), len(elements["data"])

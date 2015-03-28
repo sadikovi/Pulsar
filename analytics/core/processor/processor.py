@@ -16,6 +16,10 @@ from analytics.core.attribute.dynamic import Dynamic
 from analytics.core.attribute.feature import Feature
 
 
+# unknown cluster for elements with parent = None
+UNKNOWN_CLUSTER = Cluster(None, "Unknown Cluster", "Unknown Cluster")
+
+
 class ProcessBlock(object):
     """
         Simple class to process maps in batch.
@@ -72,6 +76,8 @@ def processWithBlock(block):
         block._pulsemap,
         idmapper
     )
+    ## check if there is any None parents in elements
+    assignUnknownCluster(block._clustermap, block._elementmap)
     # block is processed
     block._isProcessed = True
     # return block
@@ -214,6 +220,24 @@ def parsePulses(objlist, pulsemap, idmapper={}):
         warnings.warn(msg, UserWarning)
     # return idmapper
     return idmapper
+
+
+### Checking elements for None parent
+def assignUnknownCluster(clustermap, elementmap):
+    """
+        Assigns unknown cluster to the element, if parent is None.
+
+        Args:
+            clustermap (ClusterMap): cluster map
+            elementmap (ElementMap): element map
+    """
+    misc.checkTypeAgainst(type(clustermap), ClusterMap, __file__)
+    misc.checkTypeAgainst(type(elementmap), ElementMap, __file__)
+    for element in elementmap._map.values():
+        if element.cluster() is None:
+            element._cluster = UNKNOWN_CLUSTER
+            if not clustermap.has(UNKNOWN_CLUSTER.id()):
+                clustermap.add(UNKNOWN_CLUSTER)
 
 
 ### Processing functions

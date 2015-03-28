@@ -124,6 +124,18 @@ class StaticPulse(Pulse):
         """
         return True
 
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json representation of the instance.
+
+            Returns:
+                dict<str, obj>: json representation of the instance
+        """
+        obj = super(StaticPulse, self).getJSON()
+        obj["isstatic"] = self.static()
+        return obj
+
 
 class DynamicPulse(Pulse):
     """
@@ -201,3 +213,15 @@ class DynamicPulse(Pulse):
             if self._default not in self._store:
                 self._default = None
         return self._default
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json representation of the instance.
+
+            Returns:
+                dict<str, obj>: json representation of the instance
+        """
+        obj = super(DynamicPulse, self).getJSON()
+        obj["isstatic"] = self.static()
+        return obj
