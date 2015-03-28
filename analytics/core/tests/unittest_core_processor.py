@@ -34,9 +34,25 @@ class Processor_TestSequence(unittest.TestCase):
         self._teststr = "test string"
         self._iterations = 20
         # object lists
-        self._clrobj = {"id": "#1", "name": "#1", "desc": "#1", "parent": None}
-        self._elmobj = {"id": "#1", "name": "#1", "desc": "#1", "cluster": None}
-        self._plsobj = {"id": "#1", "name": "#1", "desc": "#1", "sample": 1}
+        self._clrobj = {
+            "id": "#1",
+            "name": "#1",
+            "desc": "#1",
+            "parent": None
+        }
+        self._elmobj = {
+            "id": "#1",
+            "name": "#1",
+            "desc": "#1",
+            "cluster": None,
+            "dir": "up"
+        }
+        self._plsobj = {
+            "id": "#1",
+            "name": "#1",
+            "desc": "#1",
+            "sample": 1
+        }
         # maps
         self._clustermap = ClusterMap()
         self._elementmap = ElementMap()
@@ -124,7 +140,7 @@ class Processor_TestSequence(unittest.TestCase):
         self.assertEqual(len(self._elementmap._map), 1)
         exm = self._elementmap._map.values()[0]
         self.assertEqual(len(exm.features()), 1)
-        self.assertEqual(exm.features()[0].name(), "id")
+        self.assertEqual(exm.features()[0].name(), "dir")
 
     def test_processor_parsePulses(self):
         objlist = [self._plsobj, {}]

@@ -21,9 +21,9 @@ class ProcessBlock(object):
         Simple class to process maps in batch.
 
         Attributes:
-            _clu (ClusterMap): map of clusters
-            _pul (PulseMap): map of pulses
-            _ele (ElementMap): map of elements
+            _clustermap (ClusterMap): map of clusters
+            _pulsemap (PulseMap): map of pulses
+            _elementmap (ElementMap): map of elements
             _isProcessed (bool): flag to show that block is processed
     """
     def __init__(self, clusters, elements, pulses):
@@ -234,7 +234,7 @@ def _processClusterObject(obj, idmapper={}):
     name = obj["name"]
     desc = obj["desc"]
     paid = obj["parent"]
-    cluster = Cluster(name, desc)
+    cluster = Cluster(uuid, name, desc)
     # put data into idmapper
     idmapper[uuid] = {"cluster": cluster, "parent": paid}
     return cluster
@@ -252,14 +252,15 @@ def _processElementObject(obj, idmapper={}):
             Element: cluster instance from object
     """
     # extract object properties
+    uuid = obj["id"]
     name = obj["name"]
     desc = obj["desc"]
     clid = obj["cluster"]
     cluster = idmapper[clid]["cluster"] if clid in idmapper else None
     # leave rank as default
-    element = Element(name, desc, cluster)
+    element = Element(uuid, name, desc, cluster)
     # search features
-    reserved = ["name", "desc", "cluster"]
+    reserved = ["id", "name", "desc", "cluster"]
     for key in obj.keys():
         if key not in reserved:
             element.addFeature(Feature(key, key, obj[key]))

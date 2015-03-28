@@ -32,8 +32,8 @@ class DataItemMap_TestSequence(unittest.TestCase):
         self._prior = Dynamic.ForwardPriority
         self._items = [
             DataItem(self._teststr, self._teststr),
-            Cluster(self._teststr, self._teststr),
-            Element(self._teststr, self._teststr),
+            Cluster(None, self._teststr, self._teststr),
+            Element(None, self._teststr, self._teststr),
             Pulse("#1", self._teststr, self._sample),
             StaticPulse("#2", self._teststr, self._sample),
             DynamicPulse("#3", self._teststr, self._sample, self._prior)
@@ -87,13 +87,13 @@ class DataItemMap_TestSequence(unittest.TestCase):
 
 class ClusterMap_TestSequence(unittest.TestCase):
     def _clusters_root_normal(self, num):
-        return [Cluster(i, i) for i in range(num)]
+        return [Cluster(None, i, i) for i in range(num)]
 
     def _clusters_root_unknown_parent(self, num):
-        return [Cluster(i, i, Cluster(i+1, i+1)) for i in range(num)]
+        return [Cluster(None, i, i, Cluster(None, i+1, i+1)) for i in range(num)]
 
     def _clusters_tree_normal(self, num):
-        ls = [Cluster(i, i) for i in range(num)]
+        ls = [Cluster(i, i, i) for i in range(num)]
         map = {}
         for _i in range(len(ls)):
             if 2*_i+1 < len(ls):
@@ -110,7 +110,7 @@ class ClusterMap_TestSequence(unittest.TestCase):
         return lsrev
 
     def _clusters_chain_normal(self, num):
-        ls = [Cluster(i, i) for i in range(num)]
+        ls = [Cluster(None, i, i) for i in range(num)]
         parent = None
         for cluster in ls:
             cluster.setParent(parent)
@@ -118,7 +118,7 @@ class ClusterMap_TestSequence(unittest.TestCase):
         return ls
 
     def _clusters_chain_reversed(self, num):
-        ls = [Cluster(i, i) for i in range(num)]
+        ls = [Cluster(None, i, i) for i in range(num)]
         def parent(_i):
             if len(ls) <= _i: return None
             ls[_i].setParent(parent(_i+1))
@@ -295,8 +295,8 @@ class ElementMap_TestSequence(unittest.TestCase):
         self._prior = Dynamic.ForwardPriority
         self._items = [
             DataItem(self._teststr, self._teststr),
-            Cluster(self._teststr, self._teststr),
-            Element(self._teststr, self._teststr),
+            Cluster(None, self._teststr, self._teststr),
+            Element(None, self._teststr, self._teststr),
             Pulse("#1", self._teststr, self._sample),
             StaticPulse("#2", self._teststr, self._sample),
             DynamicPulse("#3", self._teststr, self._sample, self._prior)
@@ -321,8 +321,8 @@ class PulseMap_TestSequence(unittest.TestCase):
         self._prior = Dynamic.ForwardPriority
         self._items = [
             DataItem(self._teststr, self._teststr),
-            Cluster(self._teststr, self._teststr),
-            Element(self._teststr, self._teststr),
+            Cluster(None, self._teststr, self._teststr),
+            Element(None, self._teststr, self._teststr),
             Pulse("#1", self._teststr, self._sample),
             StaticPulse("#2", self._teststr, self._sample),
             DynamicPulse("#3", self._teststr, self._sample, self._prior)

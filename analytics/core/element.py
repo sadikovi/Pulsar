@@ -19,12 +19,12 @@ class Element(DataItem):
             _rank (Rank): rank of the element
             _features (dict<str, Pulse): list of features for element
     """
-    def __init__(self, name, desc, cluster=None, rank=RSYS.UND_RANK):
+    def __init__(self, id, name, desc, cluster=None, rank=RSYS.UND_RANK):
         if cluster is not None:
             misc.checkTypeAgainst(type(cluster), Cluster, __file__)
         # rank is always Rank instance
         misc.checkTypeAgainst(type(rank), Rank, __file__)
-        super(Element, self).__init__(name, desc)
+        super(Element, self).__init__(name, desc, id)
         self._cluster = cluster
         self._rank = rank
         self._features = {}

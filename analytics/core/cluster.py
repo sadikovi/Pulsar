@@ -16,11 +16,11 @@ class Cluster(DataItem):
             _parent (Cluster): parent cluster
             _children (dict<str, Cluster>): map of child clusters
     """
-    def __init__(self, name, desc, parent=None):
+    def __init__(self, id, name, desc, parent=None):
         # make sure that parent is a Cluster instance
         if parent is not None:
             misc.checkTypeAgainst(type(parent), Cluster, __file__)
-        super(Cluster, self).__init__(name, desc)
+        super(Cluster, self).__init__(name, desc, id)
         self._parent = parent
         self._children = {}
 

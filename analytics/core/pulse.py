@@ -86,7 +86,7 @@ class Pulse(DataItem):
                 dict<str, obj>: json representation of the instance
         """
         obj = super(Pulse, self).getJSON()
-        obj["type"] = self._type
+        obj["type"] = self._type.__name__
         obj["default"] = self.default()
         return obj
 
@@ -194,7 +194,7 @@ class DynamicPulse(Pulse):
                 if self._type is IntType:
                     self._default = int(s*1.0 / n)
                 elif self._type is FloatType:
-                    self._default = int(s*100)*1.0 / (100*n)
+                    self._default = round(s*1.0 / n, 2)
             else:
                 self._default = None
         elif self.static() and self._default is not None:

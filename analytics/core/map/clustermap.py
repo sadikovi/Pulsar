@@ -125,6 +125,7 @@ class ClusterMap(DataItemMap):
         """
         return self._map[id] if id in self._map else default
 
+    # [Public]
     def has(self, id):
         """
             Returns True if element with id exists, otherwise False.
@@ -136,3 +137,13 @@ class ClusterMap(DataItemMap):
                 bool: indicator whether element is in map
         """
         return id in self._map
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json representation of the map.
+
+            Returns:
+                list<obj>: json object
+        """
+        return [x.getJSON() for x in self._root.values()]

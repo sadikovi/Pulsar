@@ -62,3 +62,13 @@ class DataItemMap(object):
         # id is always string
         id = str(id)
         return id in self._map
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json representation of the map.
+
+            Returns:
+                list<obj>: json object
+        """
+        return [x.getJSON() for x in self._map.values()]

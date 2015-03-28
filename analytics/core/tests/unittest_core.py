@@ -90,7 +90,7 @@ class Cluster_TestSequence(unittest.TestCase):
         self._teststr = "test string"
         self._parentSeq = [
             None,
-            Cluster(self._teststr, self._teststr),
+            Cluster(None, self._teststr, self._teststr),
             DataItem(self._teststr, self._teststr)
         ]
 
@@ -99,15 +99,17 @@ class Cluster_TestSequence(unittest.TestCase):
         for it in range(self._iterations):
             for parent in self._parentSeq:
                 # generate random attributes
+                id = str(random.choice(general_input)).strip()
                 name = random.choice(general_input)
                 desc = random.choice(general_input)
                 seed = random.choice(general_input)
                 # create and test cluster
                 if parent is not None and type(parent) is not Cluster:
                     with self.assertRaises(ex.AnalyticsCheckError):
-                        d = Cluster(name, desc, parent)
+                        d = Cluster(id, name, desc, parent)
                 else:
-                    d = Cluster(name, desc, parent)
+                    d = Cluster(id, name, desc, parent)
+                    self.assertEqual(d._id, misc.generateId(id))
                     self.assertEqual(d._name, str(name).strip())
                     self.assertEqual(d._desc, str(desc).strip())
                     self.assertEqual(d._parent, parent)
@@ -115,36 +117,43 @@ class Cluster_TestSequence(unittest.TestCase):
 
     def test_cluster_initUniqueId(self):
         for it in range(self._iterations):
+            # as random input can be None, id will be random
+            id = str(random.choice(general_input)).strip()
             name = random.choice(general_input)
             desc = random.choice(general_input)
-            cl1 = Cluster(name, desc)
-            cl2 = Cluster(name, desc)
-            # check that they have different ids
-            self.assertNotEqual(cl1.id(), cl2.id())
+            cl1 = Cluster(id, name, desc)
+            cl2 = Cluster(id, name, desc)
+            # check that they have the same ids
+            self.assertEqual(cl1.id(), cl2.id())
 
     def test_cluster_parent(self):
         for parent in self._parentSeq:
             if parent is None or type(parent) is Cluster:
-                d = Cluster(self._teststr, self._teststr, parent)
+                d = Cluster(self._teststr, self._teststr, self._teststr, parent)
                 self.assertEqual(d.parent(), parent)
             else:
                 with self.assertRaises(ex.AnalyticsCheckError):
-                    d = Cluster(self._teststr, self._teststr, parent)
+                    d = Cluster(
+                        self._teststr,
+                        self._teststr,
+                        self._teststr,
+                        parent
+                    )
 
     def test_cluster_children(self):
         # quite simple test
-        d = Cluster(self._teststr, self._teststr)
+        d = Cluster(self._teststr, self._teststr, self._teststr)
         self.assertEqual(type(d.children()), ListType)
         self.assertEqual(d.children(), [])
 
     def test_cluster_isLeaf(self):
         # quite simple test
-        d = Cluster(self._teststr, self._teststr)
+        d = Cluster(self._teststr, self._teststr, self._teststr)
         self.assertEqual(d.isLeaf(), True)
 
     def test_cluster_setParent(self):
         for parent in self._parentSeq:
-            d = Cluster(self._teststr, self._teststr)
+            d = Cluster(self._teststr, self._teststr, self._teststr)
             self.assertEqual(d.parent(), None)
             if parent is None or type(parent) is Cluster:
                 d.setParent(parent)
@@ -155,7 +164,7 @@ class Cluster_TestSequence(unittest.TestCase):
 
     def test_cluster_makeLeaf(self):
         # create cluster
-        d = Cluster(self._teststr, self._teststr)
+        d = Cluster(self._teststr, self._teststr, self._teststr)
         # check leaf
         self.assertEqual(d.isLeaf(), True)
         # assign some info
@@ -168,14 +177,14 @@ class Cluster_TestSequence(unittest.TestCase):
 
     def test_cluster_addChild(self):
         # create parent cluster and child cluster
-        parent = Cluster(self._teststr, self._teststr)
+        parent = Cluster(self._teststr, self._teststr, self._teststr)
         for it in range(self._iterations):
             name = random.choice(general_input)
             desc = random.choice(general_input)
             children = [
                 None,
                 parent,
-                Cluster(name, desc),
+                Cluster(None, name, desc),
                 DataItem(name, desc)
             ]
             for child in children:
@@ -192,7 +201,7 @@ class Cluster_TestSequence(unittest.TestCase):
         self.assertEqual(len(parent.children()), num)
 
     def test_cluster_removeChild(self):
-        parent = Cluster(self._teststr, self._teststr)
+        parent = Cluster(self._teststr, self._teststr, self._teststr)
         for it in range(self._iterations):
             name = random.choice(general_input)
             desc = random.choice(general_input)
@@ -200,7 +209,7 @@ class Cluster_TestSequence(unittest.TestCase):
             children = [
                 None,
                 parent,
-                Cluster(name, desc),
+                Cluster(None, name, desc),
                 DataItem(name, desc)
             ]
             for child in children:
@@ -219,11 +228,17 @@ class Cluster_TestSequence(unittest.TestCase):
 
     def test_cluster_getJSON(self):
         for it in range(self._iterations):
+            id = random.choice(general_input)
             name = random.choice(general_input)
             desc = random.choice(general_input)
-            parents = [None, Cluster(name, desc)]
+            parents = [None, Cluster(id, name, desc)]
             for parent in parents:
-                cl = Cluster(self._teststr, self._teststr, parent)
+                cl = Cluster(
+                    self._teststr,
+                    self._teststr,
+                    self._teststr,
+                    parent
+                )
                 obj = cl.getJSON()
                 pid = None if parent is None else parent.id()
                 self.assertEqual(obj["id"], cl.id())
@@ -240,7 +255,7 @@ class Element_TestSequence(unittest.TestCase):
         self._teststr = "test string"
         self._clusters = [
             None,
-            Cluster(self._teststr, self._teststr),
+            Cluster(self._teststr, self._teststr, self._teststr),
             DataItem(self._teststr, self._teststr),
             sys.maxint,
             -sys.maxint-1
@@ -260,18 +275,20 @@ class Element_TestSequence(unittest.TestCase):
 
     def test_element_init(self):
         for it in range(self._iterations):
+            id = str(random.choice(general_input)).strip()
             name = random.choice(general_input)
             desc = random.choice(general_input)
             cluster = random.choice(self._clusters)
             r = random.choice(self._ranks)
             if cluster is not None and type(cluster) is not Cluster:
                 with self.assertRaises(ex.AnalyticsCheckError):
-                    el = Element(name, desc, cluster, r)
+                    el = Element(id, name, desc, cluster, r)
             elif type(r) is not rank.Rank:
                 with self.assertRaises(ex.AnalyticsCheckError):
-                    el = Element(name, desc, cluster, r)
+                    el = Element(id, name, desc, cluster, r)
             else:
-                el = Element(name, desc, cluster, r)
+                el = Element(id, name, desc, cluster, r)
+                self.assertEqual(el.id(), misc.generateId(id))
                 self.assertEqual(el.name(), str(name).strip())
                 self.assertEqual(el.desc(), str(desc).strip())
                 self.assertEqual(el._cluster, cluster)
@@ -281,27 +298,27 @@ class Element_TestSequence(unittest.TestCase):
     def test_element_cluster(self):
         for cluster in self._clusters:
             if cluster is None or type(cluster) is Cluster:
-                el = Element(self._teststr, self._teststr, cluster)
+                el = Element(None, self._teststr, self._teststr, cluster)
                 self.assertEqual(el.cluster(), cluster)
             else:
                 with self.assertRaises(ex.AnalyticsCheckError):
-                    el = Element(self._teststr, self._teststr, cluster)
+                    el = Element(None, self._teststr, self._teststr, cluster)
 
     def test_element_rank(self):
         for r in self._ranks:
             if type(r) is rank.Rank:
-                el = Element(self._teststr, self._teststr, None, r)
+                el = Element(None, self._teststr, self._teststr, None, r)
                 self.assertEqual(el.rank(), r)
             else:
                 with self.assertRaises(ex.AnalyticsCheckError):
-                    el = Element(self._teststr, self._teststr, None, r)
+                    el = Element(None, self._teststr, self._teststr, None, r)
 
     def test_element_features(self):
-        el = Element(self._teststr, self._teststr)
+        el = Element(None, self._teststr, self._teststr)
         self.assertEqual(el.features(), [])
 
     def test_element_addFeature(self):
-        el = Element(self._teststr, self._teststr)
+        el = Element(None, self._teststr, self._teststr)
         for feature in self._features:
             if type(feature) is Feature:
                 el.addFeature(feature)
@@ -311,7 +328,7 @@ class Element_TestSequence(unittest.TestCase):
                     el.addFeature(feature)
 
     def test_element_addFeatures(self):
-        el = Element(self._teststr, self._teststr)
+        el = Element(None, self._teststr, self._teststr)
         with self.assertRaises(ex.AnalyticsCheckError):
             el.addFeatures(self._features)
         # create new list of features
@@ -327,16 +344,16 @@ class Element_TestSequence(unittest.TestCase):
 
     def test_element_getJSON(self):
         # initialise clusers and ranks
-        clusters = [None, Cluster(self._teststr, self._teststr)]
+        clusters = [None, Cluster(None, self._teststr, self._teststr)]
         ranks = [None, rank.RSYS.UND_RANK]
         for it in range(self._iterations):
             clr = random.choice(clusters)
             rnk = random.choice(ranks)
             if rnk is None:
                 with self.assertRaises(ex.AnalyticsCheckError):
-                    el = Element(self._teststr, self._teststr, clr, rnk)
+                    el = Element(None, self._teststr, self._teststr, clr, rnk)
                 continue
-            el = Element(self._teststr, self._teststr, clr, rnk)
+            el = Element(None, self._teststr, self._teststr, clr, rnk)
             obj = el.getJSON()
             self.assertEqual(obj["cluster"], None if clr is None else clr.id())
             self.assertEqual(obj["rank"], None if rnk is None else rnk.getJSON())
@@ -393,7 +410,7 @@ class Pulse_TestSequence(unittest.TestCase):
         for sample in general_input:
             pulse = Pulse(self._teststr, self._teststr, sample)
             obj = pulse.getJSON()
-            self.assertEqual(obj["type"], pulse.type())
+            self.assertEqual(obj["type"], pulse.type().__name__)
             self.assertEqual(obj["default"], pulse.default())
 
     def test_pulse_static(self):
@@ -471,7 +488,7 @@ class DynamicPulse_TestSequence(unittest.TestCase):
                     if pulse._type is IntType:
                         test_default = int(s*1.0/n)
                     elif pulse._type is FloatType:
-                        test_default = int(s*100)*1.0/(100*n)
+                        test_default = round(s*1.0/n, 2)
                     else:
                         test_default = None
                 else:
