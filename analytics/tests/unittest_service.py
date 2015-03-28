@@ -54,7 +54,7 @@ class Service_TestSequence(unittest.TestCase):
 
     def test_service_generateErrorMessage(self):
         messages = ["test"]
-        code = 400
+        code = 401
         jsonstr = service._generateErrorMessage(messages, code)
         obj = json.loads(jsonstr)
         self.assertEqual(type(obj), DictType)

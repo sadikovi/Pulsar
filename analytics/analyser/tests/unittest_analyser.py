@@ -65,7 +65,7 @@ class Analyser_TestSequence(unittest.TestCase):
     def test_analyser_analyseWithErrors(self):
         # algorithms
         algorithms = AlgorithmsMap()
-        for alg in analyser.ALGORITMS.values():
+        for alg in analyser.ALGORITHMS.values():
             algorithms.assign(alg)
         # run analyser
         with self.assertRaises(ex.AnalyticsTypeError):
@@ -94,7 +94,7 @@ class Analyser_TestSequence(unittest.TestCase):
     def test_analyser_analyseDynamic(self):
         # algorithms
         algorithms = AlgorithmsMap()
-        for alg in analyser.ALGORITMS.values():
+        for alg in analyser.ALGORITHMS.values():
             algorithms.assign(alg)
         # analyse results
         block = analyser.AnalyseBlock(algorithms, self.elements, self.pulses)
@@ -120,7 +120,7 @@ class Analyser_TestSequence(unittest.TestCase):
     def test_analyser_analyseStatic(self):
         # algorithms
         algorithms = AlgorithmsMap()
-        for alg in analyser.ALGORITMS.values():
+        for alg in analyser.ALGORITHMS.values():
             algorithms.assign(alg)
         # set all properties as static
         for pulse in self.pulses._map.values():

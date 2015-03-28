@@ -1,0 +1,11 @@
+{
+    "id": "integration_test1",
+    "name": "Integration test 1",
+    "desc": "Integration test 1",
+    "data": {
+        "clusters": { "file": "clusters", "type": "json" },
+        "elements": { "file": "elements", "type": "json" },
+        "pulses":   { "file": "pulses", "type": "json" }
+    },
+    "discover": false
+}

@@ -10,10 +10,10 @@ from analytics.algorithms.relativecomp import RelativeComparison
 import analytics.utils.misc as misc
 
 # static algorithms map
-ALGORITMS = AlgorithmsMap()
+ALGORITHMS = AlgorithmsMap()
 DEFAULT_ALGORITHM = RelativeComparison()
 # add algorithms to the map
-ALGORITMS.assign(DEFAULT_ALGORITHM)
+ALGORITHMS.assign(DEFAULT_ALGORITHM)
 
 
 class AnalyseBlock(object):
@@ -75,7 +75,7 @@ def analyseUsingMap(algmap, elements, pulses, withDefault=True):
         if len(algmap.keys()) > 1:
             msg = "Few algorithms were specified, first one will be selected"
             warnings.warn(msg, UserWarning)
-        algorithm = ALGORITMS.get(algmap.keys()[0])
+        algorithm = ALGORITHMS.get(algmap.keys()[0])
     elif withDefault:
         msg = "Nothing was specified, default algorithm will be used"
         warnings.warn(msg, UserWarning)

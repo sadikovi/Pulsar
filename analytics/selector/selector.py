@@ -208,7 +208,8 @@ def filterClusters(queryblock, clustermap):
     # filter clusters
     updatedmap = ClusterMap()
     for key in clusters:
-        updatedmap.add(clustermap.get(key))
+        if not updatedmap.has(key):
+            updatedmap.add(clustermap.get(key))
     # return updated cluster map
     return updatedmap
 

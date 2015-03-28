@@ -43,7 +43,8 @@ _RUN_TESTS = {
     "core":             True,
     "core_map":         True,
     "core_processor":   True,
-    "service":          True
+    "service":          True,
+    "integration":      True
 }
 
 def _checkTest(key):
@@ -147,6 +148,13 @@ def _collectSystemTests(suites):
         suites.addTest(unittest_service.loadSuites())
     else:
         print "@skip: service tests"
+
+    # integration tests
+    if _checkTest("integration"):
+        import analytics.tests.integrationtest_service as integrationtest_service
+        suites.addTest(integrationtest_service.loadSuites())
+    else:
+        print "@skip: integration tests"
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()

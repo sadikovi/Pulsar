@@ -21,14 +21,22 @@ limitations under the License.
 import json
 from types import StringType, ListType
 import os
+import warnings
 # import classes
 import analytics.exceptions.exceptions as ex
 import analytics.utils.misc as misc
 import projectpaths as paths
 import analytics.datamanager.datamanager as datamanager
+import analytics.core.processor.processor as processor
+import analytics.selector.selector as selector
+import analytics.analyser.analyser as analyser
 from analytics.loading.loader import Loader
 from analytics.loading.jsonloader import JsonLoader
 from analytics.loading.xmlloader import XmlLoader
+from analytics.core.map.clustermap import ClusterMap
+from analytics.core.map.elementmap import ElementMap
+from analytics.core.map.pulsemap import PulseMap
+from analytics.algorithms.algorithmsmap import AlgorithmsMap
 
 
 # Authorised email list
@@ -75,7 +83,7 @@ def getAllDatasets():
 
 
 # [Public]
-def requestData(datasetId, query):
+def requestData(datasetId, query, dmngr=None):
     """
         Public method to request data, has error handling. Returns data json,
         if everything is okay, otherwise returns error json.
@@ -83,32 +91,111 @@ def requestData(datasetId, query):
         Args:
             datasetId (str): id of a particular dataset
             query (str): select query for data
+            dmngr (DataManager): hook to pass own datamanager for tests
 
         Returns:
             str: json string of results
     """
     jsonstring = ""
     try:
-        # check arguments
-        misc.checkTypeAgainst(type(datasetId), StringType, __file__)
-        misc.checkTypeAgainst(type(query), StringType, __file__)
-        # trim arguments
-        datasetId = datasetId.strip(); query = query.strip();
-        # find that ther is actual dataset stored
-        dataset = _datamanager.getDataset(datasetId)
-        # check dataset
-        if dataset is None:
-            # no datasets - error
-            misc.raiseStandardError("No such dataset", __file__)
-        # everything is okay
-        # extract dataset and get path
-        """
-        jsonobj = _requestData(dataset, query)
-        jsonstring = _generateSuccessMessage(jsonobj)
-        """
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            # retrieve object
+            obj = _getDataObject(datasetId, query, dmngr)
+            jsonstring = _generateSuccessMessage(
+                [str(wm.message) for wm in w],
+                obj
+            )
     except ex.AnalyticsBaseException as e:
-        jsonstring = _generateErrorMessage(e._errmsg)
+        jsonstring = _generateErrorMessage([e._errmsg])
     return jsonstring
+
+
+# [Private]
+def _getDataObject(datasetId, queryset, dmngr=None):
+    """
+        Returns data object for dataset id and queryset.
+
+        Args:
+            datasetId (str): dataset id
+            queryset (str): query string
+            dmngr (DataManager): hook to pass own datamanager for tests
+
+        Returns:
+            dict<str, obj>: object with clusters, elements, pulses, algorithm
+    """
+    # check arguments
+    misc.checkTypeAgainst(type(datasetId), StringType, __file__)
+    misc.checkTypeAgainst(type(queryset), StringType, __file__)
+    # trim arguments
+    datasetId = datasetId.strip(); queryset = queryset.strip();
+    # find that ther is actual dataset stored
+    if dmngr is None:
+        dmngr = _datamanager
+    dataset = dmngr.getDataset(datasetId)
+    # check dataset
+    if dataset is None:
+        # no datasets - error
+        misc.raiseStandardError("No such dataset", __file__)
+    # everything is okay
+    ## extract information about core elements
+    cludata = dataset._clusters
+    eledata = dataset._elements
+    puldata = dataset._pulses
+    ## clusters list
+    clusters = _loaderForDatatype(
+        cludata[datamanager.TYPE],
+        cludata[datamanager.PATH]
+    ).processData()
+    ## elements list
+    elements = _loaderForDatatype(
+        eledata[datamanager.TYPE],
+        eledata[datamanager.PATH]
+    ).processData()
+    ## pulses list
+    pulses = _loaderForDatatype(
+        puldata[datamanager.TYPE],
+        puldata[datamanager.PATH]
+    ).processData()
+    # create maps
+    clustermap = ClusterMap()
+    elementmap = ElementMap()
+    pulsemap = PulseMap()
+    # create process block and call processor
+    pblock = processor.ProcessBlock(
+        {"map": clustermap, "data": clusters},
+        {"map": elementmap, "data": elements},
+        {"map": pulsemap, "data": pulses}
+    )
+    pblock = processor.processWithBlock(pblock)
+
+    # create filter block and call selector
+    algmap = AlgorithmsMap()
+    for alg in analyser.ALGORITHMS.values():
+        algmap.assign(alg)
+    fblock = selector.FilterBlock(
+        algmap,
+        pblock._pulsemap,
+        pblock._clustermap,
+        pblock._elementmap
+    )
+    fblock = selector.filterWithBlock(queryset, fblock)
+    # create analyse block and call analyser
+    ablock = analyser.AnalyseBlock(fblock._alg, fblock._ele, fblock._pul)
+    ablock = analyser.analyseWithBlock(ablock)
+    # reassign updated maps
+    clustermap = fblock._clu
+    elementmap = ablock._elementmap
+    pulsemap = fblock._pul
+    algorithm = ablock._algorithm
+    # extract json object from maps and send success message
+    obj = {
+        "clusters": clustermap.getJSON(),
+        "elements": elementmap.getJSON(),
+        "pulses": pulsemap.getJSON(),
+        "algorithm": algorithm.getJSON()
+    }
+    return obj
 
 
 # [Private]
