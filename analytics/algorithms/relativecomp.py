@@ -98,9 +98,16 @@ class _RelComp(object):
 
     @staticmethod
     def da(array):
-        if len(array) < 2:
-            msg = "Array must have at least 2 elements"
+        # 28.03.2015: ivan sadikov - if array length == 1 we return 1
+        #   fixes problem when all values are equal
+        #   though we still raise error if array is empty
+        if len(array) == 0:
+            msg = "Array must have at least 1 element"
             misc.raiseStandardError(msg, __file__)
+        elif len(array) == 1:
+            #msg = "Array must have at least 2 elements"
+            #misc.raiseStandardError(msg, __file__)
+            return 1.0
         dai = 0; _i = 0
         for _i in range(1, len(array)):
             dai += math.fabs(array[_i] - array[_i-1])
@@ -138,10 +145,16 @@ class RelativeComparison(Algorithm):
         # check that maps have the right types
         misc.checkTypeAgainst(type(elementmap), ElementMap, __file__)
         misc.checkTypeAgainst(type(pulsemap), PulseMap, __file__)
+        # if dynamic pulses are more than constant then select first two
+        pulses = pulsemap._map.values()
         # retrieve only dynamic properties
         dyns = []
-        for p in pulsemap._map.values():
+        for p in pulses:
             if type(p) is DynamicPulse and not p.static() and p.default():
+                if len(dyns)+1 > MAX_DYNAMIC_PROPS:
+                    msg = "Hey, too many dynamic pulses"
+                    warnings.warn(msg, UserWarning)
+                    break
                 dyns.append(p)
         # call private method to select appropriate ranking scheme
         return self._rank(elementmap, dyns)
@@ -165,9 +178,7 @@ class RelativeComparison(Algorithm):
             return elementmap
         # if length of dyns more than constant then we warn and select first two
         elif m > MAX_DYNAMIC_PROPS:
-            dynamics = dynamics[:MAX_DYNAMIC_PROPS]
-            msg = "Hey, too many dynamic properties"
-            warnings.warn(msg, UserWarning)
+            misc.raiseStandardError("Too many dynamic pulses", __file__)
         # we are clear, start ranking results
         # compute hash and store values into a, store id and hash into b
         a = {}; b = {}; _medians = []; _orders = []
