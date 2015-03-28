@@ -149,13 +149,17 @@ class RelativeComparison(Algorithm):
         pulses = pulsemap._map.values()
         # retrieve only dynamic properties
         dyns = []
+        exceedsMax = False
         for p in pulses:
             if type(p) is DynamicPulse and not p.static() and p.default():
                 if len(dyns)+1 > MAX_DYNAMIC_PROPS:
-                    msg = "Hey, too many dynamic pulses"
-                    warnings.warn(msg, UserWarning)
-                    break
-                dyns.append(p)
+                    exceedsMax = True
+                    p.setStatic(True)
+                else:
+                    dyns.append(p)
+        if exceedsMax:
+            msg = "Hey, too many dynamic pulses"
+            warnings.warn(msg, UserWarning)
         # call private method to select appropriate ranking scheme
         return self._rank(elementmap, dyns)
 

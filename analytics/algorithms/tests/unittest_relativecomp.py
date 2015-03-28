@@ -80,9 +80,10 @@ class RelComp_TestSequence(unittest.TestCase):
         a = []
         with self.assertRaises(ex.AnalyticsStandardError):
             rc._RelComp.da(a)
+        # 28.03.2015: ivan sadikov - changed test according to modification
+        #   [array len == 1]
         a = [random.randrange(0, 100)]
-        with self.assertRaises(ex.AnalyticsStandardError):
-            rc._RelComp.da(a)
+        self.assertEqual(rc._RelComp.da(a), 1.0)
         for _i in range(10):
             a = [random.randrange(0, 100) for i in range(10)]
             a = sorted(a)
