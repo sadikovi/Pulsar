@@ -1,7 +1,9 @@
 {
-    "id": "123456_test",
+    "id": "raw",
+    "name": "Raw dataset",
+    "desc": "Raw dataset",
     "data": {
-        "clusters": { "file": "clusters", "type": "json" },
+        "clusters": { "file": "clusters", "type": "xml" },
         "elements": { "file": "elements", "type": "json" },
         "pulses": { "file": "pulses", "type": "json" }
     },

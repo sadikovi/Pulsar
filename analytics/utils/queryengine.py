@@ -446,6 +446,7 @@ class QueryPredicate(object):
             # parse raw value based on type and value type
             if ptype == _PREDICATE_TYPES.EQUAL:
                 if vtype == _PREDICATE_VTYPES.NUMBER:
+                    raw = float(raw) if '.' in raw else int(raw)
                     values = tuple([raw])
                 else:
                     values = tuple([cls._stringToValue(raw)])
@@ -454,7 +455,13 @@ class QueryPredicate(object):
             elif ptype == _PREDICATE_TYPES.RANGE:
                 rawTuple = raw.split(_PREDICATE_KW_AND)
                 if vtype == _PREDICATE_VTYPES.NUMBER:
-                    values = tuple([x.strip() for x in rawTuple])
+                    rawTuple = [x.strip() for x in rawTuple]
+                    for i in range(len(rawTuple)):
+                        if '.' in rawTuple[i]:
+                            rawTuple[i] = float(rawTuple[i])
+                        else:
+                            rawTuple[i] = int(rawTuple[i])
+                    values = tuple(rawTuple)
                 else:
                     values = tuple([cls._stringToValue(x) for x in rawTuple])
         # return predicate instance

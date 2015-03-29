@@ -19,22 +19,20 @@ limitations under the License.
 
 # import libs
 import unittest
+import warnings
 import random
 # import classes
 import analytics.exceptions.exceptions as ex
 import analytics.algorithms.relativecomp as rc
 import analytics.algorithms.rank as rank
-from analytics.datavalidation.property import Property
-from analytics.datavalidation.result import Result
-from analytics.datavalidation.propertiesmap import PropertiesMap
-from analytics.datavalidation.resultsmap import ResultsMap
+import analytics.core.processor.processor as processor
+from analytics.core.map.elementmap import ElementMap
+from analytics.core.map.pulsemap import PulseMap
 
 
-class Algorithms_TestsSequence(unittest.TestCase):
+class RelComp_TestSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
-
-class RelComp_TestsSequence(Algorithms_TestsSequence):
 
     def test_relcomp_init(self):
         with self.assertRaises(ex.AnalyticsStandardError):
@@ -82,19 +80,34 @@ class RelComp_TestsSequence(Algorithms_TestsSequence):
         a = []
         with self.assertRaises(ex.AnalyticsStandardError):
             rc._RelComp.da(a)
+        # 28.03.2015: ivan sadikov - changed test according to modification
+        #   [array len == 1]
         a = [random.randrange(0, 100)]
-        with self.assertRaises(ex.AnalyticsStandardError):
-            rc._RelComp.da(a)
+        self.assertEqual(rc._RelComp.da(a), 1.0)
         for _i in range(10):
             a = [random.randrange(0, 100) for i in range(10)]
             a = sorted(a)
             self.assertTrue(rc._RelComp.da(a) > 0)
 
 
-class RelativeComparison_TestsSequence(Algorithms_TestsSequence):
-
+class RelativeComparison_TestSequence(unittest.TestCase):
     def setUp(self):
+        self.isStarted = True
         self._rel = rc.RelativeComparison()
+        self._a = [
+                {"name": "value", "desc": "value", "sample": 123, "dynamic": True, "priority": -1},
+                {"name": "price", "desc": "price", "sample": 320.0, "dynamic": False, "priority": 1},
+                {"name": "amount", "desc": "amount", "sample": 3, "dynamic": True}
+        ]
+        self._b = [
+            {"id": "1","name": "#1","desc": "", "cluster": "A", "value": 100, "price": 320.0, "amount": 1},
+            {"id": "2","name": "#2","desc": "", "cluster": "A", "value": 120, "price": 300.0, "amount": 4},
+            {"id": "3","name": "#3","desc": "", "cluster": "A", "value": 140, "price": 199.0, "amount": 3},
+            {"id": "4","name": "#4","desc": "", "cluster": "A", "value": 124, "price": 234.0, "amount": 5},
+            {"id": "5","name": "#5","desc": "", "cluster": "A", "value": 150, "price": 250.0, "amount": 9},
+            {"id": "6","name": "#6","desc": "", "cluster": "A", "value": 128, "price": 245.0, "amount": 3},
+            {"id": "7","name": "#7","desc": "", "cluster": "A", "value": 125, "price": 230.0, "amount": 2}
+        ]
 
     def test_relativecomp_init(self, setUp=None):
         rel = rc.RelativeComparison()
@@ -176,79 +189,47 @@ class RelativeComparison_TestsSequence(Algorithms_TestsSequence):
                 self.assertEqual(type(hashRank[key]), rank.Rank)
                 self.assertNotEqual(hashRank[key], rank.RSYS.UND_RANK)
 
-    def test_relativecomp_rank(self):
-        dyn = []; props = PropertiesMap()
-        a = [
-                {"name": "value", "sample": 123, "dynamic": True, "priority": -1},
-                {"name": "price", "sample": 320.0, "dynamic": True},
-                {"name": "amount", "sample": 3, "dynamic": True}
-        ]
-        for _i in range(2):
-            prop = Property.createFromObject(a[_i])
-            dyn.append(prop)
-            props.assign(prop)
-
-        res = ResultsMap()
-        b = [
-            {"id": "1","name": "result1","desc": "", "group": "A", "value": 100, "price": 320.0, "amount": 1},
-            {"id": "2","name": "result2","desc": "", "group": "A", "value": 120, "price": 300.0, "amount": 4},
-            {"id": "3","name": "result3","desc": "", "group": "A", "value": 140, "price": 199.0, "amount": 3},
-            {"id": "4","name": "result4","desc": "", "group": "A", "value": 124, "price": 234.0, "amount": 5},
-            {"id": "5","name": "result5","desc": "", "group": "A", "value": 150, "price": 250.0, "amount": 9},
-            {"id": "6","name": "result6","desc": "", "group": "A", "value": 128, "price": 245.0, "amount": 3},
-            {"id": "7","name": "result7","desc": "", "group": "A", "value": 125, "price": 230.0, "amount": 2}
-        ]
-        for bi in b:
-            r = Result(bi, "", props)
-            res.assign(r)
-
-        res = self._rel._rank(res, dyn)
-        self.assertEqual(len(res.values()), len(b))
-        for key in res.keys():
-            r = res.get(key)
-            self.assertNotEqual(r.getRank(), rank.RSYS.UND_RANK)
-
-    def test_relativecomp_rankResults(self):
-        dyn = []; props = PropertiesMap()
-        a = [
-                {"name": "value", "sample": 123, "dynamic": True, "priority": -1},
-                {"name": "price", "sample": 320.0, "dynamic": False},
-                {"name": "amount", "sample": 3, "dynamic": True}
-        ]
-        for ai in a:
-            prop = Property.createFromObject(ai)
-            props.assign(prop)
-            if prop.getDynamic():
-                dyn.append(prop)
-
-        res = ResultsMap()
-        b = [
-            {"id": "1","name": "result1","desc": "", "group": "A", "value": 100, "price": 320.0, "amount": 1},
-            {"id": "2","name": "result2","desc": "", "group": "A", "value": 120, "price": 300.0, "amount": 4},
-            {"id": "3","name": "result3","desc": "", "group": "A", "value": 140, "price": 199.0, "amount": 3},
-            {"id": "4","name": "result4","desc": "", "group": "A", "value": 124, "price": 234.0, "amount": 5},
-            {"id": "5","name": "result5","desc": "", "group": "A", "value": 150, "price": 250.0, "amount": 9},
-            {"id": "6","name": "result6","desc": "", "group": "A", "value": 128, "price": 245.0, "amount": 3},
-            {"id": "7","name": "result7","desc": "", "group": "A", "value": 125, "price": 230.0, "amount": 2}
-        ]
-        for bi in b:
-            r = Result(bi, "", props)
-            res.assign(r)
-
+    def test_relativecomp_rankResults_err(self):
         with self.assertRaises(ex.AnalyticsCheckError):
             self._rel.rankResults({}, {})
 
-        res = self._rel.rankResults(res, props)
-        self.assertEqual(len(res.values()), len(b))
-        for key in res.keys():
-            r = res.get(key)
-            self.assertNotEqual(r.getRank(), rank.RSYS.UND_RANK)
+    def test_relativecomp_rankResults(self):
+        # initialise maps and idmapper
+        pulses = PulseMap(); elements = ElementMap(); idmapper = {}
+        idmapper = processor.parseElements(self._b, elements, idmapper)
+        idmapper = processor.parsePulses(self._a, pulses, idmapper)
+        # rank elements
+        res = self._rel.rankResults(elements, pulses)
+        self.assertEqual(len(elements._map.values()), len(self._b))
+        for element in elements._map.values():
+            self.assertNotEqual(element.rank()._name, rank.RSYS.UND_RANK._name)
+
+    def test_relativecomp_rankResults_warn(self):
+        # initialise maps and idmapper
+        pulses = PulseMap(); elements = ElementMap(); idmapper = {}
+        idmapper = processor.parseElements(self._b, elements, idmapper)
+        idmapper = processor.parsePulses(self._a, pulses, idmapper)
+        # make all pulses dynamic
+        for pulse in pulses._map.values():
+            pulse.setStatic(False)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            # rank elements
+            res = self._rel.rankResults(elements, pulses)
+            self.assertEqual(len(elements._map.values()), len(self._b))
+            for element in elements._map.values():
+                self.assertNotEqual(element.rank()._name, rank.RSYS.UND_RANK._name)
+            # warnings assertion
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, UserWarning))
+
 
 # Load test suites
 def _suites():
     return [
-        RelComp_TestsSequence,
-        RelativeComparison_TestsSequence
+        RelComp_TestSequence,
+        RelativeComparison_TestSequence
     ]
 
 # Load tests

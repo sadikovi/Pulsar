@@ -21,12 +21,27 @@ limitations under the License.
 from xml.dom import minidom
 from types import StringType, DictType
 # import classes
-import analytics.loading.loader as l
 import analytics.utils.misc as misc
-from analytics.utils.constants import Const
+from analytics.loading.loader import Loader
 
+# constants for xml loader
+class Const(object):
+    pass
 
-class XmlLoader(l.Loader):
+# xml root
+Const.XML_ELEMENTS = "elements"
+# xml element
+Const.XML_ELEMENT = "element"
+# xml attribute
+Const.XML_ATTRIBUTE = "attr"
+Const.XML_ATTR_NAME = "name"
+Const.XML_ATTR_TYPE = "type"
+# data types
+Const.XML_TYPE_STRING = "str"
+Const.XML_TYPE_INT = "int"
+Const.XML_TYPE_FLOAT = "float"
+
+class XmlLoader(Loader):
     """
         XmlLoader class is a subclass of Loader that provides actual interface
         to load data from xml file. It overrides methods @prepareDataFrom and

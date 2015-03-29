@@ -19,14 +19,17 @@ limitations under the License.
 
 # import libs
 from types import ListType, DictType
+import warnings
 import math
 # import classes
 import analytics.utils.misc as misc
 import analytics.algorithms.rank as rank
 from analytics.algorithms.algorithm import Algorithm
-from analytics.utils.constants import Const
-from analytics.datavalidation.resultsmap import ResultsMap
-from analytics.datavalidation.propertiesmap import PropertiesMap
+from analytics.core.map.elementmap import ElementMap
+from analytics.core.map.pulsemap import PulseMap
+from analytics.core.pulse import Pulse, DynamicPulse, StaticPulse
+from analytics.core.attribute.dynamic import Dynamic
+
 
 # constants for the algorithm
 ## id, name and short name for the algorithm
@@ -95,9 +98,16 @@ class _RelComp(object):
 
     @staticmethod
     def da(array):
-        if len(array) < 2:
-            msg = "Array must have at least 2 elements"
+        # 28.03.2015: ivan sadikov - if array length == 1 we return 1
+        #   fixes problem when all values are equal
+        #   though we still raise error if array is empty
+        if len(array) == 0:
+            msg = "Array must have at least 1 element"
             misc.raiseStandardError(msg, __file__)
+        elif len(array) == 1:
+            #msg = "Array must have at least 2 elements"
+            #misc.raiseStandardError(msg, __file__)
+            return 1.0
         dai = 0; _i = 0
         for _i in range(1, len(array)):
             dai += math.fabs(array[_i] - array[_i-1])
@@ -116,86 +126,101 @@ class RelativeComparison(Algorithm):
             _short (str): short name of the algorithm
     """
     def __init__(self):
-        self._id = ID
-        self._name = LONG_NAME
-        self._short = SHORT_NAME
+        super(RelativeComparison, self).__init__(ID, LONG_NAME, SHORT_NAME)
 
     # [Public]
-    def rankResults(self, resultsMap, propertiesMap):
+    def rankResults(self, elementmap, pulsemap):
         """
-            Main method to call and rank results. It may raise errors on the
+            Main method to call and rank elements. It may raise errors on the
             way, because of some requirements that are necessary to run
-            algorithm. It may also return non-ranked results map in other cases.
+            algorithm. It may also return non-ranked elements map.
 
             Args:
-                resultsMap (ResultsMap): map of the results to rank
-                propertiesMap (PropertiesMap): map of the properties
+                elementmap (ElementMap): map of the elements to rank
+                pulsemap (PulseMap): map of the pulses
 
             Returns:
-                ResultsMap: the same map but with updated ranks
+                ElementMap: the same map but with updated ranks
         """
         # check that maps have the right types
-        misc.checkTypeAgainst(type(resultsMap), ResultsMap, __file__)
-        misc.checkTypeAgainst(type(propertiesMap), PropertiesMap, __file__)
+        misc.checkTypeAgainst(type(elementmap), ElementMap, __file__)
+        misc.checkTypeAgainst(type(pulsemap), PulseMap, __file__)
+        # if dynamic pulses are more than constant then select first two
+        pulses = pulsemap._map.values()
         # retrieve only dynamic properties
-        dyns = [p for p in propertiesMap.values() if p.getDynamic() is True]
+        dyns = []
+        exceedsMax = False
+        for p in pulses:
+            if type(p) is DynamicPulse and not p.static() and p.default():
+                if len(dyns)+1 > MAX_DYNAMIC_PROPS:
+                    exceedsMax = True
+                    p.setStatic(True)
+                else:
+                    dyns.append(p)
+        if exceedsMax:
+            msg = "Hey, too many dynamic pulses"
+            warnings.warn(msg, UserWarning)
         # call private method to select appropriate ranking scheme
-        return self._rank(resultsMap, dyns)
+        return self._rank(elementmap, dyns)
 
     # [Private]
-    def _rank(self, resultsMap, dynamics):
+    def _rank(self, elementmap, dynamics):
         """
-            _rank method actually ranks the results based on number of dynamic
-            properties.
+            _rank method actually ranks the elements using dynamic pulses.
 
             Args:
-                resultsMap (ResultsMap): map of results to rank
-                dynamics (list<Property>): list of dynamic properties
+                elementmap (ElementMap): map of elements to rank
+                dynamics (list<DynamicPulse>): list of dynamic pulses
 
             Returns:
                 ResultsMap: updated with ranks results map
         """
-        misc.checkTypeAgainst(type(resultsMap), ResultsMap, __file__)
         # check how many results are in the map
-        n = resultsMap.isEmpty(); m = len(dynamics)
-        # if length of either arguments equals 0 return resultsMap
-        if m == 0 or n:
-            return resultsMap
-        # if length of dyns more than constant then we raise an error
+        n = len(elementmap._map); m = len(dynamics)
+        # if length of either arguments equals 0 return elements
+        if m == 0 or n == 0:
+            return elementmap
+        # if length of dyns more than constant then we warn and select first two
         elif m > MAX_DYNAMIC_PROPS:
-            misc.raiseStandardError("Too many dynamic properties", __file__)
+            misc.raiseStandardError("Too many dynamic pulses", __file__)
         # we are clear, start ranking results
         # compute hash and store values into a, store id and hash into b
         a = {}; b = {}; _medians = []; _orders = []
         # append default values of the properties
-        for _i in range(0, m):
-            default = dynamics[_i].getDefault()
-            if default is None:
-                misc.raiseStandardError("Default value is None", __file__)
+        for _i in range(len(dynamics)):
+            default = dynamics[_i].default()
+            # assertion
+            msg = "Default value is None"
+            misc.evaluateAssertion(default is not None, msg, __file__)
             _medians.append(default)
             # append priority order
-            _orders.append(dynamics[_i].getPriorityOrder())
+            _orders.append(dynamics[_i]._dynamic.priority())
         medianHash = self._hashkeyForList(_medians)
         a[medianHash] = _medians
         # compute hash and store values for each result
-        for res in resultsMap.values():
-            map = res.getProperties(); values = []
-            for _i in range(0, m):
+        for element in elementmap._map.values():
+            fmap = element._features; values = []
+            for _i in range(len(dynamics)):
                 # append each value to the list
-                values.append(map[dynamics[_i].getId()])
+                if dynamics[_i].id() in fmap:
+                    # check if feature exists in the list and get value
+                    feature = fmap[dynamics[_i].id()]
+                    values.append(feature.value())
+                else:
+                    values.append(None)
             hashkey = self._hashkeyForList(values)
             a[hashkey] = values
-            b[res.getId()] = hashkey
+            b[element.id()] = hashkey
         # rank map values by applying generic algorithm
         hashRank = self._computeRanks(a, _orders, _medians)
         # update ranks
-        for res in resultsMap.values():
-            hashkey = b[res.getId()]
+        for element in elementmap._map.values():
+            key = b[element.id()]
             # if rank is not found we assign undefined rank
-            rank = hashRank[hashkey] if hashkey in hashRank else rank.RSYS.UND_RANK
-            res.setRank(rank)
-        # return successfully updated resultsMap
-        return resultsMap
+            rank = hashRank[key] if key in hashRank else rank.RSYS.UND_RANK
+            element.setRank(rank)
+        # return successfully updated elements map
+        return elementmap
 
     # [Private]
     def _hashkeyForList(self, list):
@@ -208,7 +233,7 @@ class RelativeComparison(Algorithm):
             Returns:
                 str: hashkey for a given list
         """
-        return "".join([str(value) for value in list])
+        return ":".join([str(value) for value in list])
 
     # [Private]
     def _computeRanks(self, a, orders, medians):
@@ -220,7 +245,7 @@ class RelativeComparison(Algorithm):
 
             Args:
                 a (dict<str, list>): generic map with values and hashkeys
-                orders (list<int>): list of priority orders (see Const for more)
+                orders (list<int>): list of priority orders
                 medians (list<value>): list of median values
 
             Returns:
@@ -264,7 +289,7 @@ class RelativeComparison(Algorithm):
 
             Args:
                 rankedList (list<value>): list with values to rank
-                order (int): priority order of the values (see const for more)
+                order (int): priority order of the values
                 median (value): median (default) value
 
             Returns:
@@ -279,7 +304,7 @@ class RelativeComparison(Algorithm):
                 misc.raiseStandardError("Median is not in the list", __file__)
             # sort ranked list according to priority order
             # in the end we always get sorted array in increasing order
-            if order == Const.PRIORITY_DEC:
+            if order == Dynamic.ReversedPriority:
                 rankedList = sorted(rankedList, None, None, True)
                 # find median index
                 _median_i = rankedList.index(median)
@@ -313,7 +338,7 @@ class RelativeComparison(Algorithm):
             if negative is not None:
                 rankedList = [v + negative for v in rankedList]
             # reverse values back according to order
-            if order == Const.PRIORITY_DEC:
+            if order == Dynamic.ReversedPriority:
                 minel = rankedList[0]; maxel = rankedList[rln-1]
                 rankedList = [maxel+minel-v for v in rankedList]
             # map original values and ranks

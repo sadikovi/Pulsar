@@ -51,7 +51,7 @@ class QueryPredicate_TestsSequence(QueryEngineSeq_TestsSequence):
         t = quote("@test$").encode('utf8')
         self.assertEqual(q.decode(t), unquote(t).decode('utf8'))
 
-    def test_querypredicate_init(self):
+    def test_qpredicate_init(self):
         with self.assertRaises(c.AnalyticsCheckError):
             pr = q.QueryPredicate(1, 1, {}, (1, 2))
         with self.assertRaises(c.AnalyticsCheckError):
@@ -63,20 +63,20 @@ class QueryPredicate_TestsSequence(QueryEngineSeq_TestsSequence):
                 q._PREDICATE_VTYPES.NUMBER, "p", (1, 2))
         self.assertEqual(pr._parameter, "p")
 
-    def test_querypredicate_valueToString(self):
+    def test_qpredicate_valueToString(self):
         text = "test"
         self.assertEqual(q.QueryPredicate._valueToString(text), "[test]")
         text = " te[]st "
         self.assertEqual(q.QueryPredicate._valueToString(text),
                 "["+quote(text).encode('utf8')+"]")
 
-    def test_querypredicate_stringToValue(self):
+    def test_qpredicate_stringToValue(self):
         value = "[test]"
         self.assertEqual(q.QueryPredicate._stringToValue(value), "test")
         value = "["+quote(" te[]st@ ").encode('utf8')+"]"
         self.assertEqual(q.QueryPredicate._stringToValue(value), " te[]st@ ")
 
-    def test_querypredicate_createFromTypeAndPredicate(self):
+    def test_qpredicate_createFromTypeAndPredicate(self):
         with self.assertRaises(c.AnalyticsCheckError):
             pr = q.QueryPredicate.createFromTypeAndPredicate(0, 0, [])
         with self.assertRaises(c.AnalyticsCheckError):
@@ -84,7 +84,7 @@ class QueryPredicate_TestsSequence(QueryEngineSeq_TestsSequence):
         pr = q.QueryPredicate.createFromTypeAndPredicate(q._PREDICATE_TYPES.EQUAL,
                 q._PREDICATE_VTYPES.NUMBER, self._predicate1)
         self.assertEqual(pr._parameter, "p")
-        self.assertEqual(pr._values, tuple(["1"]))
+        self.assertEqual(pr._values, tuple([1]))
         pr = q.QueryPredicate.createFromTypeAndPredicate(q._PREDICATE_TYPES.EQUAL,
                 q._PREDICATE_VTYPES.STRING, self._predicate2)
         self.assertEqual(pr._parameter, "p")
@@ -96,13 +96,13 @@ class QueryPredicate_TestsSequence(QueryEngineSeq_TestsSequence):
         pr = q.QueryPredicate.createFromTypeAndPredicate(q._PREDICATE_TYPES.RANGE,
                 q._PREDICATE_VTYPES.NUMBER, self._predicate4)
         self.assertEqual(pr._parameter, "p")
-        self.assertEqual(pr._values, tuple(["12", "35"]))
+        self.assertEqual(pr._values, tuple([12, 35]))
         pr = q.QueryPredicate.createFromTypeAndPredicate(q._PREDICATE_TYPES.RANGE,
                 q._PREDICATE_VTYPES.STRING, self._predicate5)
         self.assertEqual(pr._parameter, "p")
         self.assertEqual(pr._values, tuple(["a", "b"]))
 
-    def test_querypredicate_createFromPredicate(self):
+    def test_qpredicate_createFromPredicate(self):
         with self.assertRaises(c.AnalyticsCheckError):
             pr = q.QueryPredicate.createFromPredicate(123)
         with self.assertRaises(c.AnalyticsValueError):
@@ -114,7 +114,7 @@ class QueryPredicate_TestsSequence(QueryEngineSeq_TestsSequence):
 
         pr = q.QueryPredicate.createFromPredicate(self._predicate1)
         self.assertEqual(pr._parameter, "p")
-        self.assertEqual(pr._values, tuple(["1"]))
+        self.assertEqual(pr._values, tuple([1]))
         pr = q.QueryPredicate.createFromPredicate(self._predicate2)
         self.assertEqual(pr._parameter, "p")
         self.assertEqual(pr._values, tuple(["thes"]))
@@ -123,19 +123,19 @@ class QueryPredicate_TestsSequence(QueryEngineSeq_TestsSequence):
         self.assertEqual(pr._values, tuple(["dynamic"]))
         pr = q.QueryPredicate.createFromPredicate(self._predicate4)
         self.assertEqual(pr._parameter, "p")
-        self.assertEqual(pr._values, tuple(["12", "35"]))
+        self.assertEqual(pr._values, tuple([12, 35]))
         pr = q.QueryPredicate.createFromPredicate(self._predicate5)
         self.assertEqual(pr._parameter, "p")
         self.assertEqual(pr._values, tuple(["a", "b"]))
 
-    def test_querypredicate_toString(self):
+    def test_qpredicate_toString(self):
         pr = q.QueryPredicate.createFromPredicate(self._predicate5)
         self.assertEqual(pr.toString(), "@p |BETWEEN| [a] |AND| [b]")
 
 # QueryStatement tests
 class QueryStatement_TestsSequence(QueryEngineSeq_TestsSequence):
 
-    def test_querystatement_init(self):
+    def test_qstatement_init(self):
         with self.assertRaises(c.AnalyticsCheckError):
             st = q.QueryStatement([])
         with self.assertRaises(c.AnalyticsCheckError):
@@ -144,7 +144,7 @@ class QueryStatement_TestsSequence(QueryEngineSeq_TestsSequence):
         self.assertEqual(st._table, "table")
         self.assertEqual(st._arguments, [])
 
-    def test_querystatement_createWithTable(self):
+    def test_qstatement_createWithTable(self):
         with self.assertRaises(c.AnalyticsCheckError):
             st = q.QueryStatement([])
         with self.assertRaises(c.AnalyticsCheckError):
@@ -153,7 +153,7 @@ class QueryStatement_TestsSequence(QueryEngineSeq_TestsSequence):
         self.assertEqual(st._table, "table")
         self.assertEqual(st._arguments, [])
 
-    def test_querystatement_createFromStatement(self):
+    def test_qstatement_createFromStatement(self):
         with self.assertRaises(c.AnalyticsCheckError):
             st = q.QueryStatement.createFromStatement([])
         with self.assertRaises(c.AnalyticsSyntaxError):
@@ -164,7 +164,7 @@ class QueryStatement_TestsSequence(QueryEngineSeq_TestsSequence):
         self.assertEqual(st._table, "table")
         self.assertEqual(st._arguments, [])
 
-    def test_querystatement_toString(self):
+    def test_qstatement_toString(self):
         st = q.QueryStatement.createFromStatement("select from ${ table }")
         self.assertEqual(st.toString(), "SELECT FROM ${table}")
 

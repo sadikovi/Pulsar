@@ -51,8 +51,8 @@ class Algorithm(object):
         return self._short
 
     # [Abstract]
-    def rankResults(self, resultsMap, propertiesMap):
-        return resultsMap
+    def rankResults(self, elementMap, pulseMap):
+        return elementMap
 
     # [Abstract]
     def getJSON(self):

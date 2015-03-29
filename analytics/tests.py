@@ -31,16 +31,20 @@ import unittest
 # select what tests to run
 _RUN_TESTS = {
     "exceptions":       True,
-    "datavalidation":   True,
     "loading":          True,
     "utils":            True,
     "algorithms":       True,
     "relcomp_alg":      True,
     "query_engine":     True,
     "selector":         True,
-    "error_handler":    True,
     "analyser":         True,
-    "datamanager":      True
+    "datamanager":      True,
+    "core_attribute":   True,
+    "core":             True,
+    "core_map":         True,
+    "core_processor":   True,
+    "service":          True,
+    "integration":      True
 }
 
 def _checkTest(key):
@@ -53,13 +57,6 @@ def _collectSystemTests(suites):
         suites.addTest(unittest_exceptions.loadSuites())
     else:
         print "@skip: exceptions tests"
-
-    # datavalidation
-    if _checkTest("datavalidation"):
-        import analytics.datavalidation.tests.unittest_validation as unittest_validation
-        suites.addTest(unittest_validation.loadSuites())
-    else:
-        print "@skip: data validation tests"
 
     # loading
     if _checkTest("loading"):
@@ -103,13 +100,6 @@ def _collectSystemTests(suites):
     else:
         print "@skip: selector tests"
 
-    # error handler
-    if _checkTest("error_handler"):
-        import analytics.errorhandler.tests.unittest_errorhandling as unittest_errorhandling
-        suites.addTest(unittest_errorhandling.loadSuites())
-    else:
-        print "@skip: error handler tests"
-
     # analyser
     if _checkTest("analyser"):
         import analytics.analyser.tests.unittest_analyser as unittest_analyser
@@ -124,6 +114,47 @@ def _collectSystemTests(suites):
     else:
         print "@skip: data manager tests"
 
+    # core attributes
+    if _checkTest("core_attribute"):
+        import analytics.core.tests.unittest_core_attribute as unittest_core_attribute
+        suites.addTest(unittest_core_attribute.loadSuites())
+    else:
+        print "@skip: core attribute tests"
+
+    # core
+    if _checkTest("core"):
+        import analytics.core.tests.unittest_core as unittest_core
+        suites.addTest(unittest_core.loadSuites())
+    else:
+        print "@skip: core tests"
+
+    # core maps
+    if _checkTest("core_map"):
+        import analytics.core.tests.unittest_core_map as unittest_core_map
+        suites.addTest(unittest_core_map.loadSuites())
+    else:
+        print "@skip: core map tests"
+
+    # core processor
+    if _checkTest("core_processor"):
+        import analytics.core.tests.unittest_core_processor as unittest_core_processor
+        suites.addTest(unittest_core_processor.loadSuites())
+    else:
+        print "@skip: core processor tests"
+
+    # service
+    if _checkTest("service"):
+        import analytics.tests.unittest_service as unittest_service
+        suites.addTest(unittest_service.loadSuites())
+    else:
+        print "@skip: service tests"
+
+    # integration tests
+    if _checkTest("integration"):
+        import analytics.tests.integrationtest_service as integrationtest_service
+        suites.addTest(integrationtest_service.loadSuites())
+    else:
+        print "@skip: integration tests"
 
 if __name__ == '__main__':
     suites = unittest.TestSuite()

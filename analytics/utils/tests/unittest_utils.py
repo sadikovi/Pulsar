@@ -20,6 +20,7 @@ limitations under the License.
 # import libs
 import unittest
 import inspect
+import uuid
 from types import DictType, ListType
 # import classes
 import analytics.exceptions.exceptions as c
@@ -108,6 +109,12 @@ class misc_TestsSequence(Utils_TestsSequence):
         self.assertTrue(misc.checkInstanceAgainst(cobj, A, __file__))
         with self.assertRaises(c.AnalyticsTypeError):
             self.assertTrue(misc.checkInstanceAgainst(aobj, B, __file__))
+
+    def test_misc_generateId(self):
+        guid = misc.generateId()
+        self.assertEqual(len(uuid.uuid4().hex), len(guid))
+        guid = misc.generateId("test")
+        self.assertEqual(uuid.uuid3(uuid.NAMESPACE_DNS, "test").hex, guid)
 
 # Load test suites
 def _suites():

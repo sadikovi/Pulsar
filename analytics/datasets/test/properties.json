@@ -1,4 +1,0 @@
-[
-    {"name": "value", "sample": 1, "dynamic": true},
-    {"name": "order", "sample": "up", "dynamic": false}
-]

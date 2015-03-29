@@ -21,12 +21,12 @@ limitations under the License.
 import unittest
 # import classes
 import analytics.exceptions.exceptions as ex
-import analytics.algorithms.algorithmsmap as a
-import analytics.algorithms.algorithm as al
 import analytics.algorithms.rank as rank
+from analytics.algorithms.algorithmsmap import AlgorithmsMap
+from analytics.algorithms.algorithm import Algorithm
 
 
-class TestAlgorithm(al.Algorithm):
+class TestAlgorithm(Algorithm):
     def __init__(self, id, name, short):
         self._id = id
         self._name = name
@@ -35,14 +35,11 @@ class TestAlgorithm(al.Algorithm):
     def getId(self):
         return self._id
 
-class Algorithms_TestsSequence(unittest.TestCase):
+
+class AlgorithmsMap_TestSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
-
-class AlgorithmsMap_TestsSequence(Algorithms_TestsSequence):
-
-    def setUp(self):
-        self._almap = a.AlgorithmsMap()
+        self._almap = AlgorithmsMap()
 
     def test_algorithmsmap_init(self):
         self.assertEqual(self._almap._map, {})
@@ -83,7 +80,9 @@ class AlgorithmsMap_TestsSequence(Algorithms_TestsSequence):
         self.assertEqual(self._almap.isEmpty(), True)
 
 # Rank tests
-class Rank_TestsSequence(Algorithms_TestsSequence):
+class Rank_TestSequence(unittest.TestCase):
+    def setUp(self):
+        self.isStarted = True
 
     def test_rank_init(self):
         with self.assertRaises(ex.AnalyticsCheckError):
@@ -99,7 +98,9 @@ class Rank_TestsSequence(Algorithms_TestsSequence):
         self.assertEqual(rnk._value, 10)
 
 # Class tests
-class Class_TestsSequence(Algorithms_TestsSequence):
+class Class_TestSequence(unittest.TestCase):
+    def setUp(self):
+        self.isStarted = True
 
     def test_class_init(self):
         with self.assertRaises(ex.AnalyticsCheckError):
@@ -137,7 +138,9 @@ class Class_TestsSequence(Algorithms_TestsSequence):
         self.assertEqual(rClass._ranks[rnk._name], rnk)
 
 # Ranking system tests
-class RSYS_TestsSequence(Algorithms_TestsSequence):
+class RSYS_TestSequence(unittest.TestCase):
+    def setUp(self):
+        self.isStarted = True
 
     def test_rsys_init(self):
         with self.assertRaises(StandardError):
@@ -197,14 +200,13 @@ class RSYS_TestsSequence(Algorithms_TestsSequence):
         self.assertEqual(rank.RSYS.UND_RANK._class, rank.RSYS.UND_CLASS)
 
 
-
 # Load test suites
 def _suites():
     return [
-        AlgorithmsMap_TestsSequence,
-        Rank_TestsSequence,
-        Class_TestsSequence,
-        RSYS_TestsSequence
+        AlgorithmsMap_TestSequence,
+        Rank_TestSequence,
+        Class_TestSequence,
+        RSYS_TestSequence
     ]
 
 # Load tests

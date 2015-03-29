@@ -19,6 +19,7 @@ limitations under the License.
 
 # import libs
 import inspect
+import uuid
 # import classes
 import analytics.exceptions.exceptions as ex
 
@@ -159,3 +160,19 @@ def evaluateAssertion(condition, message, source, convertPath=True):
         message = "assertion failed [%s]" %(message)
         raise ex.AnalyticsAssertionError(message, source, line)
     return True
+
+# [Public]
+def generateId(string=None):
+    """
+        Generates unique guid that can be used as a internal id. Takes string
+        as parameter (can be empty) and generates hex value for guid.
+
+        Args:
+            string (str): id string to use to generate part of guid
+
+        Returns:
+            str: unique random uuid as internal guid
+    """
+    if string is None:
+        return uuid.uuid4().hex
+    return uuid.uuid3(uuid.NAMESPACE_DNS, str(string)).hex

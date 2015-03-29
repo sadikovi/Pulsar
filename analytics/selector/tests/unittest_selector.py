@@ -1,227 +1,267 @@
 #!/usr/bin/env python
 
-'''
-Copyright 2015 Ivan Sadikov
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-'''
-
-
 # import libs
 import unittest
+from types import IntType, FloatType, ListType
+import random
 # import classes
 import analytics.exceptions.exceptions as ex
-import analytics.selector.selector as s
-import analytics.datavalidation.validator as v
-import analytics.algorithms.algorithmsmap as a
-import analytics.algorithms.algorithm as al
-import analytics.datavalidation.propertiesmap as pm
-import analytics.datavalidation.property as p
-
-# test algorithm class
-class TestAlgorithm(al.Algorithm):
-    def __init__(self, id, name, short):
-        self._id = id
-        self._name = name
-        self._short = short
-
-    def getId(self):
-        return self._id
+import analytics.core.processor.processor as processor
+import analytics.selector.selector as selector
+from analytics.core.map.clustermap import ClusterMap
+from analytics.core.map.elementmap import ElementMap
+from analytics.core.map.pulsemap import PulseMap
+from analytics.algorithms.algorithmsmap import AlgorithmsMap
+from analytics.algorithms.algorithm import Algorithm
 
 
-class Selector_TestsSequence(unittest.TestCase):
-
+class Selector_TestSequence(unittest.TestCase):
     def setUp(self):
-        self.isStarted = True
-        self._sel = s.Selector()
-        self._bad_queryset = "select from results where @p=123 and @p is dyn"
-        self._queryset = "select from ${results} where @p=123 and @p|is| dyn"
-
-        self._testGroups = [
-            {"id": "super", "name": "supername", "parent": "null"},
-            {"id": "a", "name": "aname", "parent": "super"},
-            {"id": "b", "name": "bname", "parent": "super"},
-            {"id": "badgroup", "name": "badgroup", "parent": "null"}
+        self._p = [
+            {"id": "1", "name": "random", "desc": "random", "sample": 1, "dynamic": True},
+            {"id": "2", "name": "order", "desc": "order", "sample": 1.0, "dynamic": False}
         ]
-        self._testRes = [
-            {"id": "A", "name": "Aname", "group": "a", "a": 123, "b": 320},
-            {"id": "B", "name": "Bname", "group": "b", "a": 125, "b": 320},
-            {"id": "C", "name": "Cname", "group": "b", "a": 127, "b": 90}
+        self._c = [
+            {"id": "1", "name": "#1", "desc": "#1", "parent": None},
+            {"id": "2", "name": "#2", "desc": "#2", "parent": "1"},
+            {"id": "3", "name": "#3", "desc": "#3", "parent": "1"},
+            {"id": "4", "name": "#4", "desc": "#4", "parent": "2"},
+            {"id": "5", "name": "#5", "desc": "#5", "parent": "2"}
         ]
-        self._testProps = [
-            {"name": "a", "sample": 1},
-            {"name": "b", "sample": 1},
+        self._e = [
+            {"id": "1", "name": "@1", "desc": "@1", "cluster": "5", "random": 2, "order": 1.2},
+            {"id": "2", "name": "@2", "desc": "@2", "cluster": "5", "random": 9, "order": 0.9},
+            {"id": "3", "name": "@3", "desc": "@3", "cluster": "3", "random": 7, "order": 1.1},
+            {"id": "4", "name": "@4", "desc": "@4", "cluster": "3", "random": 1, "order": 1.5},
+            {"id": "5", "name": "@5", "desc": "@5", "cluster": "4", "random": 4, "order": 1.7}
         ]
+        # create process block
+        block = processor.ProcessBlock(
+            {"map": ClusterMap(), "data": self._c},
+            {"map": ElementMap(), "data": self._e},
+            {"map": PulseMap(), "data": self._p}
+        )
+        # parse object lists
+        block = processor.processWithBlock(block)
+        self._clustermap = block._clustermap
+        self._elementmap = block._elementmap
+        self._pulsemap = block._pulsemap
+        # create algorithms map
+        self._algorithmsmap = AlgorithmsMap()
+        self._algorithmsmap.assign(Algorithm("%1", "%1", "%1"))
 
-        self._dv = v.Validator()
-        self._dv.prepareData(self._testGroups, self._testRes, self._testProps)
+    def query_empty(self):
+        return ""
 
-    def test_selector_init(self):
-        self.assertEqual(self._sel._blocks, [])
-        self.assertEqual(self._sel._readyToFilter, False)
+    def query_cluster_select(self, cid):
+        return "select from ${clusters} where @id=[%s]" %(cid)
 
-    def test_selector_setSkipFiltering(self):
-        self.assertEqual(self._sel._skipFiltering, False)
-        self._sel.setSkipFiltering(True)
-        self.assertEqual(self._sel._skipFiltering, True)
-        self._sel.setSkipFiltering(None)
-        self.assertEqual(self._sel._skipFiltering, False)
-        self._sel.setSkipFiltering(1)
-        self.assertEqual(self._sel._skipFiltering, True)
+    def query_pulse_static_select(self, pid, value):
+        value = value if type(value) in [IntType, FloatType] else "[%s]"%(value)
+        return "select from ${pulses} where @%s=%s and @%s |is| static"%(pid, str(value), pid)
 
-    # not testing loadQueriesFromBlocks, because we are calling it with a
-    # little overhead
-    def test_selector_loadQueriesFromQueryset(self):
-        with self.assertRaises(ex.AnalyticsSyntaxError):
-            self._sel.loadQueriesFromQueryset(self._bad_queryset)
-        self._sel.loadQueriesFromQueryset(self._queryset)
-        self.assertEqual(len(self._sel._blocks), 1)
-        self.assertEqual(self._sel._readyToFilter, True)
+    def query_pulse_dynamic_select(self, pid, value):
+        value = value if type(value) in [IntType, FloatType] else "[%s]"%(value)
+        return "select from ${pulses} where @%s=%s and @%s |is| dynamic"%(pid, str(value), pid)
 
-    def test_selector_filterAlgorithms(self):
-        map = a.AlgorithmsMap()
-        map.assign(TestAlgorithm("1", "", ""))
-        map.assign(TestAlgorithm("2", "", ""))
-        map.assign(TestAlgorithm("3", "", ""))
-        set = "select from ${algorithms} where @id=[1]"
-        self._sel.loadQueriesFromQueryset(set)
-        self._sel._filterAlgorithms(map, self._sel._blocks[0])
-        self.assertEqual(len(map.keys()), 1)
-        self.assertEqual(map.keys(), ["1"])
+    def query_all_select_static(self, cid, pid, value):
+        value = value if type(value) in [IntType, FloatType] else "[%s]"%(value)
+        return ";".join([
+            "select from ${clusters} where @id=[%s]" %(cid),
+            "select from ${pulses} where @%s=%s and @%s |is| static"%(pid, str(value), pid)
+        ])
 
-        map = a.AlgorithmsMap()
-        map.assign(TestAlgorithm("1", "", ""))
-        map.assign(TestAlgorithm("2", "", ""))
-        map.assign(TestAlgorithm("3", "", ""))
-        set = "select from ${algorithms} where @id=[1] and @id=[3]"
-        self._sel.loadQueriesFromQueryset(set)
-        self._sel._filterAlgorithms(map, self._sel._blocks[0])
-        self.assertEqual(len(map.keys()), 2)
-        self.assertEqual(map.keys(), ["1", "3"])
+    def query_all_select_dynamic(self, cid, pid, value):
+        value = value if type(value) in [IntType, FloatType] else "[%s]"%(value)
+        return ";".join([
+            "select from ${clusters} where @id=[%s]" %(cid),
+            "select from ${pulses} where @%s=%s and @%s |is| dynamic"%(pid, str(value), pid)
+        ])
 
-    def test_selector_filterPropeties(self):
-        map = pm.PropertiesMap()
-        map.assign(p.Property("a", 1))
-        map.assign(p.Property("b", 1.2))
-        map.assign(p.Property("c", "str"))
-        set = "select from ${properties} where @id=[a]"
-        self._sel.loadQueriesFromQueryset(set)
-        self._sel._filterProperties(map, self._sel._blocks[0])
-        self.assertEqual(len(map.keys()), 1)
-        self.assertEqual(map.keys(), ["a"])
+    def test_selector_valid_query(self):
+        queries = [
+            self.query_empty(),
+            self.query_cluster_select("1"),
+            self.query_pulse_static_select("2", 1),
+            self.query_pulse_dynamic_select("3", 1),
+            self.query_all_select_static("4", "5", 1),
+            self.query_all_select_dynamic("4", "5", 1)
+        ]
+        for query in queries:
+            a = selector.parseQueryset(query)
+            self.assertEqual(type(a), ListType)
 
-        map = pm.PropertiesMap()
-        map.assign(p.Property("a", 1))
-        map.assign(p.Property("b", 1.2))
-        map.assign(p.Property("c", "str"))
-        set = "select from ${properties} where @id=[a] and @name=[c]"
-        self._sel.loadQueriesFromQueryset(set)
-        self._sel._filterProperties(map, self._sel._blocks[0])
-        self.assertEqual(len(map.keys()), 2)
-        self.assertEqual(map.keys(), ["a", "c"])
+    def test_selector_integration_test1(self):
+        # create filter block
+        block = selector.FilterBlock(
+            self._algorithmsmap,
+            self._pulsemap,
+            self._clustermap,
+            self._elementmap
+        )
+        # filter with selector
+        block = selector.filterWithBlock(
+            self.query_empty(),
+            block
+        )
+        # reassign maps to new values
+        self._algorithmsmap = block._alg
+        self._pulsemap = block._pul
+        self._clustermap = block._clu
+        self._elementmap = block._ele
+        # assertion
+        self.assertEqual(len(self._algorithmsmap._map.values()), 1)
+        self.assertEqual(len(self._pulsemap._map), len(self._p))
+        self.assertEqual(len(self._clustermap._map), len(self._c))
+        self.assertEqual(len(self._elementmap._map), len(self._e))
 
-    def test_selector_filterGroups(self):
-        groups = self._dv.getGroups()
-        gid = groups.guid("a")
-        set = "select from ${groups} where @id=["+gid+"]"
-        self._sel.loadQueriesFromQueryset(set)
-        self._sel._filterGroups(groups, self._sel._blocks[0])
-        self.assertEqual(len(groups.keys()), 1)
-        self.assertEqual(groups.has(gid), True)
+    def test_selector_integration_test1(self):
+        # create filter block
+        block = selector.FilterBlock(
+            self._algorithmsmap,
+            self._pulsemap,
+            self._clustermap,
+            self._elementmap
+        )
+        # extract parameters: cluster id
+        cluster_values = self._clustermap._map.values()
+        cid = [x.id() for x in cluster_values if x.name() == "#2"][0]
+        block = selector.filterWithBlock(self.query_cluster_select(cid), block)
+        # reassign maps to new values
+        self._algorithmsmap = block._alg
+        self._pulsemap = block._pul
+        self._clustermap = block._clu
+        self._elementmap = block._ele
+        # assertion
+        self.assertEqual(len(self._algorithmsmap._map.values()), 1)
+        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(len(self._clustermap._map), 3)
+        self.assertEqual(len(self._elementmap._map), 3)
 
-    def test_selector_filterResults_1(self):
-        set = "select from ${results} where @a=125 and @b=320"
-        self._sel.loadQueriesFromQueryset(set)
-        results = self._dv.getResults()
-        props = self._dv.getProperties()
-        self._sel._filterResults(results, props, self._sel._blocks[0])
-        self.assertEqual(len(results.keys()), 1)
-        self.assertEqual(results.values()[0].getName(), 'Bname')
+    def test_selector_integration_test2(self):
+        # create filter block
+        block = selector.FilterBlock(
+            self._algorithmsmap,
+            self._pulsemap,
+            self._clustermap,
+            self._elementmap
+        )
+        # extract parameters: pulse id and default value
+        pulse_values = self._pulsemap._map.values()
+        pid = [x.id() for x in pulse_values if x.name() == "random"][0]
+        value = 2
+        block = selector.filterWithBlock(
+            self.query_pulse_static_select(pid, value),
+            block
+        )
+        # reassign to maps
+        self._algorithmsmap = block._alg
+        self._pulsemap = block._pul
+        self._clustermap = block._clu
+        self._elementmap = block._ele
+        # assertion
+        self.assertEqual(len(self._algorithmsmap._map.values()), 1)
+        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(self._pulsemap.get(pid).static(), True)
+        self.assertEqual(self._pulsemap.get(pid).default(), value)
+        self.assertEqual(len(self._clustermap._map), 5)
+        self.assertEqual(len(self._elementmap._map), 1)
+        self.assertEqual(self._elementmap._map.values()[0].name(), "@1")
 
-    def test_selector_filterResults_2(self):
-        set = "select from ${results} where @b=320"
-        self._sel.loadQueriesFromQueryset(set)
-        results = self._dv.getResults()
-        props = self._dv.getProperties()
-        self._sel._filterResults(results, props, self._sel._blocks[0])
-        self.assertEqual(len(results.keys()), 2)
+    def test_selector_integration_test3(self):
+        # filter block
+        block = selector.FilterBlock(
+            self._algorithmsmap,
+            self._pulsemap,
+            self._clustermap,
+            self._elementmap
+        )
+        pulse_values = self._pulsemap._map.values()
+        pid = [x.id() for x in pulse_values if x.name() == "order"][0]
+        value = 20.0
+        block = selector.filterWithBlock(
+            self.query_pulse_dynamic_select(pid, value),
+            block
+        )
+        # reassign to maps
+        self._algorithmsmap = block._alg
+        self._pulsemap = block._pul
+        self._clustermap = block._clu
+        self._elementmap = block._ele
+        # assertion
+        self.assertEqual(len(self._algorithmsmap._map.values()), 1)
+        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(self._pulsemap.get(pid).static(), False)
+        self.assertEqual(self._pulsemap.get(pid).default(), value)
+        self.assertEqual(len(self._clustermap._map), 5)
+        self.assertEqual(len(self._elementmap._map), 5)
 
-    def test_selector_filterResults_3(self):
-        set = "select from ${results} where @b=90 and @b |is| dynamic"
-        self._sel.loadQueriesFromQueryset(set)
-        results = self._dv.getResults()
-        props = self._dv.getProperties()
-        self._sel._filterResults(results, props, self._sel._blocks[0])
-        self.assertEqual(len(results.keys()), 3)
+    def test_selector_integration_test4(self):
+        # filter block
+        block = selector.FilterBlock(
+            self._algorithmsmap,
+            self._pulsemap,
+            self._clustermap,
+            self._elementmap
+        )
+        # extract parameters: cluster id, pulse id and default value
+        cluster_values = self._clustermap._map.values()
+        cid = [x.id() for x in cluster_values if x.name() == "#3"][0]
+        pulse_values = self._pulsemap._map.values()
+        pid = [x.id() for x in pulse_values if x.name() == "random"][0]
+        value = 7
+        block = selector.filterWithBlock(
+            self.query_all_select_static(cid, pid, value),
+            block
+        )
+        # reassign parameters to maps
+        self._algorithmsmap = block._alg
+        self._pulsemap = block._pul
+        self._clustermap = block._clu
+        self._elementmap = block._ele
+        # assertion
+        self.assertEqual(len(self._algorithmsmap._map.values()), 1)
+        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(self._pulsemap.get(pid).static(), True)
+        self.assertEqual(self._pulsemap.get(pid).default(), value)
+        self.assertEqual(len(self._clustermap._map), 1)
+        self.assertEqual(len(self._elementmap._map), 1)
 
-    def test_selector_matchGroupsAndResults(self):
-        # get results
-        set = "select from ${results} where @b=90 and @b |is| dynamic"
-        self._sel.loadQueriesFromQueryset(set)
-        results = self._dv.getResults()
-        props = self._dv.getProperties()
-        self._sel._filterResults(results, props, self._sel._blocks[0])
-        self.assertEqual(len(results.keys()), 3)
-        # get groups
-        groups = self._dv.getGroups()
-        gid = groups.guid("a")
-        set = "select from ${groups} where @id=["+gid+"]"
-        self._sel.loadQueriesFromQueryset(set)
-        self._sel._filterGroups(groups, self._sel._blocks[0])
-        self.assertEqual(len(groups.keys()), 1)
-
-        self._sel._matchGroupsAndResults(groups, results)
-        self.assertEqual(len(results.keys()), 1)
-
-    def test_selector_startFiltering1(self):
-        results = self._dv.getResults()
-        groups = self._dv.getGroups()
-        # extract group id for filtering
-        gid = groups.guid("b")
-        props = self._dv.getProperties()
-        self.assertEqual(len(groups.values()), 2)
-        self.assertEquals(len(results.values()), 3)
-        self.assertEquals(len(props.values()), 2)
-
-        with self.assertRaises(ex.AnalyticsStandardError):
-            self._sel.startFiltering(results, groups, props, None)
-        set = "select from ${results} where @b=90 and @b|is|dynamic;"+\
-                "select from ${groups} where @id=["+gid+"];"+\
-                "select from ${properties} where @name=[a]"
-        self._sel.loadQueriesFromQueryset(set)
-        self.assertEqual(len(self._sel._blocks), 3)
-        self._sel.startFiltering(results, groups, props, None)
-
-        self.assertEqual(len(groups.keys()), 1)
-        self.assertEqual(groups.values()[0].getId(), gid)
-        self.assertEquals(len(results.values()), 2)
-        self.assertEquals(len(props.values()), 1)
-
-    def test_selector_startFiltering2(self):
-        results = self._dv.getResults()
-        groups = self._dv.getGroups()
-        props = self._dv.getProperties()
-        self._sel.setSkipFiltering(True)
-        self._sel.startFiltering(results, groups, props, None)
-        # make sure that nothing has changed
-        self.assertEqual(len(groups.values()), 2)
-        self.assertEquals(len(results.values()), 3)
-        self.assertEquals(len(props.values()), 2)
+    def test_selector_integration_test5(self):
+        # filter block
+        block = selector.FilterBlock(
+            self._algorithmsmap,
+            self._pulsemap,
+            self._clustermap,
+            self._elementmap
+        )
+        # extract parameters: cluster id, pulse id, value
+        cluster_values = self._clustermap._map.values()
+        cid = [x.id() for x in cluster_values if x.name() == "#3"][0]
+        pulse_values = self._pulsemap._map.values()
+        pid = [x.id() for x in pulse_values if x.name() == "random"][0]
+        value = 7
+        block = selector.filterWithBlock(
+            self.query_all_select_dynamic(cid, pid, value),
+            block
+        )
+        # reassign parameters to maps
+        self._algorithmsmap = block._alg
+        self._pulsemap = block._pul
+        self._clustermap = block._clu
+        self._elementmap = block._ele
+        # assertion
+        self.assertEqual(len(self._algorithmsmap._map.values()), 1)
+        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(self._pulsemap.get(pid).static(), False)
+        self.assertEqual(self._pulsemap.get(pid).default(), value)
+        self.assertEqual(len(self._clustermap._map), 1)
+        self.assertEqual(len(self._elementmap._map), 2)
 
 # Load test suites
 def _suites():
     return [
-        Selector_TestsSequence
+        Selector_TestSequence
     ]
 
 # Load tests

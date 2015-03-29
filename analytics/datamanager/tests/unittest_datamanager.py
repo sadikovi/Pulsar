@@ -22,12 +22,12 @@ import unittest
 import os
 from types import DictType
 # import classes
-import paths
+import projectpaths as paths
 import analytics.exceptions.exceptions as ex
 import analytics.datamanager.datamanager as dm
 
 
-class DataManager_TestsSequence(unittest.TestCase):
+class DataManager_TestSequence(unittest.TestCase):
     def setUp(self):
         self.isStarted = True
 
@@ -68,9 +68,24 @@ class DataManager_TestsSequence(unittest.TestCase):
         self.assertEqual(dataset._name, "Test dataset")
         self.assertEqual(dataset._desc, "Test dataset")
         self.assertEqual(dataset._discover, False)
-        self.assertEqual(dataset._groups, { "path": os.path.join(directory, "test", "groups.json"), "type": "json" })
-        self.assertEqual(dataset._results, { "path": os.path.join(directory, "test", "results.json"), "type": "json" })
-        self.assertEqual(dataset._properties, { "path": os.path.join(directory, "test", "properties.json"), "type": "json" })
+        self.assertEqual(dataset._clusters,
+            {
+                "path": os.path.join(directory, "test", "clusters.json"),
+                "type": "json"
+            }
+        )
+        self.assertEqual(dataset._elements,
+            {
+                "path": os.path.join(directory,
+                "test", "elements.json"), "type": "json"
+            }
+        )
+        self.assertEqual(dataset._pulses,
+            {
+                "path": os.path.join(directory, "test", "pulses.json"),
+                "type": "json"
+            }
+        )
 
     def test_datamanager_findManifests(self):
         t = dm.DataManager()
@@ -107,10 +122,10 @@ class DataManager_TestsSequence(unittest.TestCase):
             self.assertEqual(manf["dataset"], True)
         # check datasets
         for dsf in ds.values():
-            self.assertEqual(dsf["groups"], True)
-            self.assertEqual(dsf["results"], True)
-            if "properties" in dsf:
-                self.assertEqual(dsf["properties"], True)
+            self.assertEqual(dsf["clusters"], True)
+            self.assertEqual(dsf["elements"], True)
+            if "pulses" in dsf:
+                self.assertEqual(dsf["pulses"], True)
 
     def test_datamanager_checkDatasetTest(self):
         directory = os.path.join(paths.ANALYTICS_PATH, "datasets")
@@ -122,7 +137,7 @@ class DataManager_TestsSequence(unittest.TestCase):
 # Load test suites
 def _suites():
     return [
-        DataManager_TestsSequence
+        DataManager_TestSequence
     ]
 
 # Load tests
