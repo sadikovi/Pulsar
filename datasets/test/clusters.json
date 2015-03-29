@@ -1,5 +1,7 @@
 [
-    {"id": "1", "name": "Parent group", "desc": "Parent group", "parent": null},
-    {"id": "2", "name": "Child 1", "desc": "Child 1", "parent": "1"},
-    {"id": "3", "name": "Child 2", "desc": "Child 2", "parent": "1"}
+    {"id": "1", "name": "A", "desc": "A", "parent": null},
+    {"id": "2", "name": "B", "desc": "B", "parent": "1"},
+    {"id": "3", "name": "C", "desc": "C", "parent": "2"},
+    {"id": "4", "name": "D", "desc": "D", "parent": "2"},
+    {"id": "5", "name": "E", "desc": "E", "parent": "4"}
 ]

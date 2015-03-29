@@ -22,7 +22,7 @@ import unittest
 import os
 from types import ListType
 # import classes
-import paths
+import projectpaths as paths
 import analytics.loading.loader as l
 import analytics.loading.jsonloader as jsl
 import analytics.loading.xmlloader as xmll

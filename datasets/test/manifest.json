@@ -1,11 +1,11 @@
 {
-    "id": "123456_test",
-    "name": "Test dataset",
-    "desc": "Test dataset",
+    "id": "full_sample_dataset",
+    "name": "Sample dataset",
+    "desc": "Sample dataset",
     "data": {
         "clusters": { "file": "clusters", "type": "json" },
         "elements": { "file": "elements", "type": "json" },
-        "pulses": { "file": "pulses", "type": "json" }
+        "pulses":   { "file": "pulses", "type": "json" }
     },
     "discover": false
 }

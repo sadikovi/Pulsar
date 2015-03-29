@@ -28,15 +28,13 @@ class Service_TestSequence(unittest.TestCase):
         for item in service.EMAIL_LIST:
             self.assertEqual(service.isUserInEmaillist(item), True)
 
-    def test_service_getAllDatasets(self):
+    def test_service_searchDatasets(self):
         scanls = []
         for root, dirs, files in os.walk(paths.DATASETS_PATH):
             for file in files:
                 if file == "manifest.json":
                     scanls.append(os.path.join(root, file))
-
-        jsonstr = service.getAllDatasets()
-        ls = json.loads(jsonstr)
+        ls = service.searchDatasets()
         self.assertEqual(len(ls), len(scanls))
 
     def test_service_loaderForDatatype(self):
@@ -55,8 +53,7 @@ class Service_TestSequence(unittest.TestCase):
     def test_service_generateErrorMessage(self):
         messages = ["test"]
         code = 401
-        jsonstr = service._generateErrorMessage(messages, code)
-        obj = json.loads(jsonstr)
+        obj = service._generateErrorMessage(messages, code)
         self.assertEqual(type(obj), DictType)
         self.assertEqual(obj["messages"], messages)
         self.assertEqual(obj["code"], code)
@@ -65,8 +62,7 @@ class Service_TestSequence(unittest.TestCase):
     def test_service_generateSuccessMessage(self):
         messages = ["test"]
         dataobj = {"test": "test"}
-        jsonstr = service._generateSuccessMessage(messages, dataobj)
-        obj = json.loads(jsonstr)
+        obj = service._generateSuccessMessage(messages, dataobj)
         self.assertEqual(type(obj), DictType)
         self.assertEqual(obj["messages"], messages)
         self.assertEqual(obj["data"], dataobj)

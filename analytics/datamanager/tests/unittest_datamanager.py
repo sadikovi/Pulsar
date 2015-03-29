@@ -22,7 +22,7 @@ import unittest
 import os
 from types import DictType
 # import classes
-import paths
+import projectpaths as paths
 import analytics.exceptions.exceptions as ex
 import analytics.datamanager.datamanager as dm
 

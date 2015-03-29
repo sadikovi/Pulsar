@@ -18,7 +18,6 @@ limitations under the License.
 
 
 # import libs
-import json
 from types import StringType, ListType
 import os
 import warnings
@@ -51,6 +50,7 @@ _datamanager.setSearchPath(paths.DATASETS_PATH)
 # load all datasets
 _datamanager.loadDatasets()
 
+
 # [Public]
 def isUserInEmaillist(email):
     """
@@ -66,6 +66,21 @@ def isUserInEmaillist(email):
     return email in EMAIL_LIST
 
 
+# [Private]
+def searchDatasets(dmngr=None):
+    """
+        Searches and returns raw list of datasets.
+
+        Args:
+            dmngr (DataManager): datamanager specified
+
+        Returns:
+            list<Dataset>: list of datasets
+    """
+    dmngr = dmngr or _datamanager
+    return dmngr.getDatasets()
+
+
 # [Public]
 def getAllDatasets():
     """
@@ -73,13 +88,13 @@ def getAllDatasets():
         empty list.
 
         Returns:
-            str: json string of available datasets
+            dict<str, obj>: list of available datasets
     """
     try:
-        obj = [x.getJSON() for x in _datamanager.getDatasets()]
-        return json.dumps(obj)
-    except:
-        return json.dumps([])
+        obj = [x.getJSON() for x in searchDatasets()]
+        return _generateSuccessMessage([], obj)
+    except BaseException as e:
+        return _generateErrorMessage([str(e)])
 
 
 # [Public]
@@ -94,21 +109,21 @@ def requestData(datasetId, query, dmngr=None):
             dmngr (DataManager): hook to pass own datamanager for tests
 
         Returns:
-            str: json string of results
+            dict<str, obj>: json object of results
     """
-    jsonstring = ""
+    jsonobj = {}
     try:
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             # retrieve object
             obj = _getDataObject(datasetId, query, dmngr)
-            jsonstring = _generateSuccessMessage(
+            jsonobj = _generateSuccessMessage(
                 [str(wm.message) for wm in w],
                 obj
             )
     except ex.AnalyticsBaseException as e:
-        jsonstring = _generateErrorMessage([e._errmsg])
-    return jsonstring
+        jsonobj = _generateErrorMessage([e._errmsg])
+    return jsonobj
 
 
 # [Private]
@@ -231,7 +246,7 @@ def _generateSuccessMessage(messages, dataobj):
             dataobj (dict<str, obj>): data object
 
         Returns:
-            str: json representation of success message
+            dict<str, obj>: json representation of success message
     """
     misc.checkTypeAgainst(type(messages), ListType, __file__)
     # build global object
@@ -241,7 +256,7 @@ def _generateSuccessMessage(messages, dataobj):
         "data": dataobj,
         "messages": messages
     }
-    return json.dumps(obj)
+    return obj
 
 
 # [Private]
@@ -254,7 +269,7 @@ def _generateErrorMessage(messages, code=400):
             code (int): error message code
 
         Returns:
-            str: json string with error message
+            dict<str, obj>: json object with error message
     """
     misc.checkTypeAgainst(type(messages), ListType, __file__)
     # build global error object
@@ -264,4 +279,4 @@ def _generateErrorMessage(messages, code=400):
         "data": None,
         "messages": messages
     }
-    return json.dumps(obj)
+    return obj

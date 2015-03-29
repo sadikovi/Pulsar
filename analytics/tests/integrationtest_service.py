@@ -2,7 +2,6 @@
 
 # import libs
 import unittest
-import json
 import sys
 import os
 import random
@@ -25,16 +24,14 @@ class IntegrationTestSequence(unittest.TestCase):
     def test_service_default(self):
         query = ""
         datasetId = random.choice(self.datasets.keys())
-        jsonresult = service.requestData(datasetId, query, self.datamanager)
-        result = json.loads(jsonresult)
+        result = service.requestData(datasetId, query, self.datamanager)
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["code"], 200)
 
     def test_service_wrongquery(self):
         query = uuid.uuid4().hex
         datasetId = random.choice(self.datasets.keys())
-        jsonresult = service.requestData(datasetId, query, self.datamanager)
-        result = json.loads(jsonresult)
+        result = service.requestData(datasetId, query, self.datamanager)
         self.assertEqual(result["status"], "error")
         self.assertEqual(result["code"], 400)
 
@@ -44,8 +41,7 @@ class IntegrationTestSequence(unittest.TestCase):
                         and @1b4cf15c86ec31cd8838feab0f9856b1 = 2
                         and @b6db26b3972932b2862dac41cbb1493d = [up]"""
         datasetId = random.choice(self.datasets.keys())
-        jsonresult = service.requestData(datasetId, query, self.datamanager)
-        result = json.loads(jsonresult)
+        result = service.requestData(datasetId, query, self.datamanager)
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["code"], 200)
 
@@ -53,8 +49,7 @@ class IntegrationTestSequence(unittest.TestCase):
         query = """select from ${clusters}
                     where @id = [bc27b4dbbc0f34f9ae8e4b72f2d51b60]"""
         datasetId = random.choice(self.datasets.keys())
-        jsonresult = service.requestData(datasetId, query, self.datamanager)
-        result = json.loads(jsonresult)
+        result = service.requestData(datasetId, query, self.datamanager)
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["code"], 200)
 
@@ -62,8 +57,7 @@ class IntegrationTestSequence(unittest.TestCase):
         query = """select from ${pulses}
                     where @f4b9ea9d3bf239f5a1c80578b0556a5e |is| dynamic"""
         datasetId = random.choice(self.datasets.keys())
-        jsonresult = service.requestData(datasetId, query, self.datamanager)
-        result = json.loads(jsonresult)
+        result = service.requestData(datasetId, query, self.datamanager)
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["code"], 200)
         self.assertEqual(len(result["messages"]), 1)
