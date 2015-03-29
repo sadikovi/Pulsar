@@ -30,7 +30,7 @@ class ProcessBlock(object):
             _elementmap (ElementMap): map of elements
             _isProcessed (bool): flag to show that block is processed
     """
-    def __init__(self, clusters, elements, pulses):
+    def __init__(self, clusters, elements, pulses, discovery=False):
         self._clustermap = clusters["map"]
         self._elementmap = elements["map"]
         self._pulsemap = pulses["map"]
@@ -39,6 +39,7 @@ class ProcessBlock(object):
             "elements": elements["data"],
             "pulses": pulses["data"]
         }
+        self._isDiscovery = bool(discovery)
         self._isProcessed = False
 
 # [Public]
@@ -71,6 +72,9 @@ def processWithBlock(block):
         idmapper
     )
     ## pulses
+    ### if discovery is true we try searching elements for pulses
+    if block._isDiscovery:
+        block._data["pulses"] = _createPulseObjects(block._elementmap)
     idmapper = parsePulses(
         block._data["pulses"],
         block._pulsemap,
@@ -315,3 +319,34 @@ def _processPulseObject(obj, idmapper={}):
         return DynamicPulse(name, desc, sample, pr, st)
     else:
         return StaticPulse(name, desc, sample)
+
+# [Private]
+def _createPulseObjects(elementmap):
+    """
+        Returns list of objects for creating pulses.
+
+        Args:
+            elementmap (ElementMap): map of elements
+
+        Returns:
+            list<obj>: list of objects to create pulses
+    """
+    misc.checkTypeAgainst(type(elementmap), ElementMap, __file__)
+    msg = "Hmmm, though pulses are not specified, system discovered some"
+    warnings.warn(msg, UserWarning)
+    # list of maps to build pulses
+    mp = {}
+    for element in elementmap._map.values():
+        for feature in element.features():
+            if feature.id() not in mp:
+                obj = {
+                    "id": feature.id(),
+                    "name": feature.name(),
+                    "desc": feature.desc(),
+                    "sample": feature.value()
+                }
+                if feature.type() in [IntType, FloatType]:
+                    obj["dynamic"] = True
+                    obj["priority"] = 1
+                mp[feature.id()] = obj
+    return mp.values()

@@ -157,6 +157,7 @@ def _getDataObject(datasetId, queryset, dmngr=None):
     cludata = dataset._clusters
     eledata = dataset._elements
     puldata = dataset._pulses
+    isdiscover = dataset._discover
     ## clusters list
     clusters = _loaderForDatatype(
         cludata[datamanager.TYPE],
@@ -167,11 +168,13 @@ def _getDataObject(datasetId, queryset, dmngr=None):
         eledata[datamanager.TYPE],
         eledata[datamanager.PATH]
     ).processData()
-    ## pulses list
-    pulses = _loaderForDatatype(
-        puldata[datamanager.TYPE],
-        puldata[datamanager.PATH]
-    ).processData()
+    ## pulses list (if we discover pulses skip step)
+    pulses = []
+    if not isdiscover:
+        pulses = _loaderForDatatype(
+            puldata[datamanager.TYPE],
+            puldata[datamanager.PATH]
+        ).processData()
     # create maps
     clustermap = ClusterMap()
     elementmap = ElementMap()
@@ -180,7 +183,8 @@ def _getDataObject(datasetId, queryset, dmngr=None):
     pblock = processor.ProcessBlock(
         {"map": clustermap, "data": clusters},
         {"map": elementmap, "data": elements},
-        {"map": pulsemap, "data": pulses}
+        {"map": pulsemap, "data": pulses},
+        isdiscover
     )
     pblock = processor.processWithBlock(pblock)
 

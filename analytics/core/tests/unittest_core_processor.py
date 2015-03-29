@@ -211,6 +211,37 @@ class Processor_TestSequence(unittest.TestCase):
             len(block._pulsemap._map.values()), len(pulses["data"])
         )
 
+
+    def test_processor_discoverPulses(self):
+        clusters = {"map": self._clustermap, "data": [self._clrobj]}
+        elements = {"map": self._elementmap, "data": [self._elmobj]}
+        pulses = {"map": self._pulsemap, "data": [self._plsobj]}
+        # fill block, and discover pulses
+        block = processor.ProcessBlock(clusters, elements, pulses, True)
+        self.assertEqual(block._clustermap, self._clustermap)
+        self.assertEqual(block._elementmap, self._elementmap)
+        self.assertEqual(block._pulsemap, self._pulsemap)
+        self.assertEqual(block._isDiscovery, True)
+        self.assertEqual(block._isProcessed, False)
+        # process block
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            block = processor.processWithBlock(block)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, UserWarning))
+        self.assertEqual(block._isProcessed, True)
+        self.assertEqual(
+            len(block._clustermap._map.values()), len(clusters["data"])
+        )
+        self.assertEqual(
+            len(block._elementmap._map.values()), len(elements["data"])
+        )
+        self.assertEqual(len(block._pulsemap._map.values()), 1)
+        for pulse in block._pulsemap._map.values():
+            self.assertEqual(pulse.name() in self._elmobj, True)
+            self.assertEqual(len(pulse.store()), 1)
+
+
 # Load test suites
 def _suites():
     return [
