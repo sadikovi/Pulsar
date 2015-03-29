@@ -98,7 +98,7 @@ def getAllDatasets():
 
 
 # [Public]
-def requestData(datasetId, query, dmngr=None):
+def requestData(datasetId, query, dmngr=None, issorted=False):
     """
         Public method to request data, has error handling. Returns data json,
         if everything is okay, otherwise returns error json.
@@ -107,6 +107,7 @@ def requestData(datasetId, query, dmngr=None):
             datasetId (str): id of a particular dataset
             query (str): select query for data
             dmngr (DataManager): hook to pass own datamanager for tests
+            issorted (bool): indicates whether elements are sorted or not
 
         Returns:
             dict<str, obj>: json object of results
@@ -116,7 +117,7 @@ def requestData(datasetId, query, dmngr=None):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             # retrieve object
-            obj = _getDataObject(datasetId, query, dmngr)
+            obj = _getDataObject(datasetId, query, dmngr, issorted)
             jsonobj = _generateSuccessMessage(
                 [str(wm.message) for wm in w],
                 obj
@@ -127,7 +128,7 @@ def requestData(datasetId, query, dmngr=None):
 
 
 # [Private]
-def _getDataObject(datasetId, queryset, dmngr=None):
+def _getDataObject(datasetId, queryset, dmngr=None, issorted=False):
     """
         Returns data object for dataset id and queryset.
 
@@ -135,6 +136,7 @@ def _getDataObject(datasetId, queryset, dmngr=None):
             datasetId (str): dataset id
             queryset (str): query string
             dmngr (DataManager): hook to pass own datamanager for tests
+            issorted (bool): indicates whether elements are sorted or not
 
         Returns:
             dict<str, obj>: object with clusters, elements, pulses, algorithm
@@ -208,9 +210,13 @@ def _getDataObject(datasetId, queryset, dmngr=None):
     pulsemap = fblock._pul
     algorithm = ablock._algorithm
     # extract json object from maps and send success message
+    ## as elements now can be sorted we extract json manually
+    elementlist = elementmap._map.values()
+    if issorted:
+        elementlist = processor.sortElements(elementlist)
     obj = {
         "clusters": clustermap.getJSON(),
-        "elements": elementmap.getJSON(),
+        "elements": [x.getJSON() for x in elementlist],
         "pulses": pulsemap.getJSON(),
         "algorithm": algorithm.getJSON()
     }

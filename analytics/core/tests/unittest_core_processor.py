@@ -241,6 +241,36 @@ class Processor_TestSequence(unittest.TestCase):
             self.assertEqual(pulse.name() in self._elmobj, True)
             self.assertEqual(len(pulse.store()), 1)
 
+    def test_processor_sortElements(self):
+        elementlist = [
+            {"id": "#1","name": "#1","desc": "#1","cluster": None},
+            {"id": "#2","name": "#2","desc": "#2","cluster": None},
+            {"id": "#3","name": "#3","desc": "#3","cluster": None}
+        ]
+        ranks = [RSYS.O, RSYS.B, RSYS.A, RSYS.F, RSYS.G, RSYS.K]
+        elementmap = ElementMap()
+        processor.parseElements(elementlist, elementmap)
+        for element in elementmap._map.values():
+            element.setRank(random.choice(ranks))
+        ls = processor.sortElements(elementmap._map.values())
+        for i in range(len(ls)-1):
+            self.assertTrue(ls[i].rank()._value >= ls[i+1].rank()._value)
+
+    def test_processor_sortElementsReversed(self):
+        elementlist = [
+            {"id": "#1","name": "#1","desc": "#1","cluster": None},
+            {"id": "#2","name": "#2","desc": "#2","cluster": None},
+            {"id": "#3","name": "#3","desc": "#3","cluster": None}
+        ]
+        ranks = [RSYS.O, RSYS.B, RSYS.A, RSYS.F, RSYS.G, RSYS.K]
+        elementmap = ElementMap()
+        processor.parseElements(elementlist, elementmap)
+        for element in elementmap._map.values():
+            element.setRank(random.choice(ranks))
+        ls = processor.sortElements(elementmap._map.values(), True)
+        for i in range(len(ls)-1):
+            self.assertTrue(ls[i].rank()._value <= ls[i+1].rank()._value)
+
 
 # Load test suites
 def _suites():

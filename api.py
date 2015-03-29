@@ -40,7 +40,8 @@ class Query(webapp2.RequestHandler):
         if accessGranted(user):
             query = str(self.request.get('q'))
             datasetId = str(self.request.get('d'))
-            result = service.requestData(datasetId, query)
+            sort = bool(self.request.get('s'))
+            result = service.requestData(datasetId, query, issorted=sort)
         else:
             msg = "Access is not granted"
             result = service._generateErrorMessage([msg])

@@ -350,3 +350,33 @@ def _createPulseObjects(elementmap):
                     obj["priority"] = 1
                 mp[feature.id()] = obj
     return mp.values()
+
+
+# [Public]
+def sortElements(elementlist, lowRanksFirst=False):
+    """
+        Sorts elements in elementmap with specified order.
+
+        Args:
+            elementlist (list<ElementMap>): elements list
+            highRanksFirst (bool): flag showing the order of ranking
+
+        Returns:
+            list<Elementmap>: sorted element list
+    """
+    # comparison function
+    def elemcmp(x, y):
+        xrank = x.rank(); yrank = y.rank()
+        if xrank is None or yrank is None:
+            misc.raiseStandardError("Element does not have a rank", __file__)
+        if xrank._value < yrank._value:
+            return 1
+        elif xrank._value > yrank._value:
+            return -1
+        else:
+            return 0
+    # check element list
+    if len(elementlist) <= 1:
+        return elementlist
+    else:
+        return sorted(elementlist, elemcmp, None, lowRanksFirst)
