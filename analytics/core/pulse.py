@@ -108,11 +108,20 @@ class StaticPulse(Pulse):
 
             Args:
                 default (obj): default value
+
+            Returns:
+                bool: returns True if assign was successful, False otherwise
         """
+        # flag to indicate correct assignment
+        _passed = False
         if default is None:
             self._default = default
+            _passed = True
         elif type(default) is self._type and default in self._store:
             self._default = default
+            _passed = True
+        # value is not from store or not the same type
+        return _passed
 
     # [Public]
     def static(self):
@@ -159,17 +168,27 @@ class DynamicPulse(Pulse):
 
             Args:
                 default (obj): default value
+
+            Returns:
+                bool: returns True, if value is correct, otherwise False
         """
+        # flag to indicate correct assignment
+        _passed = False
         # check default value as None
         if default is None:
             self._default = default
+            _passed = True
         # check typed default value
         elif type(default) is self._type:
             if not self._static:
                 self._default = default
+                _passed = True
             # if dynamic property is mimicking static pulse, check store
             elif default in self._store:
                 self._default = default
+                _passed = True
+        # value does not match any case above, must be wrong value
+        return _passed
 
     # [Public]
     def static(self):

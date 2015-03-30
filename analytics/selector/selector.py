@@ -173,7 +173,13 @@ def filterPulses(queryblock, pulsemap):
             pulse = pulsemap.get(predicate._parameter)
             if pulse is not None:
                 values = predicate._values
-                pulse.setDefaultValue(values[0])
+                _passed = pulse.setDefaultValue(values[0])
+                # 30.03.2015 ivan.sadikov: added issue#27 fix
+                # reporting warning, if value is incorrect
+                if not _passed:
+                    _n = pulse.name(); _v = str(values[0])
+                    msg = "Pulse %s cannot set value %s as default" %(_n, _v)
+                    warnings.warn(msg, UserWarning)
     # return updated pulsemap
     return pulsemap
 

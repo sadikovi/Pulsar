@@ -19,6 +19,19 @@ def accessGranted(user):
     return user and service.isUserInEmaillist(user.email())
 
 
+def boolean(value):
+    """
+        Converts string into boolean
+
+        Returns:
+            bool: converted boolean value
+    """
+    if value in ["false", "0"]:
+        return False
+    else:
+        return bool(value)
+
+
 class Datasets(webapp2.RequestHandler):
     def get(self):
         result = {}
@@ -40,8 +53,14 @@ class Query(webapp2.RequestHandler):
         if accessGranted(user):
             query = str(self.request.get('q'))
             datasetId = str(self.request.get('d'))
-            sort = bool(self.request.get('s'))
-            result = service.requestData(datasetId, query, issorted=sort)
+            sort = boolean(self.request.get('s'))
+            warn = boolean(self.request.get('w'))
+            result = service.requestData(
+                datasetId,
+                query,
+                issorted=sort,
+                iswarnings=warn
+            )
         else:
             msg = "Access is not granted"
             result = service._generateErrorMessage([msg])

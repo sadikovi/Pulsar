@@ -4,6 +4,7 @@
 import unittest
 from types import IntType, FloatType, ListType
 import random
+import warnings
 # import classes
 import analytics.exceptions.exceptions as ex
 import analytics.core.processor.processor as processor
@@ -19,7 +20,8 @@ class Selector_TestSequence(unittest.TestCase):
     def setUp(self):
         self._p = [
             {"id": "1", "name": "random", "desc": "random", "sample": 1, "dynamic": True},
-            {"id": "2", "name": "order", "desc": "order", "sample": 1.0, "dynamic": False}
+            {"id": "2", "name": "order", "desc": "order", "sample": 1.0, "dynamic": False},
+            {"id": "3", "name": "dir", "desc": "dir", "sample": "str"}
         ]
         self._c = [
             {"id": "1", "name": "#1", "desc": "#1", "parent": None},
@@ -29,11 +31,11 @@ class Selector_TestSequence(unittest.TestCase):
             {"id": "5", "name": "#5", "desc": "#5", "parent": "2"}
         ]
         self._e = [
-            {"id": "1", "name": "@1", "desc": "@1", "cluster": "5", "random": 2, "order": 1.2},
-            {"id": "2", "name": "@2", "desc": "@2", "cluster": "5", "random": 9, "order": 0.9},
-            {"id": "3", "name": "@3", "desc": "@3", "cluster": "3", "random": 7, "order": 1.1},
-            {"id": "4", "name": "@4", "desc": "@4", "cluster": "3", "random": 1, "order": 1.5},
-            {"id": "5", "name": "@5", "desc": "@5", "cluster": "4", "random": 4, "order": 1.7}
+            {"id": "1", "name": "@1", "desc": "@1", "cluster": "5", "random": 2, "order": 1.2, "dir": "up"},
+            {"id": "2", "name": "@2", "desc": "@2", "cluster": "5", "random": 9, "order": 0.9, "dir": "down"},
+            {"id": "3", "name": "@3", "desc": "@3", "cluster": "3", "random": 7, "order": 1.1, "dir": "down"},
+            {"id": "4", "name": "@4", "desc": "@4", "cluster": "3", "random": 1, "order": 1.5, "dir": "up"},
+            {"id": "5", "name": "@5", "desc": "@5", "cluster": "4", "random": 4, "order": 1.7, "dir": "down"}
         ]
         # create process block
         block = processor.ProcessBlock(
@@ -134,7 +136,7 @@ class Selector_TestSequence(unittest.TestCase):
         self._elementmap = block._ele
         # assertion
         self.assertEqual(len(self._algorithmsmap._map.values()), 1)
-        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(len(self._pulsemap._map), 3)
         self.assertEqual(len(self._clustermap._map), 3)
         self.assertEqual(len(self._elementmap._map), 3)
 
@@ -161,7 +163,7 @@ class Selector_TestSequence(unittest.TestCase):
         self._elementmap = block._ele
         # assertion
         self.assertEqual(len(self._algorithmsmap._map.values()), 1)
-        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(len(self._pulsemap._map), 3)
         self.assertEqual(self._pulsemap.get(pid).static(), True)
         self.assertEqual(self._pulsemap.get(pid).default(), value)
         self.assertEqual(len(self._clustermap._map), 5)
@@ -190,7 +192,7 @@ class Selector_TestSequence(unittest.TestCase):
         self._elementmap = block._ele
         # assertion
         self.assertEqual(len(self._algorithmsmap._map.values()), 1)
-        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(len(self._pulsemap._map), 3)
         self.assertEqual(self._pulsemap.get(pid).static(), False)
         self.assertEqual(self._pulsemap.get(pid).default(), value)
         self.assertEqual(len(self._clustermap._map), 5)
@@ -221,7 +223,7 @@ class Selector_TestSequence(unittest.TestCase):
         self._elementmap = block._ele
         # assertion
         self.assertEqual(len(self._algorithmsmap._map.values()), 1)
-        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(len(self._pulsemap._map), 3)
         self.assertEqual(self._pulsemap.get(pid).static(), True)
         self.assertEqual(self._pulsemap.get(pid).default(), value)
         self.assertEqual(len(self._clustermap._map), 1)
@@ -252,11 +254,63 @@ class Selector_TestSequence(unittest.TestCase):
         self._elementmap = block._ele
         # assertion
         self.assertEqual(len(self._algorithmsmap._map.values()), 1)
-        self.assertEqual(len(self._pulsemap._map), 2)
+        self.assertEqual(len(self._pulsemap._map), 3)
         self.assertEqual(self._pulsemap.get(pid).static(), False)
         self.assertEqual(self._pulsemap.get(pid).default(), value)
         self.assertEqual(len(self._clustermap._map), 1)
         self.assertEqual(len(self._elementmap._map), 2)
+
+    def test_selector_warn_staticdefault(self):
+        pulse_values = self._pulsemap._map.values()
+        pulse = [x for x in pulse_values if x.name() == "dir"][0]
+        values = [2, 20.0, "str", "up"]
+        for value in values:
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                block = selector.FilterBlock(
+                    self._algorithmsmap,
+                    self._pulsemap,
+                    self._clustermap,
+                    self._elementmap
+                )
+                block = selector.filterWithBlock(
+                    self.query_pulse_static_select(pulse.id(), value),
+                    block
+                )
+                if value == "up" or value == "down":
+                    self.assertEqual(len(w), 0)
+                    self.assertEqual(pulse.default(), value)
+                else:
+                    self.assertEqual(len(w), 1)
+                    self.assertTrue(issubclass(w[-1].category, UserWarning))
+                    self.assertEqual(pulse.default(), None)
+
+    def test_selector_warn_dynamicdefault(self):
+        pulse_values = self._pulsemap._map.values()
+        pulse = [x for x in pulse_values if x.name() == "order"][0]
+        values = [20.0, 2, "str", "up"]
+        for value in values:
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                # filter block
+                block = selector.FilterBlock(
+                    self._algorithmsmap,
+                    self._pulsemap,
+                    self._clustermap,
+                    self._elementmap
+                )
+                block = selector.filterWithBlock(
+                    self.query_pulse_dynamic_select(pulse.id(), value),
+                    block
+                )
+                if type(value) is pulse.type():
+                    self.assertEqual(len(w), 0)
+                    self.assertEqual(pulse.default(), value)
+                else:
+                    self.assertEqual(len(w), 1)
+                    self.assertTrue(issubclass(w[-1].category, UserWarning))
+                    self.assertNotEqual(pulse.default(), value)
+
 
 # Load test suites
 def _suites():
