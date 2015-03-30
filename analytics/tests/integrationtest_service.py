@@ -53,14 +53,32 @@ class IntegrationTestSequence(unittest.TestCase):
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["code"], 200)
 
-    def test_service_warnings(self):
+    def service_warnings(self, warn=True):
         query = """select from ${pulses}
                     where @f4b9ea9d3bf239f5a1c80578b0556a5e |is| dynamic"""
         datasetId = random.choice(self.datasets.keys())
-        result = service.requestData(datasetId, query, self.datamanager)
+        result = service.requestData(
+            datasetId,
+            query,
+            self.datamanager,
+            iswarnings=warn
+        )
+        # result should not fail and should generate warnings
+        return result
+
+    def test_service_warnings_on(self):
+        # warnings are on by default
+        result = self.service_warnings()
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["code"], 200)
         self.assertEqual(len(result["messages"]), 1)
+
+    def test_service_warnings_off(self):
+        # warning is expected, but we turn it off
+        result = self.service_warnings(False)
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["code"], 200)
+        self.assertEqual(len(result["messages"]), 0)
 
 
 # Load test suites

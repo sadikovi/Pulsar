@@ -98,7 +98,7 @@ def getAllDatasets():
 
 
 # [Public]
-def requestData(datasetId, query, dmngr=None, issorted=False):
+def requestData(datasetId, query, dmngr=None, issorted=False, iswarnings=True):
     """
         Public method to request data, has error handling. Returns data json,
         if everything is okay, otherwise returns error json.
@@ -108,6 +108,7 @@ def requestData(datasetId, query, dmngr=None, issorted=False):
             query (str): select query for data
             dmngr (DataManager): hook to pass own datamanager for tests
             issorted (bool): indicates whether elements are sorted or not
+            iswarnings (bool): indicates wherther warnings are reported or not
 
         Returns:
             dict<str, obj>: json object of results
@@ -118,10 +119,10 @@ def requestData(datasetId, query, dmngr=None, issorted=False):
             warnings.simplefilter("always")
             # retrieve object
             obj = _getDataObject(datasetId, query, dmngr, issorted)
-            jsonobj = _generateSuccessMessage(
-                [str(wm.message) for wm in w],
-                obj
-            )
+            # 30.03.2015 ivan.sadikov: added iswarnings feature
+            messages = [str(wm.message) for wm in w] if iswarnings else []
+            # prepare json object
+            jsonobj = _generateSuccessMessage(messages, obj)
     except ex.AnalyticsBaseException as e:
         jsonobj = _generateErrorMessage([e._errmsg])
     return jsonobj
