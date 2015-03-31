@@ -69,22 +69,17 @@ class Query(webapp2.RequestHandler):
         self.response.set_status(result["code"])
 
 
-class Login(webapp2.RequestHandler):
+class WrongAPICall(webapp2.RequestHandler):
     def get(self):
-        self.redirect(users.create_login_url('/'))
+        msg = "API does not exist"
+        result = service._generateErrorMessage([msg])
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(result))
+        self.response.set_status(400)
 
-class Logout(webapp2.RequestHandler):
-    def get(self):
-        self.redirect(users.create_logout_url('/'))
-
-class Mainpage(webapp2.RequestHandler):
-    def get(self):
-        self.response.write('Hello world!')
 
 application = webapp2.WSGIApplication([
-    ('/datasets', Datasets),
-    ('/logout', Logout),
-    ('/login', Login),
-    ('/query', Query),
-    ('/', Mainpage)
+    ('/api/datasets', Datasets),
+    ('/api/query', Query),
+    ('/api/.*', WrongAPICall)
 ], debug=True)

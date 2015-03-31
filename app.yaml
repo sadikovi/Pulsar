@@ -1,12 +1,28 @@
 application: awesome-sphere-88306
-version: 1
+version: 1-0
 runtime: python27
 api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
+# main webpage handlers
+- url: /
+  script: main.application
+
+- url: /index\.html
+  script: main.application
+
+# api calls
+- url: /api/.*
   script: api.application
+
+# login and logout
+- url: /login
+  script: auth.application
+
+- url: /logout
+  script: auth.application
+
 
 libraries:
 - name: webapp2
