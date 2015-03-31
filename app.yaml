@@ -5,12 +5,23 @@ api_version: 1
 threadsafe: true
 
 handlers:
-# main webpage handlers
+# main webpage handler
 - url: /
-  script: main.application
+  static_files: static/mainpage.html
+  upload: static/mainpage.html
 
 - url: /index\.html
-  script: main.application
+  static_files: static/mainpage.html
+  upload: static/mainpage.html
+
+# resources handlers
+- url: /stylesheets/(.*\.(less|css))$
+  static_files: static/stylesheets/\1
+  upload: static/stylesheets/(.*\.(less|css))$
+
+- url: /fonts/(.*\.(ttf))$
+  static_files: static/fonts/\1
+  upload: static/fonts/(.*\.(ttf))$
 
 # api calls
 - url: /api/.*
