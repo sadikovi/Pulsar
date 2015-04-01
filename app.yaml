@@ -14,10 +14,29 @@ handlers:
   static_files: static/mainpage.html
   upload: static/mainpage.html
 
+- url: /demo
+  static_files: static/demo.html
+  upload: static/demo.html
+  login: required
+
+- url: /signin
+  static_files: static/signin.html
+  upload: static/signin.html
+
+- url: /(login|logout)$
+  script: auth.application
+
+- url: /resolve
+  script: resolve.application
+
 # resources handlers
 - url: /stylesheets/(.*\.(less|css))$
   static_files: static/stylesheets/\1
   upload: static/stylesheets/(.*\.(less|css))$
+
+- url: /scripts/(.*\.(js|coffee))$
+  static_files: static/scripts/\1
+  upload: static/scripts/(.*\.(js|coffee))$
 
 - url: /fonts/(.*\.(ttf))$
   static_files: static/fonts/\1
@@ -26,13 +45,6 @@ handlers:
 # api calls
 - url: /api/.*
   script: api.application
-
-# login and logout
-- url: /login
-  script: auth.application
-
-- url: /logout
-  script: auth.application
 
 
 libraries:

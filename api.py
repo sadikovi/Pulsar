@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # import libs
-from google.appengine.api import users
+from google.appengine.api import users, mail
 import analytics.service as service
 import webapp2
 import json
@@ -69,6 +69,38 @@ class Query(webapp2.RequestHandler):
         self.response.set_status(result["code"])
 
 
+class AccountInfo(webapp2.RequestHandler):
+    def get(self):
+        user = users.get_current_user()
+        if accessGranted(user):
+            msg = "Access is already granted"
+            result = service._generateSuccessMessage([msg], None)
+        elif user and not service.isUserInEmaillist(user.email()):
+            # send email to me
+            mail.send_mail(
+                sender="Example.com Support <string@awesome-sphere-88306.appspotmail.com>",
+                to="Ivan Sadikov <ivan.sadikov@gmail.com>",
+                subject="Pulsar - Account to add",
+                body="""
+                    Hi, Ivan:
+
+                    New user, %s, has requested access to demo.
+                    Email to add: %s
+
+                    Cheers,
+                    Pulsar register
+                """ % (user.nickname(), user.email())
+            )
+            msg = "Authorised, but not in whitelist"
+            result = service._generateErrorMessage([msg], 403)
+        else:
+            msg = "Not authenticated"
+            result = service._generateErrorMessage([msg], 401)
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(result))
+        self.response.set_status(result["code"])
+
+
 class WrongAPICall(webapp2.RequestHandler):
     def get(self):
         msg = "API does not exist"
@@ -81,5 +113,6 @@ class WrongAPICall(webapp2.RequestHandler):
 application = webapp2.WSGIApplication([
     ('/api/datasets', Datasets),
     ('/api/query', Query),
+    ('/api/accountinfo', AccountInfo),
     ('/api/.*', WrongAPICall)
 ], debug=True)

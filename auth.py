@@ -7,7 +7,8 @@ import webapp2
 
 class Login(webapp2.RequestHandler):
     def get(self):
-        self.redirect(users.create_login_url('/'))
+        self.redirect(users.create_login_url('/resolve'))
+
 
 class Logout(webapp2.RequestHandler):
     def get(self):
@@ -15,6 +16,6 @@ class Logout(webapp2.RequestHandler):
 
 
 application = webapp2.WSGIApplication([
-    ('/logout', Logout),
-    ('/login', Login)
+    ('/login', Login),
+    ('/logout', Logout)
 ], debug=True)
