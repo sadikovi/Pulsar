@@ -12,25 +12,36 @@
     <link rel="stylesheet/less" type="text/css" href="stylesheets/button.less">
     <link rel="stylesheet/less" type="text/css" href="stylesheets/text.less">
     <link rel="stylesheet/less" type="text/css" href="stylesheets/utility.less">
+    <link rel="stylesheet/less" type="text/css" href="stylesheets/notcenter.less">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/2.3.1/less.min.js"></script>
 </head>
 <body>
     <div class="pl-grid">
         <div class="pl-width-1-1">
-            <div class="pl-container pl-container-center pl-margin-large-top" data-bind="header">
-                <div class="pl-display-inline-block">
-                    <span>Amelia Brand</span>
-                    <span class="pl-text-muted">@Pulsar 1.1</span>
-                    <a class="pl-button-link pl-margin-left" href="/logout">Logout</a>
+            <div class="pl-container pl-container-center">
+                <div class="pl-text-center notification-center" id="cbr-notification-content">
+                </div>
+            </div>
+            <div class="pl-container pl-container-center pl-margin-small-top">
+                <div class="pl-display-inline-block" id="cbr-header-login">
+                    <span id="cbr-header-username">{{ username }}</span>
+                    <span class="pl-text-muted">{{ system }}</span>
+                </div>
+                <div class="pl-display-inline-block pl-margin-left pl-margin-right"></div>
+                <div class="pl-display-inline-block" id="cbr-header-controls">
+                    <a class="pl-button-link" href="{{ logouturl }}">Logout</a>
                 </div>
             </div>
             <div class="pl-container pl-container-center">
                 <hr>
             </div>
-            <div class="pl-container pl-container-center">
-                Test
+            <div class="pl-container pl-container-center" id="cbr-content-main">
             </div>
         </div>
     </div>
+    <script src="scripts/notcenter.js"></script>
+    <script src="http://coffeescript.org/extras/coffee-script.js"></script>
+    <script type="text/coffeescript" src="scripts/loader.coffee"></script>
+    <script type="text/coffeescript" src="scripts/demo.coffee"></script>
 </body>
 </html>

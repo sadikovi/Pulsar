@@ -1,0 +1,11 @@
+{
+    "id": "mann_planet",
+    "name": "Mann planet",
+    "desc": "Mann planet dataset. Cold and snowy place, nothing interesting",
+    "data": {
+        "clusters": { "file": "clusters", "type": "json" },
+        "elements": { "file": "elements", "type": "json" },
+        "pulses":   { "file": "pulses", "type": "json" }
+    },
+    "discover": false
+}

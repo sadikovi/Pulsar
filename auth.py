@@ -7,7 +7,7 @@ import webapp2
 
 class Login(webapp2.RequestHandler):
     def get(self):
-        self.redirect(users.create_login_url('/resolve'))
+        self.redirect(users.create_login_url('/demo'))
 
 
 class Logout(webapp2.RequestHandler):

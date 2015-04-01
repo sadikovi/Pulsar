@@ -9,7 +9,7 @@ datamap =
 notauth =
     title: {classname: "", title: "Sign in with Google account"}
     subtitle: {classname: "", title: "We will also have to add you to the white list to play with demo"}
-    info: {classname: "", title: "Your email address will not be shared and will be used to log in to the website only"}
+    info: {classname: "pl-text-muted", title: "Your email address will not be shared and will be used to log in to the website only"}
     controls: [
         {type: "a", classname: "pl-button pl-button-success", action: "/login", title: "Okay, let me in"},
         {type: "div", classname: "pl-display-inline-block pl-margin-small-all", title: ""},
@@ -20,7 +20,7 @@ notauth =
 forbidden =
     title: {classname: "pl-text-success", title: "Request has been sent"}
     subtitle: {classname: "", title: "We will add you and send confirmation email as soon as possible"}
-    info: {classname: "", title: "Your email address will not be shared and will be used to log in to the website only"}
+    info: {classname: "pl-text-muted", title: "Your email address will not be shared and will be used to log in to the website only"}
     controls: [
         {type: "a", classname: "pl-button", action: "mailto:ivan.sadikov@lincolnuni.ac.nz", title: "Didn't get email?"},
         {type: "div", classname: "pl-display-block pl-margin-all", title: ""},
@@ -32,9 +32,9 @@ forbidden =
 hasaccess =
     title: {classname: "pl-text-success", title: "You have access"}
     subtitle: {classname: "", title: "Click below to try demo"}
-    info: {classname: "", title: "If you still cannot log in or have troubles send an email"}
+    info: {classname: "pl-text-muted", title: "Having troubles to log in? Send an email"}
     controls: [
-        {type: "a", classname: "pl-button pl-button-primary", action: "/resolve", title: "Try demo"},
+        {type: "a", classname: "pl-button pl-button-primary", action: "/demo", title: "Try demo"},
         {type: "div", classname: "pl-display-block pl-margin-all", title: ""},
         {type: "a", classname: "pl-button pl-button-link pl-link-muted", action: "mailto:ivan.sadikov@lincolnuni.ac.nz", title: "Send email"}
     ]

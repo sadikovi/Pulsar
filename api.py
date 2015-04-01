@@ -73,8 +73,9 @@ class AccountInfo(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         if accessGranted(user):
-            msg = "Access is already granted"
-            result = service._generateSuccessMessage([msg], None)
+            msg = "Access is granted"
+            obj = {"username": user.nickname()}
+            result = service._generateSuccessMessage([msg], obj)
         elif user and not service.isUserInEmaillist(user.email()):
             # send email to me
             mail.send_mail(

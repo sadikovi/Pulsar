@@ -15,9 +15,7 @@ handlers:
   upload: static/mainpage.html
 
 - url: /demo
-  static_files: static/demo.html
-  upload: static/demo.html
-  login: required
+  script: demo.application
 
 - url: /signin
   static_files: static/signin.html
@@ -25,9 +23,6 @@ handlers:
 
 - url: /(login|logout)$
   script: auth.application
-
-- url: /resolve
-  script: resolve.application
 
 # resources handlers
 - url: /stylesheets/(.*\.(less|css))$

@@ -1,0 +1,11 @@
+{
+    "id": "miller_planet",
+    "name": "Miller planet",
+    "desc": "Dataset about things on Miller planet",
+    "data": {
+        "clusters": { "file": "clusters", "type": "json" },
+        "elements": { "file": "elements", "type": "json" },
+        "pulses":   { "file": "pulses", "type": "json" }
+    },
+    "discover": false
+}

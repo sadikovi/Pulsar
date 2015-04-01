@@ -1,0 +1,11 @@
+{
+    "id": "edmund_planet",
+    "name": "Edmund planet",
+    "desc": "Dataset about Edmund planet. Very close to Earth. Some people think that it is our new Home",
+    "data": {
+        "clusters": { "file": "clusters", "type": "json" },
+        "elements": { "file": "elements", "type": "json" },
+        "pulses":   { "file": "pulses", "type": "json" }
+    },
+    "discover": false
+}
