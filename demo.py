@@ -45,7 +45,7 @@ class DemoQuery(webapp2.RequestHandler):
                 'logouturl': '/logout',
                 'datasetsurl': '/demo',
                 'datasetId': dataset._id if dataset is not None else '',
-                'datasetName': dataset._name if dataset is not None else ''
+                'datasetName': dataset._name if dataset is not None else 'fire'
             }
             # load template
             path = os.path.join(os.path.dirname(__file__), 'static', 'demoquery.html')

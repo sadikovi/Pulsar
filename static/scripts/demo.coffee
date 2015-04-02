@@ -13,10 +13,10 @@ contcenter = document.getElementById content_id
 return "Content center is not found" unless contcenter
 
 # create notification for loading
-load = @notificationcenter.show @notificationcenter.type.Info, "Loading datasets...", null, true, null, null, notcenter
+load = @notificationcenter.show @notificationcenter.type.Info, "Loading datasets...", -1, true, null, null, notcenter
 
 success = (code, result) ->
-    @notificationcenter.change load, @notificationcenter.type.Success, "Datasets are loaded", 3000, false, null, null
+    @notificationcenter.change load, @notificationcenter.type.Success, "Datasets are loaded", null, false, null, null
     # convert into json
     datasets = (JSON.parse result).data
     # create map
@@ -62,7 +62,7 @@ success = (code, result) ->
 error = (code, result) ->
     result = JSON.parse result
     msg = if result.messages.length > 0 then result.messages[0] else "Something went wrong"
-    @notificationcenter.change load, @notificationcenter.type.Error, msg, 3000, false, null, null
+    @notificationcenter.change load, @notificationcenter.type.Error, msg, null, false, null, null
 
 
 url = "/api/datasets"
