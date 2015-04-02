@@ -24,4 +24,4 @@ class Loader
         xmlhttp.send(payload);
 
 # set global loader
-@loader = @loader ? new Loader
+@loader ?= new Loader

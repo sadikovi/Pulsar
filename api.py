@@ -2,11 +2,11 @@
 
 # import libs
 from google.appengine.api import users, mail
-import analytics.service as service
 import webapp2
 import json
 # import classes
 import projectpaths
+import analytics.service as service
 
 
 def accessGranted(user):

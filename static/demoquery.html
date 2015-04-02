@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pulsar Demo</title>
+    <title>Pulsar Query</title>
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/font.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/base.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/grid.less">
@@ -16,6 +16,7 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/2.3.1/less.min.js"></script>
 </head>
 <body>
+    <input type="hidden" id="cbr-dataset-id" value="{{ datasetId }}"/>
     <div class="pl-grid">
         <div class="pl-width-1-1">
             <div class="pl-container pl-container-center">
@@ -25,10 +26,12 @@
             <div class="pl-container pl-container-center pl-margin-small-top">
                 <div class="pl-display-inline-block" id="cbr-header-login">
                     <span id="cbr-header-username">{{ username }}</span>
-                    <span class="pl-text-muted">selecting a dataset</span>
+                    <span class="pl-text-muted">playing with <b>{{ datasetName }}</b></span>
                 </div>
                 <div class="pl-display-inline-block pl-margin-left pl-margin-right"></div>
                 <div class="pl-display-inline-block" id="cbr-header-controls">
+                    <a class="pl-button-link pl-margin-small-left pl-margin-small-right" href="{{ datasetsurl }}">Datasets</a>
+                    <div class="pl-display-inline-block pl-text-muted">|</div>
                     <a class="pl-button-link pl-margin-small-left pl-margin-small-right" href="{{ logouturl }}">Logout</a>
                 </div>
                 <div class="pl-display-inline-block pl-margin-left pl-margin-right"></div>
@@ -47,6 +50,6 @@
     <script type="text/coffeescript" src="/scripts/loader.coffee"></script>
     <script type="text/coffeescript" src="/scripts/mapper.coffee"></script>
     <script type="text/coffeescript" src="/scripts/notcenter.coffee"></script>
-    <script type="text/coffeescript" src="/scripts/demo.coffee"></script>
+    <script type="text/coffeescript" src="/scripts/demoquery.coffee"></script>
 </body>
 </html>

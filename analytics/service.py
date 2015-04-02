@@ -96,6 +96,23 @@ def getAllDatasets():
     except BaseException as e:
         return _generateErrorMessage([str(e)])
 
+# [Public]
+# [Restrictions]
+def searchDataset(datasetId, dmngr=None):
+    """
+        [!] Restricted use.
+        Returns dataset object for dataset id. Does not return generated
+        message.
+
+        Returns:
+            Dataset: dataset object
+    """
+    try:
+        dmngr = dmngr or _datamanager
+        return dmngr.getDataset(datasetId)
+    except BaseException as e:
+        return None
+
 
 # [Public]
 def requestData(datasetId, query, dmngr=None, issorted=False, iswarnings=True):

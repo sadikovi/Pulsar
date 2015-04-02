@@ -82,11 +82,14 @@ var NotificationCenter = (function() {
         // get type object for specified type
         getTypeObject: function(type) {
             if (NotificationType.Success == type) {
-                return { nclass: "notification-success", laclass: "loading-indicator-success" };
+                return { nclass: "notification-success",
+                laclass: "loading-indicator-success" };
             } else if (NotificationType.Warning == type) {
-                return { nclass: "notification-warning", laclass: "loading-indicator-warning" };
+                return { nclass: "notification-warning",
+                laclass: "loading-indicator-warning" };
             } else if (NotificationType.Error == type) {
-                return { nclass: "notification-error", laclass: "loading-indicator-error" };
+                return { nclass: "notification-error",
+                laclass: "loading-indicator-error" };
             } else {
                 return { nclass: "", laclass: "" };
             }

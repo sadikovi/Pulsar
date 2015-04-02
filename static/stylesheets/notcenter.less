@@ -26,7 +26,7 @@
 @notcenter-color: #aaa;
 
 // loading indicator
-@notcenter-loading-indicator-width: 16px;
+@notcenter-loading-indicator-width: 14px;
 @notcenter-loading-indicator-border: 3px solid;
 @notcenter-loading-indicator-mask-width: 10px;
 
@@ -125,18 +125,7 @@ div.notification {
 /* internal styles */
 .notification-content-cell {
     display: @notcenter-display-inline-block;
-    margin: 0 2px;
-}
-/* for the left part (loading indicator) */
-.notification-loading {
-    display: @notcenter-display-inline-block;
-    margin-right: 4px;
-}
-
-/* for the right part (controls) */
-.notification-control-panel {
-    display: @notcenter-display-inline-block;
-    margin-left: 4px;
+    margin: 0 4px;
 }
 
 a.notification-control {

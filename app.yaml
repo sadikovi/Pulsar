@@ -17,6 +17,9 @@ handlers:
 - url: /demo
   script: demo.application
 
+- url: /demo/([\w-]+)$
+  script: demo.application
+
 - url: /signin
   static_files: static/signin.html
   upload: static/signin.html
