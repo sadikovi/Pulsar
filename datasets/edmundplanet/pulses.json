@@ -1,6 +1,6 @@
 [
     {"id": "1", "name": "price", "desc": "price", "sample": 1.0, "priority": -1, "dynamic": true},
     {"id": "2", "name": "count", "desc": "count", "sample": 1, "priority": 1, "dynamic": true},
-    {"id": "3", "name": "order", "desc": "order", "sample": 1, "priority": 1, "dynamic": true},
+    {"id": "3", "name": "order", "desc": "order", "sample": 1, "priority": 1, "dynamic": false},
     {"id": "4", "name": "dir", "desc": "dir", "sample": "str"}
 ]

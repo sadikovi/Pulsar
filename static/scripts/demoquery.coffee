@@ -28,6 +28,18 @@ success = (code, result) ->
         children: []
     # collect elements
     for element in result.data.elements
+        #features
+        features = []
+        for feature in element.features
+            f =
+                type: "div"
+                cls: "pl-display-inline-block pl-margin-small-left pl-margin-small-right"
+                title: "#{feature.name}: #{feature.value}"
+            features.push f
+        # cluster attributes
+        clustername = if element.cluster then element.cluster.name else "Undefined"
+        clusterid = if element.cluster then element.cluster.id else ""
+        # element
         element =
             type: "div"
             cls: "pl-width-1-1"
@@ -36,14 +48,29 @@ success = (code, result) ->
                 id: "#{element.id}"
                 cls: "pl-panel pl-panel-box pl-margin-small-all"
                 children: [
-                    title =
+                    header =
                         type: "div"
                         cls: "pl-panel-title"
-                        title: "#{element.name}"
+                        children: [
+                            rank =
+                                type: "span"
+                                cls: "pl-margin-small-left pl-margin-small-right"
+                                title: "rank: #{element.rank.name}"
+                            title =
+                                type: "span"
+                                cls: "pl-margin-small-left pl-margin-small-right"
+                                title: "#{element.name}"
+                            cluster =
+                                type: "a"
+                                id: "#{clusterid}"
+                                cls: "pl-margin-small-left pl-margin-small-right"
+                                title: "#{clustername}"
+                        ]
                     paragraph =
                         type: "div"
                         cls: "pl-text-muted"
                         title: "#{element.desc}"
+                    features = features
                 ]
         map.children.push element
     # parse map

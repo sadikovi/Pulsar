@@ -17,7 +17,7 @@ from analytics.core.attribute.feature import Feature
 
 
 # unknown cluster for elements with parent = None
-UNKNOWN_CLUSTER = Cluster(None, "Unknown Cluster", "Unknown Cluster")
+UNKNOWN_CLUSTER = Cluster(None, "Unknown", "Unknown Cluster")
 
 
 class ProcessBlock(object):
