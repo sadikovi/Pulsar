@@ -142,6 +142,8 @@ def requestData(datasetId, query, dmngr=None, issorted=False, iswarnings=True):
             jsonobj = _generateSuccessMessage(messages, obj)
     except ex.AnalyticsBaseException as e:
         jsonobj = _generateErrorMessage([e._errmsg])
+    except BaseException as be:
+        jsonobj = _generateErrorMessage([str(be)])
     return jsonobj
 
 
