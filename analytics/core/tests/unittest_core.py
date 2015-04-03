@@ -355,7 +355,7 @@ class Element_TestSequence(unittest.TestCase):
                 continue
             el = Element(None, self._teststr, self._teststr, clr, rnk)
             obj = el.getJSON()
-            self.assertEqual(obj["cluster"], None if clr is None else clr.id())
+            self.assertEqual(obj["cluster"], None if clr is None else {"id":clr.id(),"name":clr.name()})
             self.assertEqual(obj["rank"], None if rnk is None else rnk.getJSON())
             self.assertEqual(obj["features"], [])
 
