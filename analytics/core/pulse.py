@@ -143,6 +143,8 @@ class StaticPulse(Pulse):
         """
         obj = super(StaticPulse, self).getJSON()
         obj["isstatic"] = self.static()
+        obj["dynamic"] = False
+        obj["store"] = self.store()
         return obj
 
 
@@ -243,4 +245,6 @@ class DynamicPulse(Pulse):
         """
         obj = super(DynamicPulse, self).getJSON()
         obj["isstatic"] = self.static()
+        obj["dynamic"] = True
+        obj["store"] = self.store() if self.static() else None
         return obj
