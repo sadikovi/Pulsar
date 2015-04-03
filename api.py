@@ -53,8 +53,8 @@ class Query(webapp2.RequestHandler):
         if accessGranted(user):
             query = str(self.request.get('q'))
             datasetId = str(self.request.get('d'))
-            sort = boolean(self.request.get('s'))
-            warn = boolean(self.request.get('w'))
+            sort = boolean(self.request.get('s') or False)
+            warn = boolean(self.request.get('w') or True)
             result = service.requestData(
                 datasetId,
                 query,
