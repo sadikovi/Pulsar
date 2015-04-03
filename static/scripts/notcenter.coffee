@@ -31,7 +31,6 @@ class Util
 
     removeClass: (elem, cls) ->
         b = (x for x in elem.className.split(' ') when x != cls)
-        b.push cls
         elem.className = b.join ' '
 
     hasClass: (elem, cls) ->
@@ -70,25 +69,26 @@ class NotificationCenter
 
     change: (notification, type, msg, time, isLoader, okhandler, cancelhandler) ->
         return false unless notification
-        typeobj = @_getType type
+        # remove previous class
+        if notification.type and notification.type.cls
+            @util.removeClass notification.main.element, notification.type.cls
         # type of notification
+        typeobj = @_getType type
         @util.addClass notification.main.element, typeobj.cls if typeobj.cls
+        # reassign notification type
+        notification.type = typeobj
         # text node message
         notification.textnode.element.innerHTML = msg if msg
         # loading indicator
         notification.loadnode.element.innerHTML = ''
         @_createLoadingIndicator notification.loadnode.element, typeobj.licls if isLoader
         # control panel
+        # clear actions
+        @_removeActionHandlers notification
+        @_removeControlPanel notification
         if okhandler or cancelhandler
-            # clear actions
-            @_removeActionHandlers notification
             # create control panel
-            t = @_createControlPanel notification.controlnode.element, okhandler, cancelhandler
-            notification.controlnode.panel.element = t.panel
-            notification.controlnode.ok.element = t.ok
-            notification.controlnode.cancel.element = t.cancel
-            # set handlers
-            @_setControlPanelHanders notification, okhandler, cancelhandler
+            t = @_createControlPanel notification, okhandler, cancelhandler
         # set notification timeout
         @_setHideTimeout(notification, time)
 
@@ -97,6 +97,7 @@ class NotificationCenter
         # structure of notification
         notification =
             parent: parent
+            type: null
             main:
                 element: null
             loadnode:
@@ -105,9 +106,6 @@ class NotificationCenter
                 element: null
             controlnode:
                 element: null
-                panel:
-                    element: null
-                    handler: null
                 ok:
                     element: null
                     handler: null
@@ -191,17 +189,20 @@ class NotificationCenter
         @util.addClass maskcircle, typecls if typecls
         return main
 
-    _createControlPanel: (parent, isok, iscancel) ->
-        return null unless isok or iscancel
+    _createControlPanel: (notification, okhandler, cancelhandler) ->
+        return null unless okhandler or cancelhandler
+        # get parent
+        parent = notification.controlnode.element
         # build control panel
         [ok, cancel] = [null, null]
-        if isok
+        if okhandler
             ok = @util.createElement 'a', null, @classes.notification_control, @title_ok, parent
-        if iscancel
+        if cancelhandler
             cancel = @util.createElement 'a', null, @classes.notification_control, @title_cancel, parent
-        return group =
-            ok: ok
-            cancel: cancel
+        notification.controlnode.ok.element = ok
+        notification.controlnode.cancel.element = cancel
+        # set handlers
+        @_setControlPanelHanders notification, okhandler, cancelhandler
 
     _setControlPanelHanders: (notification, okhandler, cancelhandler) ->
         return null unless okhandler or cancelhandler
@@ -223,6 +224,16 @@ class NotificationCenter
         # remove event listeners
         @util.removeEventListener ok.element, 'click', ok.handler if ok.element
         @util.removeEventListener cancel.element, 'click', cancel.handler if cancel.element
+
+    _removeControlPanel: (notification) ->
+        return false unless notification
+        notification.controlnode.element.innerHTML = ""
+        # ok
+        notification.controlnode.ok.element = null
+        notification.controlnode.ok.handler = null
+        # cancel
+        notification.controlnode.cancel.element = null
+        notification.controlnode.cancel.handler = null
 
     _setHideTimeout: (notification, time) ->
         clearTimeout notification.timeout if notification.timeout

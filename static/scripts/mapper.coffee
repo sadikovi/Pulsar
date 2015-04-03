@@ -13,6 +13,7 @@ class Mapper
         mprs =
             type: 'type'
             cls: 'cls'
+            id: 'id'
             title: 'title'
             href: 'href'
             children: 'children'
@@ -22,9 +23,10 @@ class Mapper
         if mprs.type of map
             # create object and add to parent
             c = @.createElement map[mprs.type], parent
-            c.className = map[mprs.cls] unless mprs.cls not of map
-            c.innerHTML = map[mprs.title] unless mprs.title not of map
-            c.href = map[mprs.href] unless mprs.href not of map
+            c.id = map[mprs.id] if mprs.id of map
+            c.className = map[mprs.cls] if mprs.cls of map
+            c.innerHTML = map[mprs.title] if mprs.title of map
+            c.href = map[mprs.href] if mprs.href of map
             @parseMapForParent map[mprs.children], c if mprs.children of map
         else
             @parseMapForParent item, parent for item in map
