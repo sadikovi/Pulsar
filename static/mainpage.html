@@ -6,21 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pulsar</title>
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/font.less">
-    <link rel="stylesheet/less" type="text/css" href="/stylesheets/base.less">
-    <link rel="stylesheet/less" type="text/css" href="/stylesheets/grid.less">
-    <link rel="stylesheet/less" type="text/css" href="/stylesheets/panel.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/button.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/text.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/utility.less">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/semantic.min.css">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/2.3.1/less.min.js"></script>
 </head>
 <body>
-    <div class="pl-grid">
-        <div class="pl-width-1-1">
+    <div class="ui grid">
+        <div class="ui ten wide centered column">
             <div class="pl-container pl-container-center pl-margin-massive-top">
                 <div class="pl-text-center">
-                    <h1 class="pl-text-center">Pulsar <small class="pl-text-muted">1.1</small></h1>
-                    <div class="pl-text-muted">Ranking search</div>
+                    <h1 class="pl-text-thin pl-text-center">{{main_name}} <small class="pl-text-muted">{{main_version}}</small></h1>
+                    <div class="pl-text-muted">{{main_description}}</div>
                 </div>
             </div>
             <div class="pl-container pl-container-center pl-margin-large-top">
@@ -32,9 +30,13 @@
             </div>
             <div class="pl-container pl-container-center pl-margin-large-top">
                 <div class="pl-text-center">
-                    <a class="pl-margin-small-all" href="https://github.com/sadikovi/">Github</a>
-                    <a class="pl-margin-small-all" href="https://www.facebook.com/ivan.sadikov">Facebook</a>
-                    <a class="pl-margin-small-all" href="mailto:ivan.sadikov@lincolnuni.ac.nz">Email</a>
+                    <div class="ui breadcrumb">
+                        <a class="section" href="{{main_github_url}}">Github</a>
+                        <div class="ui divider">|</div>
+                        <a class="section" href="{{main_facebook_url}}">Facebook</a>
+                        <div class="ui divider">|</div>
+                        <a class="section" href="mailto:{{main_email}}">Email</a>
+                    </div>
                 </div>
             </div>
             <div class="pl-container pl-container-center pl-margin-top">

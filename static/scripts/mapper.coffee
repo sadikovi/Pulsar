@@ -16,6 +16,10 @@ class Mapper
             id: 'id'
             title: 'title'
             href: 'href'
+            src: 'src'
+            inputvalue: 'inputvalue'
+            inputtype: 'inputtype'
+            optionselected: 'optionselected'
             children: 'children'
         # return of something is wrong
         return false unless map and parent
@@ -27,6 +31,11 @@ class Mapper
             c.className = map[mprs.cls] if mprs.cls of map
             c.innerHTML = map[mprs.title] if mprs.title of map
             c.href = map[mprs.href] if mprs.href of map
+            c.src = map[mprs.src] if mprs.src of map
+            # input parameters
+            c.value = map[mprs.inputvalue] if mprs.inputvalue of map
+            c.type = map[mprs.inputtype] if mprs.inputtype of map
+            c.selected = map[mprs.optionselected] if mprs.optionselected of map
             @parseMapForParent map[mprs.children], c if mprs.children of map
         else
             @parseMapForParent item, parent for item in map

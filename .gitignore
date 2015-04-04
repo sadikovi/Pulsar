@@ -2,3 +2,4 @@
 analytics/logs/*
 .DS_Store
 appengine
+semantic.min.css

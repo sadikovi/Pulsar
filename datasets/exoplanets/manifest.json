@@ -1,0 +1,11 @@
+{
+    "id": "exoplanets",
+    "name": "Exoplanets",
+    "desc": "The discovery of exoplanets has intensified interest in the search for extraterrestrial life. The study of planetary habitability also considers a wide range of other factors in determining the suitability of a planet for hosting life.",
+    "data": {
+        "clusters": { "file": "clusters", "type": "json" },
+        "elements": { "file": "elements", "type": "json" },
+        "pulses":   { "file": "pulses", "type": "json" }
+    },
+    "discover": false
+}

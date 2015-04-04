@@ -6,6 +6,10 @@ return false unless container
 notcenter_id = "cbr-notification-content"
 notcenter = document.getElementById notcenter_id
 return false unless notcenter
+# menu
+menupanel_id = "cbr-menu"
+menupanel = document.getElementById menupanel_id
+return false unless menupanel
 # extract dataset id
 dataset_holder = document.getElementById "cbr-dataset-id"
 # store dataset
@@ -75,6 +79,54 @@ success = (code, result) ->
         map.children.push element
     # parse map
     @mapper.parseMapForParent map, container
+
+    # build pulses
+    map = []
+    for pulse in result.data.pulses
+        element = null
+        if pulse.isstatic
+            element =
+                type: "span"
+                cls: "pl-margin-left pl-margin-right"
+                title: "#{pulse.name}"
+                children:
+                    type: "select"
+                    cls: "pl-margin-small-left"
+                    children: []
+            # all option
+            alloption =
+                type: "option"
+                title: "All"
+            if not pulse.default
+                alloption.selected = true
+            element.children.children.push alloption
+            # rest of the values
+            for value in pulse.store
+                valueelement =
+                    type: "option"
+                    title: "#{value}"
+                if value == pulse.default
+                    valueelement.selected = true
+                element.children.children.push valueelement
+        else
+            element =
+                type: "span"
+                cls: "pl-margin-left pl-margin-right"
+                title: "#{pulse.name}"
+                children:
+                    type: "input"
+                    cls: "pl-margin-small-left"
+                    inputtype: "text"
+                    inputvalue: "#{pulse.default}"
+        map.push element
+    # add search button
+    searchbutton =
+        type: "a"
+        cls: "pl-button pl-button-primary"
+        title: "Search"
+    map.push searchbutton
+    # parse map
+    @mapper.parseMapForParent map, menupanel
 
 error = (code, result) ->
     result = JSON.parse result

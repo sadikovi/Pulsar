@@ -23,3 +23,19 @@ class PulseMap(DataItemMap):
         """
         misc.checkInstanceAgainst(element, Pulse, __file__)
         super(PulseMap, self).add(element)
+
+    # [Public]
+    def getJSON(self):
+        """
+            Returns json representation of the map.
+
+            Returns:
+                list<obj>: json object
+        """
+        def cmp(x, y):
+            if x.static() and not y.static():
+                return -1
+            elif not x.static() and y.static():
+                return 1
+            return 0
+        return [x.getJSON() for x in sorted(self._map.values(), cmp)]

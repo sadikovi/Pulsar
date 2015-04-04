@@ -7,12 +7,10 @@ threadsafe: true
 handlers:
 # main webpage handler
 - url: /
-  static_files: static/mainpage.html
-  upload: static/mainpage.html
+  script: main.application
 
 - url: /index\.html
-  static_files: static/mainpage.html
-  upload: static/mainpage.html
+  script: main.application
 
 - url: /demo
   script: demo.application
@@ -28,9 +26,9 @@ handlers:
   script: auth.application
 
 # resources handlers
-- url: /stylesheets/(.*\.(less|css))$
+- url: /stylesheets/(.*\.(less|css|eot|otf|svg|ttf|woff|woff2))$
   static_files: static/stylesheets/\1
-  upload: static/stylesheets/(.*\.(less|css))$
+  upload: static/stylesheets/(.*\.(less|css|eot|otf|svg|ttf|woff|woff2))$
 
 - url: /scripts/(.*\.(js|coffee))$
   static_files: static/scripts/\1

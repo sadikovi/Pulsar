@@ -22,15 +22,6 @@
 @text-danger-color:                             #d9534f;
 @text-contrast-color:                           #fff;
 
-@breakpoint-small:                              480px;
-@breakpoint-medium:                             768px;
-@breakpoint-large:                              960px;
-@breakpoint-xlarge:                             1220px;
-@breakpoint-mini-max:                           (@breakpoint-small - 1);
-@breakpoint-small-max:                          (@breakpoint-medium - 1);
-@breakpoint-medium-max:                         (@breakpoint-large - 1);
-@breakpoint-large-max:                          (@breakpoint-xlarge - 1);
-
 /* ========================================================================
    Component: Text
  ========================================================================== */
@@ -54,6 +45,7 @@
  ========================================================================== */
 
 .pl-text-bold { font-weight: bold; }
+.pl-text-thin { font-weight: 300; }
 
 
 /* Color modifiers
@@ -78,19 +70,6 @@
 .pl-text-top { vertical-align: top !important; }
 .pl-text-middle { vertical-align: middle !important; }
 .pl-text-bottom { vertical-align: bottom !important; }
-
-/* Only tablets portrait and smaller */
-@media (max-width: @breakpoint-medium-max) {
-    .pl-text-center-medium { text-align: center !important; }
-    .pl-text-left-medium { text-align: left !important; }
-}
-
-/* Phone landscape and smaller */
-@media (max-width: @breakpoint-small-max) {
-    .pl-text-center-small { text-align: center !important; }
-    .pl-text-left-small { text-align: left !important; }
-}
-
 
 /* Wrap modifiers
  ========================================================================== */
@@ -122,11 +101,3 @@
     -moz-hyphens: auto;
     hyphens: auto;
 }
-
-
-// Hooks
-// ========================================================================
-
-.hook-text-misc;
-
-.hook-text-misc() {}

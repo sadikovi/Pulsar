@@ -6,40 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pulsar Demo</title>
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/font.less">
-    <link rel="stylesheet/less" type="text/css" href="/stylesheets/base.less">
-    <link rel="stylesheet/less" type="text/css" href="/stylesheets/grid.less">
-    <link rel="stylesheet/less" type="text/css" href="/stylesheets/panel.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/button.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/text.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/utility.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/notcenter.less">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/semantic.min.css">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/2.3.1/less.min.js"></script>
 </head>
 <body>
-    <div class="pl-grid">
-        <div class="pl-width-1-1">
+    <div class="ui grid">
+        <div class="ui ten wide centered column">
             <div class="pl-container pl-container-center">
                 <div class="pl-text-center notification-center" id="cbr-notification-content">
                 </div>
             </div>
-            <div class="pl-container pl-container-center pl-margin-small-top">
-                <div class="pl-display-inline-block" id="cbr-header-login">
-                    <span id="cbr-header-username">{{ username }}</span>
-                    <span class="pl-text-muted">selecting a dataset</span>
-                </div>
-                <div class="pl-display-inline-block pl-margin-left pl-margin-right"></div>
-                <div class="pl-display-inline-block" id="cbr-header-controls">
-                    <a class="pl-button-link pl-margin-small-left pl-margin-small-right" href="{{ logouturl }}">Logout</a>
-                </div>
-                <div class="pl-display-inline-block pl-margin-left pl-margin-right"></div>
-                <div class="pl-display-inline-block" id="cbr-header-controls">
-                    <a class="pl-link-muted" href="/">{{ system }}</a>
+            <div class="ui segment pl-margin-small-top">
+                <div class="ui breadcrumb pl-margin-left">
+                    <div class="ui section pl-margin-right">
+                        <div class="ui teal label">{{ username }}</div>
+                        <span class="pl-text-muted">selecting a dataset</span>
+                    </div>
+                    <a class="ui section" href="{{ logouturl }}">Logout</a>
+                    <div class="ui divider">|</div>
+                    <a class="ui section" href="/">{{ system }}</a>
                 </div>
             </div>
-            <div class="pl-container pl-container-center">
-                <hr>
-            </div>
-            <div class="pl-container pl-container-center" id="cbr-content-main">
+            <div class="ui segment">
+                <div class="ui divided items" id="cbr-content-main">
+                </div>
             </div>
         </div>
     </div>
