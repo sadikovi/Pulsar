@@ -4,3 +4,4 @@ analytics/logs/*
 appengine
 static/stylesheets/semantic.min.css
 static/stylesheets/themes/*
+*.log
