@@ -18,6 +18,20 @@ dataset = dataset_holder.value
 # create notification for loading
 load = @notificationcenter.show @notificationcenter.type.Info, "Loading datasets...", -1, true, null, null, notcenter
 
+rankByName = (rankname) ->
+    # top ranks
+    return "rank-o" if rankname == "O"
+    return "rank-b" if rankname == "B"
+    return "rank-a" if rankname == "A"
+    # medium ranks
+    return "rank-f" if rankname == "F"
+    return "rank-g" if rankname == "G"
+    return "rank-k" if rankname == "K"
+    # low ranks
+    return "rank-m" if rankname == "M"
+    return "rank-l" if rankname == "L"
+    return "rank-t" if rankname == "T"
+
 success = (code, result) ->
     result = JSON.parse result
     msg = "Everything is loaded"
@@ -28,54 +42,65 @@ success = (code, result) ->
     # build template
     map =
         type: "div"
-        cls: "pl-grid"
-        children: []
+        cls: "ui comments"
+        children: [
+            header =
+                type: "h3"
+                cls: "ui dividing header"
+                title: "Elements"
+        ]
     # collect elements
     for element in result.data.elements
         #features
         features = []
         for feature in element.features
-            f =
-                type: "div"
-                cls: "pl-display-inline-block pl-margin-small-left pl-margin-small-right"
+            feat =
+                type: "a"
+                cls: "reply"
                 title: "#{feature.name}: #{feature.value}"
-            features.push f
+            features.push feat
         # cluster attributes
         clustername = if element.cluster then element.cluster.name else "Undefined"
         clusterid = if element.cluster then element.cluster.id else ""
+        rankcolor = rankByName element.rank.name
         # element
         element =
             type: "div"
-            cls: "pl-width-1-1"
-            children:
-                type: "div"
-                id: "#{element.id}"
-                cls: "pl-panel pl-panel-box pl-margin-small-all"
-                children: [
-                    header =
+            cls: "comment"
+            children: [
+                rank =
+                    type: "a"
+                    cls: "avatar"
+                    children:
                         type: "div"
-                        cls: "pl-panel-title"
-                        children: [
-                            rank =
-                                type: "span"
-                                cls: "pl-margin-small-left pl-margin-small-right"
-                                title: "rank: #{element.rank.name}"
-                            title =
-                                type: "span"
-                                cls: "pl-margin-small-left pl-margin-small-right"
-                                title: "#{element.name}"
-                            cluster =
+                        cls: "circular ui icon button #{rankcolor}"
+                data =
+                    type: "div"
+                    cls: "content"
+                    children: [
+                        elementname =
+                            type: "a"
+                            id: "#{element.id}"
+                            cls: "author"
+                            title: "#{element.name}"
+                        cluster =
+                            type: "div"
+                            cls: "metadata"
+                            children:
                                 type: "a"
+                                cls: "reply"
                                 id: "#{clusterid}"
-                                cls: "pl-margin-small-left pl-margin-small-right"
-                                title: "#{clustername}"
-                        ]
-                    paragraph =
-                        type: "div"
-                        cls: "pl-text-muted"
-                        title: "#{element.desc}"
-                    features = features
-                ]
+                                title: "Cluster: #{clustername}"
+                        desc =
+                            type: "div"
+                            cls: "text"
+                            title: "#{element.desc}"
+                        featurespanel =
+                            type: "div"
+                            cls: "actions"
+                            children: features
+                    ]
+            ]
         map.children.push element
     # parse map
     @mapper.parseMapForParent map, container
@@ -85,21 +110,14 @@ success = (code, result) ->
     for pulse in result.data.pulses
         element = null
         if pulse.isstatic
-            element =
-                type: "span"
-                cls: "pl-margin-left pl-margin-right"
-                title: "#{pulse.name}"
-                children:
-                    type: "select"
-                    cls: "pl-margin-small-left"
-                    children: []
+            options = []
             # all option
             alloption =
                 type: "option"
                 title: "All"
             if not pulse.default
                 alloption.selected = true
-            element.children.children.push alloption
+            options.push alloption
             # rest of the values
             for value in pulse.store
                 valueelement =
@@ -107,17 +125,38 @@ success = (code, result) ->
                     title: "#{value}"
                 if value == pulse.default
                     valueelement.selected = true
-                element.children.children.push valueelement
+                options.push valueelement
+            # element
+            element =
+                type: "div"
+                cls: "pl-margin-top pl-margin-bottom"
+                children: [
+                    label =
+                        type: "div"
+                        cls: "ui label"
+                        title: "#{pulse.name}"
+                    select =
+                        type: "select"
+                        cls: "ui small dropdown"
+                        children: options
+                ]
         else
             element =
-                type: "span"
-                cls: "pl-margin-left pl-margin-right"
-                title: "#{pulse.name}"
+                type: "div"
+                cls: "pl-margin-top pl-margin-bottom"
                 children:
-                    type: "input"
-                    cls: "pl-margin-small-left"
-                    inputtype: "text"
-                    inputvalue: "#{pulse.default}"
+                    type: "div"
+                    cls: "ui labeled small input"
+                    children: [
+                        label =
+                            type: "div"
+                            cls: "ui blue label"
+                            title: "#{pulse.name}"
+                        input =
+                            type: "input"
+                            inputtype: "text"
+                            inputvalue: "#{pulse.default}"
+                    ]
         map.push element
     # add search button
     searchbutton =

@@ -10,6 +10,7 @@
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/text.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/utility.less">
     <link rel="stylesheet/less" type="text/css" href="/stylesheets/notcenter.less">
+    <link rel="stylesheet/less" type="text/css" href="/stylesheets/rank.less">
     <link rel="stylesheet" type="text/css" href="/stylesheets/semantic.min.css">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/2.3.1/less.min.js"></script>
 </head>
@@ -34,11 +35,18 @@
                     <a class="ui section" href="/">{{ system }}</a>
                 </div>
             </div>
-            <div class="ui segment">
-                <div id="cbr-menu"></div>
-            </div>
-            <div class="ui segment">
-                <div class="ui divided items" id="cbr-content-main"></div>
+        </div>
+        <div class="ui ten wide centered column">
+            <div class="ui grid">
+                <div class="ui twelve wide column">
+                    <div class="ui segment">
+                        <div class="ui divided items" id="cbr-content-main"></div>
+                        <div class="ui right rail">
+                            <div class="ui segment" id="cbr-menu">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
