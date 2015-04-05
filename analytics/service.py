@@ -21,6 +21,8 @@ limitations under the License.
 from types import StringType, ListType
 import os
 import warnings
+import sys
+import traceback
 # import classes
 import analytics.exceptions.exceptions as ex
 import analytics.utils.misc as misc
@@ -36,7 +38,11 @@ from analytics.core.map.clustermap import ClusterMap
 from analytics.core.map.elementmap import ElementMap
 from analytics.core.map.pulsemap import PulseMap
 from analytics.algorithms.algorithmsmap import AlgorithmsMap
+import analytics.log as log
 
+
+# if it runs tests - set True
+IS_TEST = False
 
 # Authorised email list
 #[Private]
@@ -94,6 +100,9 @@ def getAllDatasets():
         obj = [x.getJSON() for x in searchDatasets()]
         return _generateSuccessMessage([], obj)
     except BaseException as e:
+        # log error
+        _type, _value, _trace = sys.exc_info()
+        log.logger(IS_TEST).error(traceback.format_exception(_type, _value, _trace))
         return _generateErrorMessage([str(e)])
 
 # [Public]
@@ -111,6 +120,9 @@ def searchDataset(datasetId, dmngr=None):
         dmngr = dmngr or _datamanager
         return dmngr.getDataset(datasetId)
     except BaseException as e:
+        # log error
+        _type, _value, _trace = sys.exc_info()
+        log.logger(IS_TEST).error(traceback.format_exception(_type, _value, _trace))
         return None
 
 
@@ -140,10 +152,19 @@ def requestData(datasetId, query, dmngr=None, issorted=False, iswarnings=True):
             messages = [str(wm.message) for wm in w] if iswarnings else []
             # prepare json object
             jsonobj = _generateSuccessMessage(messages, obj)
+            # log warnings
+            for wm in w:
+                log.logger(IS_TEST).warn(wm.message)
     except ex.AnalyticsBaseException as e:
         jsonobj = _generateErrorMessage([e._errmsg])
+        # log error
+        _type, _value, _trace = sys.exc_info()
+        log.logger(IS_TEST).error(traceback.format_exception(_type, _value, _trace))
     except BaseException as be:
         jsonobj = _generateErrorMessage([str(be)])
+        # log error
+        _type, _value, _trace = sys.exc_info()
+        log.logger(IS_TEST).error(traceback.format_exception(_type, _value, _trace))
     return jsonobj
 
 
@@ -278,7 +299,8 @@ def _generateSuccessMessage(messages, dataobj):
         Returns:
             dict<str, obj>: json representation of success message
     """
-    misc.checkTypeAgainst(type(messages), ListType, __file__)
+    if type(messages) is not ListType:
+        messages = [messages]
     # build global object
     obj = {
         "status": "success",
@@ -301,7 +323,8 @@ def _generateErrorMessage(messages, code=400):
         Returns:
             dict<str, obj>: json object with error message
     """
-    misc.checkTypeAgainst(type(messages), ListType, __file__)
+    if type(messages) is not ListType:
+        messages = [messages]
     # build global error object
     obj = {
         "code": int(code),

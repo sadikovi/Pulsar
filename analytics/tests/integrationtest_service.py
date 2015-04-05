@@ -15,11 +15,18 @@ from analytics.datamanager.datamanager import DataManager
 
 class IntegrationTestSequence(unittest.TestCase):
     def setUp(self):
+        # run test mode
+        service.IS_TEST = True
+
         filepath = os.path.dirname(os.path.realpath(__file__))
         self.integrationpath = os.path.join(filepath, "datasets")
         self.datamanager = DataManager()
         self.datamanager.loadDatasets(self.integrationpath)
         self.datasets = self.datamanager._datasets
+
+    def tearDown(self):
+        # turn off test mode
+        service.IS_TEST = False
 
     def test_service_default(self):
         query = ""
